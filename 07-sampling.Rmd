@@ -46,6 +46,7 @@ If needed, read Section \@ref(packages) for information on how to install and lo
 ```{r message=FALSE}
 library(tidyverse)
 library(moderndive)
+library(infer)
 ```
 
 Recall that loading the `tidyverse` package loads many commonly used data science packages that are needed here and we have encountered earlier. For details refer to Section \@ref(tidyverse-package).
@@ -895,7 +896,7 @@ comparing_n_table |>
   )
 ```
 
-Remember the key message of this last table: that as the sample size $n$ goes up, the "typical" error of your point estimate will go down, as quantified by the *standard error*. In section \@ref(central-limit-theorem) we introduce a theoretical framework to formalize these ideas, present atheory-based formula to estimate the standard error, and introduce one of the most important results in statistics, the Central Limit Theorem. 
+Remember the key message of this last table: that as the sample size $n$ goes up, the "typical" error of your point estimate will go down, as quantified by the *standard error*. In section \@ref(central-limit-theorem) we introduce a theoretical framework to formalize these ideas, present a theory-based formula to estimate the standard error, and introduce one of the most important results in statistics, the Central Limit Theorem. 
 
 ```{block, type="learncheck", purl=FALSE}
 \vspace{-0.15in}
@@ -953,13 +954,6 @@ simul_X_bar_25 <- bowl |>
 ```
 
 The object `simul_X_bar` contains 10,000 sample proportions, each replicate was obtained following the experiment described earlier, so each sample proportion is a possible value of $\bar X$. 
-
-### Theory-based standard-errors {#theory-se}
-
-
-
-
-
 
 ### The mean and standard deviation of $\bar X$
 
