@@ -64,6 +64,7 @@ In Subsection \@ref(sampling-simulation), the sampling activity was expanded "vi
 Due to sampling variation, the sample proportions were different for different random samples. 
 These sample proportions were used to construct a histogram and visualize the *sampling distribution* of the *sample proportion*. One example could be seen in Figure \@ref(fig:samplingdistribution-virtual-1000).
 The histogram was bell-shaped and centered, precisely, at the population proportion, the proportion of red balls in the entire bowl. 
+
 Simulations were also obtained for different sample sizes, as those shown in Figure \@ref(fig:comparing-sampling-distributions-31) where three histograms of sample proportion were drawn, representing the distribution when using three different sample sizes. This comparison showed that as the sample size increased, the sampling variation in the sample proportions decreased.
 These results were formalized in Section \@ref(central-limit-theorem) and can be summarized in three points. 
 First, the population proportion, the proportion of red balls in the entire bowl, was located precisely at the center of the sampling distribution of the sample proportion. 
