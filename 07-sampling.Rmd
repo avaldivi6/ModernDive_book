@@ -485,7 +485,7 @@ if (!file.exists("rds/virtual_samples_25.rds")) {
   virtual_samples_25 <- read_rds("rds/virtual_samples_25.rds")
 }
 virtual_prop_red_25 <- virtual_samples_25 |>
-  summarize(prop_red = mean(color == "red"), n =n())
+  summarize(prop_red = mean(color == "red"), n = n())
 
 # n = 50
 if (!file.exists("rds/virtual_samples_50.rds")) {
