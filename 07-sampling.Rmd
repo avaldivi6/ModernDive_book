@@ -496,7 +496,7 @@ if (!file.exists("rds/virtual_samples_50.rds")) {
   virtual_samples_50 <- read_rds("rds/virtual_samples_50.rds")
 }
 virtual_prop_red_50 <- virtual_samples_50 |>
-  summarize(prop_red = mean(color == "red"), n =n())
+  summarize(prop_red = mean(color == "red"), n = n())
 
 # n = 100
 if (!file.exists("rds/virtual_samples_100.rds")) {
@@ -507,7 +507,7 @@ if (!file.exists("rds/virtual_samples_100.rds")) {
   virtual_samples_100 <- read_rds("rds/virtual_samples_100.rds")
 }
 virtual_prop_red_100 <- virtual_samples_100 |>
-  summarize(prop_red = mean(color == "red"), n =n())
+  summarize(prop_red = mean(color == "red"), n = n())
 
 virtual_prop <- bind_rows(
   virtual_prop_red_25,
@@ -595,7 +595,7 @@ The first set of terms and notations relate to **populations**:
     - For our sampling activities, for example, we use the virtual `bowl` to determine that the population size, the total number of balls in the bowl, was $N$ = `r num_balls`. 
     - For more general settings, it is not uncommon to deal with situations where the size of the population is in the thousands, millions, or even more. In real-life problems, the size of the population is often unknown and for some theoretical populations, we could deal with an infinite number of outcomes.
 1. A **population parameter** or simply **parameter** is a numerical summary, a number, that represents some characteristic of the population. 
-    - In our sampling activities, the *population proportion*, denote it by the letter $p$, is the *parameter* of interest. In subsection \@ref(population-proportion) we calculated this value, $p$=`r prop_red`. 
+    - In our sampling activities, the *population proportion*, denoted by the letter $p$, is the *parameter* of interest. In subsection \@ref(population-proportion) we calculated this value, $p$=`r prop_red`. 
     - Another relevant parameter is the average (or mean) of the population. We call it *population mean* and use the Greek letter $\mu$ to denote it. Most of our work in the next chapter deals with the population mean. 
     - Interestingly enough, the population proportion can be viewed as a special case of the population mean, as we show in the next subsection.
 
@@ -633,7 +633,7 @@ The second set of terms and notations relate to **samples** and **sampling**:
 
 
 
-### Sampling distributions, the expected value and the standard error {#sampling-definitions}
+### Sampling distributions, the expected value, and the standard error {#sampling-definitions}
 
 In Subsection \@ref(different-shovels) we obtained three histograms. As shown in Figure \@ref(fig:comparing-sampling-distributions) each histogram was constructed using 1000 sample proportions from random samples of sizes $n$ = 25, $n$ = 50, and $n$ = 100, respectively.
 
@@ -699,10 +699,10 @@ We quantify this variation using the standard deviation of sample proportions. R
 
 n <- c(25, 50, 100)
 p <- prop_red
-sd.prop <- round(sqrt(p*(1-p)/n),3)
+sd_prop <- round(sqrt(p * (1 - p) / n), 3)
 comparing_n_table <- 
-  tibble(n,sd.prop) |> 
-  rename(`Sample size used` = n, `Standard deviation of sample proportions (Standard Error)` = sd.prop)
+  tibble(n, sd_prop) |> 
+  rename(`Sample size used` = n, `Standard deviation of sample proportions (Standard Error)` = sd_prop)
 
 comparing_n_table |>
   kable(
@@ -778,7 +778,7 @@ simul_X_bar_25 <- bowl |>
   summarize(prop_red = mean(color == "red"))
 ```
 
-The object `simul_X_bar_25` contains 10,000 sample proportions, each replicate was obtained following the experiment described earlier, so each sample proportion is a possible value of $\bar X$. 
+The object `simul_X_bar_25` contains 10,000 sample proportions; each replicate was obtained following the experiment described earlier, so each sample proportion is a possible value of $\bar X$. 
 
 ### The expected value and standard error of $\bar X$
 
@@ -845,7 +845,7 @@ if (!file.exists("rds/virtual_prop_25.rds")) {
     summarize(prop_red = mean(color == "red"), n=n())
   write_rds(virtual_prop_25, "rds/virtual_prop_25.rds")
 } else {
-  virtual_prop_25<- read_rds("rds/virtual_prop_25.rds")
+  virtual_prop_25 <- read_rds("rds/virtual_prop_25.rds")
 }
 
 # n = 100
@@ -855,7 +855,7 @@ if (!file.exists("rds/virtual_prop_100.rds")) {
     summarize(prop_red = mean(color == "red"), n=n())
   write_rds(virtual_prop_100, "rds/virtual_prop_100.rds")
 } else {
-  virtual_prop_100<- read_rds("rds/virtual_prop_100.rds")
+  virtual_prop_100 <- read_rds("rds/virtual_prop_100.rds")
 }
 
 
@@ -866,7 +866,7 @@ if (!file.exists("rds/virtual_prop_400.rds")) {
     summarize(prop_red = mean(color == "red"), n=n())
   write_rds(virtual_prop_400, "rds/virtual_prop_400.rds")
 } else {
-  virtual_prop_400<- read_rds("rds/virtual_prop_400.rds")
+  virtual_prop_400 <- read_rds("rds/virtual_prop_400.rds")
 }
 
 
@@ -912,7 +912,7 @@ if (!file.exists("rds/virtual_prop_25.rds")) {
     summarize(prop_red = mean(color == "red"), n = n())
   write_rds(virtual_prop_25, "rds/virtual_prop_25.rds")
 } else {
-  virtual_prop_25<- read_rds("rds/virtual_prop_25.rds")
+  virtual_prop_25 <- read_rds("rds/virtual_prop_25.rds")
 }
 
 
@@ -936,7 +936,7 @@ if (!file.exists("rds/virtual_prop_100.rds")) {
     summarize(prop_red = mean(color == "red"), n = n())
   write_rds(virtual_prop_100, "rds/virtual_prop_100.rds")
 } else {
-  virtual_prop_100<- read_rds("rds/virtual_prop_100.rds")
+  virtual_prop_100 <- read_rds("rds/virtual_prop_100.rds")
 }
 
 
@@ -960,7 +960,7 @@ if (!file.exists("rds/virtual_prop_400.rds")) {
     summarize(prop_red = mean(color == "red"), n = n())
   write_rds(virtual_prop_400, "rds/virtual_prop_400.rds")
 } else {
-  virtual_prop_400<- read_rds("rds/virtual_prop_400.rds")
+  virtual_prop_400 <- read_rds("rds/virtual_prop_400.rds")
 }
 
 
