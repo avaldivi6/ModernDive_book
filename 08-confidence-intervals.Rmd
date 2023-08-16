@@ -51,8 +51,11 @@ resampled_means <- pennies_resamples %>%
   summarize(mean_weight = mean(year))
 ```
 
-In Chapter \@ref(sampling), sampling was introduced. 
-The goal was to estimate the proportion of red balls in the bowl shown in Figure \@ref(fig:sampling-exercise-1). 
+In Chapter \@ref(sampling), we introduced sampling
+.
+
+
+Te goal was to estimate the proportion of red balls in the bowl shown in Figure \@ref(fig:sampling-exercise-1). 
 To achieve this, a shovel was used to extract a random sample of `r n_balls_sample` balls, and the proportion of red balls in this sample, the sample proportion, was used as an *estimate* of the proportion of red balls in the entire bowl, the population proportion. When this activity was repeated a few times, different random samples produced different *estimates*, a phenomenon known as *sampling variation*.
 
 ```{r echo=FALSE, purl=FALSE}
