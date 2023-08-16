@@ -2627,3 +2627,5 @@ If you want more examples of the `infer` workflow to construct confidence interv
 ### What's to come?
 
 Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hypothesis-testing) we'll cover the other common tool for statistical inference: hypothesis testing. Just like confidence intervals, hypothesis tests are used to infer about a population using a sample. However, we'll see that the framework for making such inferences is slightly different. 
+
+
