@@ -51,29 +51,50 @@ resampled_means <- pennies_resamples %>%
   summarize(mean_weight = mean(year))
 ```
 
+<<<<<<< HEAD
+In Chapter \@ref(sampling) we introduced *sampling*. In particular, we introduced the *sampling distribution of the sample proportion*. 
+
+We illustrated this concept by using the bowl with red and white balls shown in Figure \@ref(fig:sampling-exercise-1) with values stored in the R object `bowl`. We obtained samples of balls selected at random and with a fixed sample size, for example, by mixing the balls in the ball beforehand and then using a shovel that could hold exactly $n= 50$ balls, or using the appropriate code in R to perform the virtual analog of this activity, as shown in subsection \@ref(sampling-simulation).
+
+By doing the latter, we were able to obtain thousands of random samples, of the same size, and the corresponding sample proportions of red balls. We then used those proportions to build a histogram as shown, for example, in Figure \@ref(fig:samplingdistribution-virtual-1000). The histogram was the visual approximation of the *sampling distribution of the sample proportion* of red balls.
+
+When studying numerical summaries of these sample proportions and visual characteristics of the histogram obtained, we were able to highlight important properties of the sample distribution. These were the most important conclusions:
+
+- The sample proportion of red balls obtained from a random sample is likely different than the sample proportion of any other random sample. This is called *sampling variation*.
+- The *expected value* of the sample proportion is equal to the *population proportion*. This is statistical jargon that can be understood as follows: when a large number of random samples and corresponding sample proportions are obtained, we *expect* the average of these sample proportions to be equal to the proportion of red balls in the entire bowl, or *population proportions*. This is precisely the readson why the histogram is centered precisely at the value of the *population proportion*.
+- The sampling variation, determined by the standard deviation of sample proportions, or *standard error*, is obtained precisely by the formula $SE = \sqrt{p(1-p)/n}$ where $p$ is the population proportion and $n$ is the sample size. By looking at the formula we can see that the standard error is inversely proportional to the square root of the sample size used to obtain the random samples. The formula supports our visual conclusions when comparing histograms for different sample sizes, such as those shown in Figure \@ref(fig:comparing-sampling-distributions-31): the larger the sample size used to obtained random samples, the closer the sample proportions will be to the population proportions. Sampling variation will always be present, but the sample proportions will get closer and closer, on average, to the population proportion.
+- When the sample size used is large enough, the sampling distribution of the sample proportion approximate the normal distribution, and the histogram of the sample proportions seems to come from a normal distribution. This is a direct application of the Central Limit Theorem formalized in Section \@ref(central-limit-theorem).
+
+
+Our original goal was to *estimate* the proportion of red balls in the bowl. Why did we learn about the sampling distribution of the sample proportion? Well, in real-life situations, it is impractical or even impossible to obtain thousands of samples from a population. Instead, as shown in Section \ref(sampling-case-study), we obtain a single sample and associated sample proportion and use it to *estimate* the population proportion. This is the topic of this chapter.
+
+This chapter is about *estimation*. An estimate is a number obtained from a sample that represents some characteristic of the population. Recall that in Chapter \@ref(sampling), our original goal was to *estimate* the proportion of red balls in the bowl. Why did we learn about the sampling distribution of the sample proportion? Well, this knowledge will allow us to 
+
+
+In Section \@ref(sampling-activity) we illustrate sampling using a tactile example and simultaneously introducing key concepts and terminology. In Section \@ref(sampling-simulation) we extend this by performing virtual sampling via simulations. The tools used in the data science portion of this book, in particular data visualization and data wrangling, continue to be useful in this context. In Section \@ref(sampling-framework) we introduce more definitions, terminology, and a theoretical framework to introduce one of the fundamental theoretical results in Statistics: the *Central Limit Theorem*. In Section \@ref(sampling-case-study) we tie the contents of this chapter to the real world by presenting a case study: a 2023 Gallup poll conducted in the US asking whether coronavirus pre-pandemic normalcy was attainable.
+
+The concepts behind *sampling* form the basis for constructing confidence intervals and performing tests of significance also called hypothesis tests; these are the best-known and used inferential methods and are presented in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing).
+
+Later in Chapter \@ref(sampling) in a case study was presented 
+
+
+and we cared about learning how much information we learned fr understand how sampling works and how much can we learn from it The real goal of learning this was to be able to use what we have learned 
+
+
+
+=======
 In Chapter \@ref(sampling), we introduced sampling
 .
 
 
 Te goal was to estimate the proportion of red balls in the bowl shown in Figure \@ref(fig:sampling-exercise-1). 
 To achieve this, a shovel was used to extract a random sample of `r n_balls_sample` balls, and the proportion of red balls in this sample, the sample proportion, was used as an *estimate* of the proportion of red balls in the entire bowl, the population proportion. When this activity was repeated a few times, different random samples produced different *estimates*, a phenomenon known as *sampling variation*.
+>>>>>>> ee9906bd2b704946ef82a7f4d22b2b690fca5ebd
 
 ```{r echo=FALSE, purl=FALSE}
 # This code is used for dynamic non-static in-line text output purposes
 n_virtual_resample <- 1000L
 ```
-
-In Subsection \@ref(sampling-simulation), the sampling activity was expanded "virtually" by performing computer simulations; that is, obtaining thousands of random samples and the corresponding sample proportions of red balls. 
-Due to sampling variation, the sample proportions were different for different random samples. 
-These sample proportions were used to construct a histogram and visualize the *sampling distribution* of the *sample proportion*. One example could be seen in Figure \@ref(fig:samplingdistribution-virtual-1000).
-The histogram was bell-shaped and centered, precisely, at the population proportion, the proportion of red balls in the entire bowl. 
-
-Simulations were also obtained for different sample sizes, as those shown in Figure \@ref(fig:comparing-sampling-distributions-31) where three histograms of sample proportion were drawn, representing the distribution when using three different sample sizes. This comparison showed that as the sample size increased, the sampling variation in the sample proportions decreased.
-These results were formalized in Section \@ref(central-limit-theorem) and can be summarized in three points. 
-First, the population proportion, the proportion of red balls in the entire bowl, was located precisely at the center of the sampling distribution of the sample proportion. 
-Second, the sampling variation, determined by the standard deviation of sample proportions, or *standard error*, is obtained precisely by the formula $SE = \sqrt{p(1-p)/n}$ where $p$ is the population proportion and $n$ is the sample size.
-Third, it was shown that, as long as the sample size used is large enough, the sampling distribution of the sample proportion will follow, approximately, a normal curve. The final result is supported by one of the most important theorems in Statistics, the Central Limit Theorem. 
-
 
 
 ```{r echo=FALSE, purl=FALSE}
@@ -81,9 +102,22 @@ Third, it was shown that, as long as the sample size used is large enough, the s
 n_gallup_survey <- 1000L
 ```
 
-However, as described in Section \@ref(sampling-simulation), the sampling activities were useful to study the sampling distribution of the sample proportion. 
-In a real-life situation, a *single* random sample is obtained and the sample proportion obtained from this sample is used as the *estimate* of the population proportion. 
-This was the situation presented in Section \@ref(sampling-case-study) when the  ["Gallup poll."](https://news.gallup.com/poll/471953/not-expect-return-pre-pandemic-normalcy.aspx) was presented. 
+
+Our study of the sampling distribution had the purpose of learning how it works 
+
+Now that we learn 
+
+
+We finished the chapter by presenting a case study in Section \@ref(sampling-case-study) when the  ["Gallup poll."](https://news.gallup.com/poll/471953/not-expect-return-pre-pandemic-normalcy.aspx) was presented. 
+
+In this situation a *single* random sample and associated sample proportion was obtained. It is clear that we cannot build the sampling distribution with a single sample proportion, we need several of them to do this.
+
+We also don't know if the sample obtained was 
+
+We cannot and the sample proportion obtained from this sample is used as the *estimate* of the population proportion. 
+This was the situation presented in 
+
+
 Pollsters wanted to estimate the proportion of *all* people living in the US who believed that pre-pandemic normalcy was no longer attainable for them. 
 They took a random sample of about 1000 people and determine that 47% of them believed that pre-pandemic normalcy was not attainable. 
 This sample proportion is an *estimate* of the population proportion.
@@ -145,7 +179,7 @@ pop_ave_wt <- bowl_almonds |>
 In Chapter \@ref(sampling), a bowl with red and white balls was used to study the sampling distribution of the sample proportion. We do here something similar with a bowl of chocolate-covered almonds, as seen in Figure \@ref(fig:bowl_almond). 
 
 ```{r bowl_almond, echo=FALSE, fig.cap="A bowl of chocolate-covered almonds.", purl=FALSE, out.width = "40%", purl=FALSE}
-include_graphics("images/sampling/almonds/almond_bowl_aux.png")
+knitr::include_graphics("images/sampling/almonds/almond_bowl_aux.png")
 ```
 
 For simplicity we refer to each chocolate covered almond simply as an almond. So, assume we are interested in the average weight in grams of *all*  the almonds in the bowl. We call this the *population average* weight or *population mean* weight.
@@ -156,13 +190,13 @@ For simplicity we refer to each chocolate covered almond simply as an almond. So
 If we randomly select one almond from the bowl, we could determine its weight using a scale, as shown in Figure \@ref(fig:one_almond)
 
 ```{r one_almond, echo=FALSE, fig.show="hold", fig.cap="One almond on a scale.", purl=FALSE, out.width = "40%", purl=FALSE}
-include_graphics("images/sampling/almonds/one_almond.png")
+knitr::include_graphics("images/sampling/almonds/one_almond.png")
 ```
 
 Let's now obtain a random sample of 25 almonds, as shown in Figure \@ref(fig:twenty_five_almonds), and determine the sample average weight, or *sample mean* weight, in grams.
 
 ```{r twenty_five_almonds, echo=FALSE, fig.cap="A random sample of 25 almonds on a scale.", purl=FALSE, out.width = "40%", purl=FALSE}
-include_graphics("images/sampling/almonds/twenty_five_almonds.png")
+knitr::include_graphics("images/sampling/almonds/twenty_five_almonds.png")
 ```
 
 Since the total weight is 88.6 grams, as shown in the Figure \@ref(fig:twenty_five_almonds), the average weight will be $88.6/25 = 3.544$. Is this sample mean a good *estimate* of the population mean? The `moderndive` \index{moderndive!almonds\_sample} package contains the information of this sample in the `almonds_sample` data frame:
@@ -223,7 +257,7 @@ sampling_scenarios %>%
     linesep = ""
   ) %>%
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position")
   ) %>%
   column_spec(1, width = "0.5in") %>%
@@ -383,7 +417,7 @@ comparing_sampling_distributions <- ggplot(virtual_mean, aes(x = mean_weight)) +
   ) +
   facet_wrap(~n)
 
-if (is_latex_output()) {
+if (knitr::is_latex_output()) {
   comparing_sampling_distributions +
     theme(
       strip.text = element_text(colour = "black"),
@@ -429,7 +463,7 @@ comparing_n_table |>
     linesep = ""
   ) |>
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position")
   )
 ```
@@ -655,7 +689,7 @@ Point estimate           |  Confidence interval
 -->
 
 ```{r point-estimate-vs-conf-int, echo=FALSE, fig.cap="Analogy of difference between point estimates and confidence intervals.", out.width="100%", purl=FALSE}
-include_graphics("images/shutterstock/point_estimate_vs_conf_int.png")
+knitr::include_graphics("images/shutterstock/point_estimate_vs_conf_int.png")
 ```
 
 Our proposed interval of 1992 to 2000 was constructed by eye and was thus somewhat subjective. We now introduce two methods for constructing such intervals in a more exact fashion: the *percentile method* and the *standard error method*.
@@ -873,7 +907,7 @@ Let's now illustrate the sequence of verbs necessary to construct a confidence i
 #### 1. `specify` variables {-}
 
 ```{r infer-specify, out.width="20%", out.height="20%", echo=FALSE, fig.cap="Diagram of the specify() verb.", purl=FALSE}
-include_graphics("images/flowcharts/infer/specify.png")
+knitr::include_graphics("images/flowcharts/infer/specify.png")
 ```
 
 As shown in Figure \@ref(fig:infer-specify), the `specify()` \index{infer!specify()} function is used to choose which variables in a data frame will be the focus of our statistical inference. We do this by `specify`ing the `response` argument. For example, in our `almonds_sample` data frame of the `r num_almonds` almonds sampled from the bank, the variable of interest is `weight`:
@@ -899,7 +933,7 @@ While in the case of the almonds either specification works just fine, we'll see
 #### 2. `generate` replicates {-}
 
 ```{r infer-generate, out.width="60%", out.height="60%", echo=FALSE, fig.cap="Diagram of generate() replicates.", purl=FALSE}
-include_graphics("images/flowcharts/infer/generate.png")
+knitr::include_graphics("images/flowcharts/infer/generate.png")
 ```
 
 After we `specify()` the variables of interest, we pipe the results into the `generate()` function to generate replicates. Figure \@ref(fig:infer-generate) shows how this is combined with `specify()` to start the pipeline. In other words, repeat the resampling process a large number of times. Recall in Sections \@ref(bootstrap-35-replicates) and \@ref(bootstrap-1000-replicates) we did this `r n_resample_friends` and `r n_virtual_resample` times.
@@ -941,7 +975,7 @@ almonds_sample %>%                  almonds_sample %>%
 #### 3. `calculate` summary statistics {-}
 
 ```{r infer-calculate, out.width="80%", out.height="80%", echo=FALSE, fig.cap="Diagram of calculate() summary statistics.", purl=FALSE}
-include_graphics("images/flowcharts/infer/calculate.png")
+knitr::include_graphics("images/flowcharts/infer/calculate.png")
 ```
 
 After we `generate()` many replicates of bootstrap resampling with replacement, we next want to summarize each of the `r n_virtual_resample` resamples of size `r num_almonds` to a single sample statistic value. As seen in the diagram, the `calculate()` \index{infer!calculate()} function does this.
@@ -987,7 +1021,7 @@ almonds_sample %>%                  almonds_sample %>%
 #### 4. `visualize` the results {-}
 
 ```{r infer-visualize, out.width="70%", echo=FALSE, fig.cap="Diagram of visualize() results.", purl=FALSE}
-include_graphics("images/flowcharts/infer/visualize.png")
+knitr::include_graphics("images/flowcharts/infer/visualize.png")
 ```
 
 The `visualize()` \index{infer!visualize()} verb provides a quick way to visualize the bootstrap distribution as a histogram of the numerical `stat` variable's values. The pipeline of the main `infer` verbs used for exploring bootstrap distribution results is shown in Figure \@ref(fig:infer-visualize).  
@@ -1016,7 +1050,7 @@ The `visualize()` function can take many other arguments which we'll see momenta
 Let's recap the steps of the `infer` workflow for constructing a bootstrap distribution and then visualizing it in Figure \@ref(fig:infer-workflow-ci).
 
 ```{r infer-workflow-ci, out.width="100%", echo=FALSE, fig.cap="infer package workflow for confidence intervals.", purl=FALSE}
-include_graphics("images/flowcharts/infer/ci_diagram.png")
+knitr::include_graphics("images/flowcharts/infer/ci_diagram.png")
 ```
 
 Recall how we introduced two different methods for constructing 95% confidence intervals for an unknown population parameter in Section \@ref(ci-build-up): the *percentile method* and the *standard error method*. Let's now check out the `infer` package code that explicitly constructs these. There are also some additional neat functions to visualize the resulting confidence intervals built-in to the `infer` package!
@@ -1045,7 +1079,7 @@ visualize(bootstrap_distribution) +
 
 ```{r percentile-ci-viz, echo=FALSE, fig.cap="(ref:perc-ci-viz)", purl=FALSE, fig.height=3}
 # Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here (added to `develop` branch on 2019-10-26)
-if (is_html_output()) {
+if (knitr::is_html_output()) {
   visualize(bootstrap_distribution) +
     shade_confidence_interval(endpoints = percentile_ci) #+
   #  ggtitle("Simulation-Based Bootstrap Distribution")
@@ -1099,7 +1133,7 @@ visualize(bootstrap_distribution) +
 # Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here
 # (added to `develop` branch on 2019-10-26)
 
-if (is_html_output()) {
+if (knitr::is_html_output()) {
   visualize(bootstrap_distribution) +
     shade_confidence_interval(endpoints = standard_error_ci) #+
   #    ggtitle("Simulation-Based Bootstrap Distribution")
@@ -1276,7 +1310,7 @@ sample_1_bootstrap %>%
 ```{r shovel-bootstrap-1-infer, echo=FALSE, fig.show="hold", fig.cap="Bootstrap distribution.", fig.height=2.5, purl=FALSE}
 # Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here
 # (added to `develop` branch on 2019-10-26)
-if (is_html_output()) {
+if (knitr::is_html_output()) {
   sample_1_bootstrap %>%
     visualize(bins = 15) +
     shade_confidence_interval(endpoints = percentile_ci_1) +
@@ -1633,7 +1667,7 @@ percentile_cis_by_level %>%
     linesep = ""
     longtable = TRUE
   ) %>% 
-  kable_styling(font_size = ifelse(is_latex_output(), 10, 16),
+  kable_styling(font_size = ifelse(knitr::is_latex_output(), 10, 16),
                 latex_options = c("hold_position", "repeat_header"))
 ```
 
@@ -1657,7 +1691,7 @@ perc_interval_plot <- ggplot(sample_of_cis) +
   facet_wrap(~confidence_level) +
   geom_vline(xintercept = p_red, color = "red")
 
-if (is_latex_output()) {
+if (knitr::is_latex_output()) {
   perc_interval_plot +
     theme(
       strip.text = element_text(colour = "black"),
@@ -1684,7 +1718,7 @@ percentile_cis_by_level %>%
     linesep = ""
   ) %>%
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position", "repeat_header")
   )
 ```
@@ -1780,7 +1814,7 @@ cis_plot <- ggplot(sample_of_cis) +
   facet_wrap(~sample_size) +
   geom_vline(xintercept = p_red, color = "red")
 
-if (is_latex_output()) {
+if (knitr::is_latex_output()) {
   cis_plot +
     theme(
       strip.text = element_text(colour = "black"),
@@ -1808,7 +1842,7 @@ percentile_cis_by_n %>%
     linesep = ""
   ) %>%
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position", "repeat_header")
   )
 ```
@@ -1892,7 +1926,7 @@ sampling_scenarios %>%
     linesep = ""
   ) %>%
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position")
   ) %>%
   column_spec(1, width = "0.5in") %>%
@@ -2310,7 +2344,7 @@ tibble(
     linesep = ""
   ) %>%
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position", "repeat_header")
   )
 ```
@@ -2356,7 +2390,7 @@ tibble(
     linesep = ""
   ) %>%
   kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
     latex_options = c("hold_position", "repeat_header")
   )
 ```
@@ -2436,7 +2470,7 @@ conf_ints <- tactile_prop_red %>%
 ```
 
 ```{r echo=FALSE, purl=FALSE}
-if (!is_latex_output()) {
+if (!knitr::is_latex_output()) {
   conf_ints
 }
 ```
@@ -2581,14 +2615,11 @@ We see that of our 100 confidence intervals based on samples of size $n$ = 50, `
 ### Additional resources
 
 ```{r echo=FALSE, results="asis", purl=FALSE}
-if (is_latex_output()) {
+if (knitr::is_latex_output()) {
   cat("Solutions to all *Learning checks* can be found online in [Appendix D](https://moderndive.com/D-appendixD.html).")
 }
 ```
 
-```{r echo=FALSE, purl=FALSE, results="asis"}
-generate_r_file_link("08-confidence-intervals.R")
-```
 
 If you want more examples of the `infer` workflow to construct confidence intervals, we suggest you check out the `infer` package homepage, in particular, a series of example analyses available at <https://infer.netlify.app/articles/>.
 
@@ -2596,3 +2627,5 @@ If you want more examples of the `infer` workflow to construct confidence interv
 ### What's to come?
 
 Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hypothesis-testing) we'll cover the other common tool for statistical inference: hypothesis testing. Just like confidence intervals, hypothesis tests are used to infer about a population using a sample. However, we'll see that the framework for making such inferences is slightly different. 
+
+
