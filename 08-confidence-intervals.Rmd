@@ -52,7 +52,7 @@ resampled_means <- pennies_resamples %>%
 ```
 
 <<<<<<< HEAD
-In Chapter \@ref(sampling) we introduced *sampling*. In particular, we introduced the *sampling distribution of the sample proportion*. 
+In Chapter \@ref(sampling) we introduced *sampling*. In particular, we discussed the *sampling distribution of the sample proportion*. 
 
 We illustrated this concept by using the bowl with red and white balls shown in Figure \@ref(fig:sampling-exercise-1) with values stored in the R object `bowl`. We obtained samples of balls selected at random and with a fixed sample size, for example, by mixing the balls in the ball beforehand and then using a shovel that could hold exactly $n= 50$ balls, or using the appropriate code in R to perform the virtual analog of this activity, as shown in subsection \@ref(sampling-simulation).
 
