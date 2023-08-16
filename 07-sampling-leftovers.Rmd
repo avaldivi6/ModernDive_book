@@ -1,0 +1,544 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-06-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+
+Moreover, the amount of sampling variation is actually proportional to the sample size used. To see this, we measure the amount of variation explicitly using a summary statistic called the \index{standard deviation} *standard deviation* (see Appendix \@ref(appendix-stat-terms) for a brief discussion on the properties of the standard deviation). The following data wrangling code introduces the `sd()` summary function to calculate the standard deviation of 1000 sample proportions of the same sample size. Therefore, three standard deviations are obtained, one for each sample size, as shown below.
+
+```{r, eval=FALSE}
+# n = 25
+virtual_prop_red_25 |> 
+  summarize(sd = sd(prop_red))
+
+# n = 50
+virtual_prop_red_50 |> 
+  summarize(sd = sd(prop_red))
+
+# n = 100
+virtual_prop_red_100 |> 
+  summarize(sd = sd(prop_red))
+```
+
+Let's compare these three measures of distributional variation in Table \@ref(tab:comparing-n).
+
+```{r comparing-n, echo=FALSE, purl=FALSE}
+comparing_n_table <- virtual_prop |>
+  group_by(n) |>
+  summarize(sd = sd(prop_red)) |>
+  rename(`Sample size` = n, `Standard deviation of sample proportions` = sd)
+
+comparing_n_table |>
+  kable(
+    digits = 3,
+    caption = "Comparing standard deviations of sample proportions for three different sample sizes",
+    booktabs = TRUE,
+    linesep = ""
+  ) |>
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
+```
+
+As we observed in Figure \@ref(fig:comparing-sampling-distributions), as the sample size increases, the sampling variation decreases. If this variation becomes really small, each sample proportion of red balls is not that different from any other sample proportion of red balls. So as the sample size increases, our guesses at the true proportion of red balls in the bowl get more precise. 
+
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What summary statistic did we use to quantify how much the 1000 sample proportions of red balls varied?
+
+- A. The interquartile range
+- B. The standard deviation
+- C. The range: the largest value minus the smallest.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Precision and Accuracy {#moral-of-the-story}
+
+Let's recap what we have learned so far. If a sample is generated at random, the resulting point estimate is a "good guess" of the true unknown population parameter. In our sampling activities, the sample proportion $\widehat{p}$ of red balls was a "good guess" of the population proportion $p$ of red balls in the bowl. 
+
+A "good guess" is not a perfect guess. A point estimate can be smaller or greater than the population parameter due to sampling variation. However, the estimates "on average" will be equal to the center of the sampling distribution, thus equal to the population parameter. In our sampling activities, as shown in Figure \@ref(fig:comparing-sampling-distributions-3), the sample proportion $\widehat{p}$ was sometimes less than, other times greater than the true population proportion $p$. Still, on average, they were equal to the population proportion $p$. This is also known as having an *accurate* estimate\index{accuracy}.
+
+We also saw that as the sample size $n$ increases, the point estimates vary less and are more concentrated around the true population parameter, thus the *standard error* gets smaller and the typical error of the point estimates also decreases. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\widehat{p}$ decreased as seen in Figures \@ref(fig:comparing-sampling-distributions-3) and \@ref(fig:comparing-sampling-distributions-2). This is also known as having a *precise* estimate\index{precision}. 
+
+
+In conclusion, random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" they are. Figure \@ref(fig:accuracy-vs-precision) illustrates the difference.
+
+```{r accuracy-vs-precision, echo=FALSE, fig.cap="Comparing accuracy and precision.", purl=FALSE, out.width="75%", out.height="75%", purl=FALSE}
+knitr::include_graphics("images/accuracy_vs_precision.jpg")
+```
+
+Observe that taking 1000 repeated random samples of different sizes was useful to illustrate how the sampling distribution of point estimates works, and what are the best practices to obtain accurate and precise estimates. In a real-life situation when getting the best estimate is the main task, we try to get a single random sample that is as large as we can afford because we know that the resulting point estimate will be the most accurate and precise. 
+
+In Section \@ref(sampling-case-study), we're going to study a real-life example of sampling: polls.
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.15in}
+**_Learning check_**
+\vspace{-0.1in}
+```
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** The table that follows is a version of Table \@ref(tab:comparing-n-2) matching sample sizes $n$ to different *standard errors* of the sample proportion $\widehat{p}$, but with the rows randomly re-ordered and the sample sizes removed. Fill in the table by matching the correct sample sizes to the correct standard errors.
+
+```{r comparing-n-3, echo=FALSE, purl=FALSE}
+set.seed(76)
+comparing_n_table <- virtual_prop |>
+  group_by(n) |>
+  summarize(sd = sd(prop_red)) |>
+  mutate(
+    n = str_c("n = ")
+  ) |>
+  rename(`Sample size` = n, `Standard error of $\\widehat{p}$` = sd) |>
+  sample_frac(1)
+
+comparing_n_table |>
+  kable(
+    digits = 3,
+    caption = "Standard errors of $\\widehat{p}$ based on n = 25, 50, 100",
+    booktabs = TRUE,
+    escape = FALSE,
+    linesep = ""
+  ) |>
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
+```
+
+For the following four *Learning checks*, let the *estimate* be the sample proportion $\widehat{p}$: the proportion of a shovel's balls that were red. It estimates the population proportion $p$: the proportion of the bowl's balls that were red.
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What is the difference between an *accurate* and a *precise* estimate? 
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** How do we ensure that an estimate is *accurate*? How do we ensure that an estimate is *precise*?
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** In a real-life situation, we would not take 1000 different samples to infer about a population, but rather only one. Then, what was the purpose of our exercises where we took 1000 different samples?
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Figure \@ref(fig:accuracy-vs-precision) with the targets shows four combinations of "accurate versus precise" estimates. Draw four corresponding *sampling distributions* of the sample proportion $\widehat{p}$, like the one in the leftmost plot in Figure \@ref(fig:comparing-sampling-distributions-3).
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.25in}
+\vspace{-0.25in}
+```
+
+
+
+
+
+A clever reader may be now wondering why did we do any sampling if we already had a way of knowing that the exact proportion of red balls in the bowl was `r percent_red_chr`. This is correct, if our goal was to determine the population proportion of red ball in the bowl, sampling was not necessary. The real purpose of our activities was to learn about sampling variation, how *sampling variation* effects our estimates and how the sample size and other characteristics of the sample affect sampling variation.
+
+Furthermore, in real-life scenarios, typically, we do not have information about the entire population of interest, and we can often take only one sample. But our knowledge of sampling variation will allow us to learn a great deal about the population and population parameters based entirely on a single sample.
+
+
+The third set of terms relates to **sampling methodology**: the method used to collect samples.\index{sampling methodology} You'll see here and throughout the rest of the book that the *way* you collect samples directly influences their quality.
+
+1. A sample is said to be **representative** if it roughly "resembles" the population; if the characteristics found in the sample are a "good" representation of the characteristics found in the population.
+1. We say a sample is **generalizable** if any results based on the sample can be generalized to the population. In particular, information or conclusions obtained from the sample can be used as information or conclusions that apply to the entire population.
+1. We say a sampling procedure is **biased** if the samples obtained using this procedure have characteristics that systematically differ from those in the population. 
+    - Using our bowl sampling activity, if for each sample of 50 balls we take from the bowl, we remove three white balls and replace them with red balls, the samples obtained would be **biased** and the sample proportions would no longer be representative of the proportion of red balls in the bowl.
+1. **Random sampling** is a sampling procedure in which any group of individuals has an equal chance of being chosen than any other group of individuals of the same size. A sample obtained using random sampling is called a **random sample**
+
+
+Let's now put all three sets of terms and notation together, keeping our sampling activities in mind:
+
+* For the tactile activity, we extracted a sample of $n$ = 50 because we mixed all of the equally sized balls before using the shovel. For the virtual activity, we did the same by using the `rep_slice_sample()` function that takes advantage of the computer's [random number generator](https://en.wikipedia.org/wiki/Random_number_generation). In both cases we obtained *random samples*
+* the contents of the sample obtained are *unbiased* and *representative* of the contents of the bowl, thus
+* any result based on the sample can be *generalized* to the bowl, thus
+* The sample proportion $\widehat{p}$ of the $n$ = 50 balls in the shovel that are red is a "good guess" of the population proportion $p$ of the bowl's $N$ = `r num_balls` balls that are red, thus
+* we can **infer** about the bowl using the sample from the shovel.
+
+What we have done is **statistical inference**. **Inference** is the act of "making a guess" about some unknown. **Statistical inference** is the act of making a guess about a population using a random sample. This is one of the most important concepts in all of statistics. It is so important that this book is titled: "Statistical Inference via Data Science". More generally speaking, 
+
+* If the sampling of a sample of size $n$ is done at *random*, then
+* the sample is *unbiased* and *representative* of the population of size $N$, thus
+* any result based on the sample can *generalize* to the population, thus
+* the point estimate is a "good guess" of the unknown population parameter, thus
+* instead of performing a census, we can *infer* about the population using sampling.
+
+In the upcoming Chapter \@ref(confidence-intervals) on confidence intervals, we introduce the `infer` package, which makes statistical inference "tidy" and transparent.
+
+
+Typically, 
+    - If needed, we use upper-case $N$ to represent the size of the population.
+    - In our sampling activities, the **population** is the collection of balls in the bowl shown in Figure \@ref(fig:sampling-exercise-1). Since we also have the virtual `bowl` that represents this population, we know that the population has  $N$ = `r num_balls` balls in the bowl.
+    - Depending of the problem, the size of the population can be in the thousands, millions, or even more. Theoretical populations can also be infinity or have an infinite number of outcomes. 
+1. 
+    - One of the most relevant parameters in our work is the average (or mean) of the population. We call it *population mean* and use the Greek letter $\mu$ to denote it. Another relevant parameter is the proportion of the population, or *population proportion*, and use the letter $p$ to denote it. Interestingly enough, the population proportion can be viewed as a special case of the population mean, as we show in the next subsection. 
+    - In our sampling activities, we were interested in the proportion of red balls in the entire bowl. The parameter of interest was $p$, the *population proportion* of red balls. 
+
+Since `r num_red` of the `r num_balls` are red, then `r num_red`/`r num_balls` = `r prop_red` = `r percent_red_chr`. The *population proportion*, $p$, is equal to `r prop_red`.
+
+
+When this statistic is used to estimate a *population parameter* we also call it a **point estimate**.
+
+
+- Two point estimates that are often used are the average (or mean) and the proportion of the sample. We call them *sample mean* and *sample proportion* and use $\widehat {\mu}$  and $\widehat{p}$ to denote them, respectively. The hat above the letter is a common convention in statistics to differentiate point estimates (samples) from parameters (populations). As in the case of population parameters, the sample proportion can be viewed as a special type of sample mean. 
+
+
+
+As we did in our virtual sampling activity, we take a random sample of $n$=50 balls from the virtual `bowl` and use it to obtain the sample proportion of red balls, $\widehat{p}$. We use the same `dplyr` verbs used earlier, as shown below:
+
+```{r}
+bowl |>
+  rep_slice_sample(n = 50) |> 
+  summarize(prop_red = mean(color == "red"))
+```
+
+The sample proportion, $\widehat{p}$, is given by the value of `prop_red`.
+
+
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What would performing a census in our bowl activity correspond to? Why did we not perform a census?
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What purpose do *point estimates* serve in general? What is the name of the point estimate specific to our bowl activity? What is its mathematical notation?
+
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Why is it important that sampling be done *at random*?
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What are we *inferring* about the bowl based on the samples using the shovel?
+
+
+
+
+To help reinforce these concepts, let's re-display Figure \@ref(fig:comparing-sampling-distributions) but using our new terminology, notation, and definitions relating to sampling in Figure \@ref(fig:comparing-sampling-distributions-2). 
+
+```{r comparing-sampling-distributions-2, echo=FALSE, fig.cap="Three sampling distributions of the sample proportion $\\widehat{p}$.", purl=FALSE}
+p_hat_compare <- virtual_prop |>
+  mutate(
+    n = str_c("n = ", n),
+    n = factor(n, levels = c("n = 25", "n = 50", "n = 100"))
+  ) |>
+  ggplot(aes(x = prop_red)) +
+  geom_histogram(binwidth = 0.05, boundary = 0.4, color = "white") +
+  labs(
+    x = expression(paste("Sample proportion ", hat(p))),
+    title = expression(paste("Sampling distributions of ", hat(p), " based on n = 25, 50, 100."))
+  ) +
+  facet_wrap(~n)
+
+if (knitr::is_latex_output()) {
+  p_hat_compare +
+    theme(
+      strip.text = element_text(colour = "black"),
+      strip.background = element_rect(fill = "grey93")
+    )
+} else {
+  p_hat_compare
+}
+```
+
+Furthermore, let's re-display Table \@ref(tab:comparing-n) using our new terminology, notation, and definitions relating to sampling in Table \@ref(tab:comparing-n-2).
+
+```{r comparing-n-2, echo=FALSE, purl=FALSE}
+comparing_n_table <- virtual_prop |>
+  group_by(n) |>
+  summarize(sd = sd(prop_red)) |>
+  mutate(
+    n = str_c("n = ", n),
+    n = factor(n, levels = c("n = 25", "n = 50", "n = 100"))
+  ) |>
+  rename(`Sample size (n)` = n, `Standard error of $\\widehat{p}$` = sd)
+
+comparing_n_table |>
+  kable(
+    digits = 3,
+    caption = "Standard errors of the sample proportion based on sample sizes of 25, 50, and 100",
+    booktabs = TRUE,
+    escape = FALSE,
+    linesep = ""
+  ) |>
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
+```
+
+Remember the key message of this last table: that as the sample size $n$ goes up, the "typical" error of your point estimate will go down, as quantified by the *standard error*.
+
+
+
+
+We show that the former is an idealized version of the latter.
+
+First, who is the **(study) population** of $N$ individuals or observations of interest? \index{sampling!population}
+
+* Bowl: $N$ = `r num_balls` identically sized red and white balls
+* Gallup poll: The population of interest is all people living in the US that are 18 years of age or older. Based on the 2021 census, $N$ is approximately 258 million people. In the following paragraphs, when we refer to people living in the US we refer to those 18 years or older.
+
+Second, what is the **population parameter**? \index{sampling!population parameter}
+
+* Bowl: The population proportion $p$ of *all* the balls in the bowl that are red.
+* Gallup poll: The population proportion $p$ is the proportion of *all* those people living in the US who believe that pre-pandemic normalcy is not attainable.
+
+Third, what would a **census** look like? \index{sampling!census}
+
+* Bowl: Manually going over all $N$ = `r num_balls` balls and exactly computing the  proportion $p$ of red balls in the entire bowl.
+* Gallup poll: Locating all people living in the US and asking them whether they believe that pre-pandemic normalcy is attainable. As you can imagine, this would be a very costly and impractical activity.
+
+Fourth, how do you perform **sampling** to obtain a sample of size $n$? \index{sampling}
+
+* Bowl: Using a shovel with $n=50$ slots. 
+* Gallup poll: The sample will be of size $n=1,000$. One possible method to obtain a random sample would be to get a list of phone numbers of all people living in the US and pick out $n$ phone numbers. This is not a perfect method, as some people in the US may not have phone numbers, share phone numbers with other household members, not answer when called, answer but decide not to participate, etc. It is not easy to obtain a proper random sample from this population and those are real-life limitation polling organizations, such as Gallup, need to deal with.
+
+Fifth, what is your **point estimate** also known as the **sample statistic** of the unknown population parameter?
+
+* Bowl: The sample proportion $\widehat{p}$ of red balls. 
+* Gallup poll: The sample proportion $\widehat{p}$ of $1,000$ people selected in the sample who believed that pre-pandemic normalcy was not attainable. In this poll's case, $\widehat{p} = 0.47 = 47\%$, the quoted percentage in the article. \index{point estimate} \index{sample statistic}
+
+Sixth, is the sampling procedure **representative**? \index{sampling!representative}
+
+* Bowl: Are the contents of the shovel representative of the contents of the bowl? Because we mixed the bowl before sampling, we can feel confident that they are. 
+* Gallup poll: Is the sample of $n = 1,000$ people representative of *all* people living in the US? While Gallup had to overcome many limitations and obstacles that put in risk the ability for the poll to be a proper random sample, the methodology and theoretical considerations they use when studying polls such as this, typically, make the random sample obtained representative of the population of interest. 
+
+Seventh, are the samples **generalizable** to the greater population? \index{generalizability}
+
+* Bowl: Is the sample proportion $\widehat{p}$ of the shovel's balls that are red a "good guess" of the population proportion $p$ of the bowl's balls that are red? Given that the sample was representative, the answer is yes.
+* Gallup poll: Is the sample proportion $\widehat{p}$ = 0.47 of people living in the US who believed that pre-pandemic normalcy was not attainable a "good guess" of the population proportion $p$ of all people living in the US? In other words, can we confidently say that roughly 47% of *all* people living in the US believe that pre-pandemic normalcy was not attainable? Again, this depends on whether the sampling was random.
+
+Eighth, is the sampling procedure **unbiased**? In other words, do all observations have an equal chance of being included in the sample? \index{bias}
+
+* Bowl: Since each ball was equally sized and we mixed the bowl before using the shovel, each ball had an equal chance of being included in a sample and hence the sampling was unbiased. 
+* Gallup poll: Did all young Americans have an equal chance at being represented in this poll? Likely not, in real-life polls, the sample obtained will have some amount of bias. What polling company such as Gallup do, is to account for the potential bias by giving a higher weight to those observations that likely have been misrepresented. The methodology that they use likely helps provide results that are less biased, but some level of bias will likely remain.
+
+Ninth and lastly, was the sampling done at **random**? \index{sampling!random}
+
+* Bowl: As long as you mixed the bowl sufficiently before sampling, your samples would be random.
+* Gallup poll: Was the sample conducted at random? We can't answer this question without knowing about the *sampling methodology*\index{sampling methodology} used by Gallup. We will discuss this more at the end of this section.
+
+In other words, the poll by Gallup can be thought of as *an instance* of using the shovel to sample balls from the bowl. Furthermore, if another polling company conducted a similar poll of young Americans at roughly the same time, they would likely get a different estimate than 47%. This is due to *sampling variation*.
+
+Let's now revisit the sampling paradigm from Subsection \@ref(terminology-and-notation):
+
+**In general**: 
+
+* If the sampling of a sample of size $n$ is done at *random*, then
+* the sample is *unbiased* and *representative* of the population of size $N$, thus
+* any result based on the sample can *generalize* to the population, thus
+* the point estimate is a "good guess" of the unknown population parameter, thus
+* instead of performing a census, we can *infer* about the population using sampling.
+
+**Specific to the bowl:**
+
+* Since we extracted a sample of $n$ = 50 balls at *random*, in other words we mixed all of the equally sized balls before using the shovel, then
+* the contents of the shovel are *unbiased* and *representative* of the contents of the bowl, thus
+* any result based on the shovel can *generalize* to the bowl, thus
+* the sample proportion $\widehat{p}$ of the $n$ = 50 balls in the shovel that are red is a "good guess" of the population proportion $p$ of the bowl's $N$ = `r num_balls` balls that are red, thus
+* instead of conducting a *census* of the `r num_balls` balls in the bowl, we can **infer** about the bowl using the sample from the shovel.
+
+**Specific to the Gallup poll:**
+
+* If we had a way of obtaining a *randomly* chosen sample of 1,000 people living in the US and determining who believed that pre-pandemic normalcy was not attainable, then
+* these 1,000 people would be an *unbiased* and *representative* sample of all people living in the US, thus 
+* any results based on this sample could *generalize* to the entire population of all people living in the US, thus
+* the reported sample approval rating of 47% of these 1,000 people would be a *good guess* of the true proportion of people living in the US who believe that pre-pandemic normalcy was not attainable, thus
+* instead of asking all people in the US, we could *infer* about them using polling.
+
+So as you can see, it was critical for the sample obtained by Gallup to be truly random in order to infer about *all* people living in the US. Was their sample truly random? It is hard to answer such questions without knowing about the *sampling methodology* they used\index{sampling methodology}. For example, if this poll was conducted using only mobile phone numbers, people without mobile phones would be left out and therefore not represented in the sample. What about if Gallup conducted this poll on an internet news site? Then people who don't read this particular internet news site would be left out. Ensuring that our samples were random was easy to do in our sampling bowl exercises; however, in a real-life situation like the Gallup poll, this is much harder to do.
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.15in}
+**_Learning check_**
+\vspace{-0.1in}
+```
+
+Comment on the representativeness of the following *sampling methodologies*:
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** The Royal Air Force wants to study how resistant all their airplanes are to bullets. They study the bullet holes on all the airplanes on the tarmac after an air battle against the Luftwaffe (German Air Force).
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Imagine it is 1993, a time when almost all households had landlines. You want to know the average number of people in each household in your city. You randomly pick out 500 phone numbers from the phone book and conduct a phone survey.
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** You want to know the prevalence of illegal downloading of TV shows among students at a local college.  You get the emails of 100 randomly chosen students and ask them, "How many times did you download a pirated TV show last week?".
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** A local college administrator wants to know the average income of all graduates in the last 10 years. So they get the records of five randomly chosen graduates, contact them, and obtain their answers. 
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.25in}
+\vspace{-0.25in}
+```
+
+
+
+
+ 
+
+
+## Conclusion {#sampling-conclusion}
+
+### Sampling scenarios {#sampling-conclusion-table}
+
+In this chapter, we performed both tactile and virtual sampling exercises to infer about an unknown proportion. We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion, $\bar X$ or $\widehat{p}$, to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well. We present four more such scenarios in Table \@ref(tab:table-ch8). 
+
+```{r table-ch8, echo=FALSE, message=FALSE, purl=FALSE}
+# The following Google Doc is published to CSV and loaded using read_csv():
+# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
+
+if (!file.exists("rds/sampling_scenarios.rds")) {
+  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" |>
+    read_csv(na = "") |>
+    slice(1:5)
+  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
+} else {
+  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
+}
+
+sampling_scenarios |>
+  kable(
+    caption = "\\label{tab:summarytable-ch8}Scenarios of sampling for inference",
+    booktabs = TRUE,
+    escape = FALSE,
+    linesep = ""
+  ) |>
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  ) |>
+  column_spec(1, width = "0.5in") |>
+  column_spec(2, width = "1.2in") |>
+  column_spec(3, width = "0.8in") |>
+  column_spec(4, width = "1.5in") |>
+  column_spec(5, width = "0.6in")
+```
+
+In the rest of this book, we will cover all the remaining scenarios as follows:
+
+* In Chapter \@ref(confidence-intervals), we will cover examples of statistical inference for
+    + Scenario 2: The mean age $\mu$ of all pennies in circulation in the US.
+    + Scenario 3: The difference $p_1 - p_2$ in the proportion of people who yawn *when seeing someone else yawn first* minus the proportion of people who yawn *without seeing someone else yawn first*. This is an example of *two-sample* inference\index{two-sample inference}.
+* In Chapter \@ref(hypothesis-testing), we will cover an example of statistical inference for
+    + Scenario 4: The difference $\mu_1 - \mu_2$ in mean IMDb ratings for action and romance movies. This is another example of *two-sample* inference.
+* In Chapter \@ref(inference-for-regression), we will cover an example of statistical inference for regression by revisiting the regression models for teaching score as a function of various instructor demographic variables you saw in Chapters \@ref(regression) and \@ref(multiple-regression).
+    + Scenario 5: The slope $\beta_1$ of the population regression line.
+
+
+### Additional resources
+
+```{r echo=FALSE, results="asis", purl=FALSE}
+if (knitr::is_latex_output()) {
+  cat("Solutions to all *Learning checks* can be found online in [Appendix D](https://moderndive.com/D-appendixD.html).")
+}
+```
+
+```{r echo=FALSE, purl=FALSE, results="asis", eval = FALSE}
+generate_r_file_link("07-sampling.R")
+```
+
+
+### What's to come?
+
+Recall that in the bowl activity in Section \@ref(sampling-simulation) we obtained samples that produced sample proportions of red balls that were fairly close to, but not exactly equal to the population proportion. Similarly, our Gallup poll case study in Section \@ref(sampling-case-study) suggested that, based on a sample of at least 1,000 people living in the US, about 47% of them believed that pre-pandemic normalcy was not attainable. However, as good of an estimate this sample proportion may be, it is likely not exactly equal to the population proportion. Samples of balls or opinion polls will not produce *statistics* that are exactly equal to population *parameters*; there will be differences caused by *sampling variation*. So, instead of proposing *point* estimates, we could instead propose interval estimates for these population *parameters*. For example, we could instead say that the population proportion of people living in the US who believe that pre-pandemic normalcy is not attainable is about 47%, with a **margin of error* of about 2.1%, or equivalently $$(47\% - 2.1\%, 47\% + 2.1\%) = (46.9\%, 49.1\%)$$
+this is, with some high degree of confidence, the population proportion is somewhere between 46.9% and 49.1%. The study of these types of intervals is presented in the next chapter, where intervals, such as this one, are known as *confidence intervals*.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Sampling scenarios {#sampling-conclusion-table}
+
+In this chapter, we performed both tactile and virtual sampling exercises to learn about the sampling distribution of the sample proportion. We also presented a case study of sampling in real life with polls. In each case, we used the sample proportion, $\bar X$ or $\widehat{p}$, to estimate the population proportion $p$. However, we are not just limited to scenarios related to proportions. In other words, we can use sampling to estimate other population parameters using other point estimates as well. We present four more such scenarios in Table \@ref(tab:table-ch8). 
+
+```{r table-ch8, echo=FALSE, message=FALSE, purl=FALSE}
+# The following Google Doc is published to CSV and loaded using read_csv():
+# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
+
+if (!file.exists("rds/sampling_scenarios.rds")) {
+  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" |>
+    read_csv(na = "") |>
+    slice(1:5)
+  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
+} else {
+  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
+}
+
+sampling_scenarios |>
+  kable(
+    caption = "\\label{tab:summarytable-ch8}Scenarios of sampling for inference",
+    booktabs = TRUE,
+    escape = FALSE,
+    linesep = ""
+  ) |>
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  ) |>
+  column_spec(1, width = "0.5in") |>
+  column_spec(2, width = "1.2in") |>
+  column_spec(3, width = "0.8in") |>
+  column_spec(4, width = "1.5in") |>
+  column_spec(5, width = "0.6in")
+```
+
+In the rest of this book, we will cover all the remaining scenarios as follows:
+
+* In Chapter \@ref(confidence-intervals), we will cover examples of statistical inference for
+    + Scenario 2: The mean weight $\mu$ of chocolate-covered almonds in a bowl.
+    + Scenario 3: The difference $p_1 - p_2$ in the proportion of people who yawn *when seeing someone else yawn first* minus the proportion of people who yawn *without seeing someone else yawn first*. This is an example of *two-sample* inference\index{two-sample inference}.
+* In Chapter \@ref(hypothesis-testing), we will cover an example of statistical inference for
+    + Scenario 4: The difference $\mu_1 - \mu_2$ in mean IMDb ratings for action and romance movies. This is another example of *two-sample* inference.
+* In Chapter \@ref(inference-for-regression), we will cover an example of statistical inference for regression by revisiting the regression models for teaching score as a function of various instructor demographic variables you saw in Chapters \@ref(regression) and \@ref(multiple-regression).
+    + Scenario 5: The slope $\beta_1$ of the population regression line.
+
+
+### Additional resources
+
+```{r echo=FALSE, results="asis", purl=FALSE}
+if (knitr::is_latex_output()) {
+  cat("Solutions to all *Learning checks* can be found online in [Appendix D](https://moderndive.com/D-appendixD.html).")
+}
+```
+
+```{r echo=FALSE, purl=FALSE, results="asis", eval = FALSE}
+generate_r_file_link("07-sampling.R")
+```
+
+
+### What's to come?
+
+Recall that in the bowl activity in Section \@ref(sampling-simulation) we obtained samples that produced sample proportions of red balls that were fairly close to, but not exactly equal to the population proportion. Similarly, our Gallup poll case study in Section \@ref(sampling-case-study) suggested that, based on a sample of at least 1,000 people living in the US, about 47% of them believed that pre-pandemic normalcy was not attainable. However, as good of an estimate this sample proportion may be, it is likely not exactly equal to the population proportion. Samples of balls or opinion polls will not produce *statistics* that are exactly equal to population *parameters*; there will be differences caused by *sampling variation*. So, instead of proposing *point* estimates, we could instead propose interval estimates for these population *parameters*. For example, we could instead say that the population proportion of people living in the US who believe that pre-pandemic normalcy is not attainable is about 47%, with a **margin of error* of about 2.1%, or equivalently $$(47\% - 2.1\%, 47\% + 2.1\%) = (46.9\%, 49.1\%)$$
+this is, with some high degree of confidence, the population proportion is somewhere between 46.9% and 49.1%. The study of these types of intervals is presented in the next chapter, where intervals, such as this one, are known as *confidence intervals*.
+
+
+
+
