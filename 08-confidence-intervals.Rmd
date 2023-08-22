@@ -174,500 +174,11 @@ pop_ave_wt <- bowl_almonds |>
 
 
 
-## Chocolate-covered almonds {#ci-activity}
 
-In Chapter \@ref(sampling), a bowl with red and white balls was used to study the sampling distribution of the sample proportion. We do here something similar with a bowl of chocolate-covered almonds, as seen in Figure \@ref(fig:bowl_almond). 
 
-```{r bowl_almond, echo=FALSE, fig.cap="A bowl of chocolate-covered almonds.", purl=FALSE, out.width = "40%", purl=FALSE}
-knitr::include_graphics("images/sampling/almonds/almond_bowl_aux.png")
-```
-
-For simplicity we refer to each chocolate covered almond simply as an almond. So, assume we are interested in the average weight in grams of *all*  the almonds in the bowl. We call this the *population average* weight or *population mean* weight.
-
-
-### One sample {#resampling-tactile}
-
-If we randomly select one almond from the bowl, we could determine its weight using a scale, as shown in Figure \@ref(fig:one_almond)
-
-```{r one_almond, echo=FALSE, fig.show="hold", fig.cap="One almond on a scale.", purl=FALSE, out.width = "40%", purl=FALSE}
-knitr::include_graphics("images/sampling/almonds/one_almond.png")
-```
-
-Let's now obtain a random sample of 25 almonds, as shown in Figure \@ref(fig:twenty_five_almonds), and determine the sample average weight, or *sample mean* weight, in grams.
-
-```{r twenty_five_almonds, echo=FALSE, fig.cap="A random sample of 25 almonds on a scale.", purl=FALSE, out.width = "40%", purl=FALSE}
-knitr::include_graphics("images/sampling/almonds/twenty_five_almonds.png")
-```
-
-Since the total weight is 88.6 grams, as shown in the Figure \@ref(fig:twenty_five_almonds), the average weight will be $88.6/25 = 3.544$. Is this sample mean a good *estimate* of the population mean? The `moderndive` \index{moderndive!almonds\_sample} package contains the information of this sample in the `almonds_sample` data frame:
-
-```{r}
-almonds_sample
-```
-
-The `almonds_sample` data frame has `r num_almonds` rows corresponding to each almond with two variables. 
-The first variable `ID` identifies individual almonds from top-left to bottom right, by rows in Figure \@ref(fig:twenty_five_almonds), whereas the second variable `weight` corresponds to the corresponding weight of each almond in grams as a numeric variable, also known as a double (`dbl`).
-
-Based on these `r num_almonds` sampled almonds, what can we say about the almonds in the bowl? 
-Let's study some properties of our sample by performing an exploratory data analysis. 
-Let's first visualize the distribution of the weights of these `r num_almonds_sample` almonds using our data visualization tools from Chapter \@ref(viz). 
-Since `weight` is a numerical variable, we use a histogram in Figure \@ref(fig:almonds-sample-histogram) to visualize its distribution.
-
-```{r almonds-sample-histogram, fig.cap="Distribution of weight on a sample of 25 almonds."}
-ggplot(almonds_sample, aes(x = weight)) +
-  geom_histogram(binwidth = .1, color = "white")
-```
-
-Observe a slightly left-skewed \index{skew} distribution, since most almonds in the sample weight between 3.6 and 3.8 gr. What is the average weight for the `r num_almonds` sampled almonds? Eyeballing the histogram it appears to be around 3.5. Let's now compute this value exactly using our data wrangling tools from Chapter \@ref(wrangling).
-
-```{r}
-x_bar <- almonds_sample %>% 
-  summarize(mean_weight = mean(weight))
-x_bar
-```
-
-Thus, if we're willing to assume that `almonds_sample` is a representative sample from *all* the almonds in the ball, a "good guess" of the average almond weight would be `r x_bar %>% pull(mean_weight) %>% round(2)` gr. This should all start sounding similar to what we did previously in Chapter \@ref(sampling)!
-
-In Chapter \@ref(sampling), the *population* of interest was the bowl of red and white balls and the *population parameter* was the *population proportion* of red balls, denoted by $p$. In order to estimate $p$, a sample of `r n_balls_sample` balls was obtained with a shovel and the proportion of red balls in the sample was computed. This *sample proportion*, $\widehat{p}$, was the *point estimate* for the population proportion.
-
-Here, the population of interest are all the chocolate-covered almonds in the bowl. The population parameter of interest is now the *population mean* weight of all these almonds, a value denoted by the Greek letter $\mu$ (pronounced "mu"). In order to estimate $\mu$, a sample of `r num_almonds_sample` almonds from the bowl was obtained and the *sample mean* weight computed. This sample mean, denoted by $\overline{x}$ (pronounced "x-bar"), is the point estimate of $\mu$. Occasionally, the point estimate for the sample mean is also written $\hat \mu$.
-
-We summarize the relationship and notation between population parameters and correspondin point estimates for both, proportions and means, in Table \@ref(tab:table-ch8-b).
-
-```{r table-ch8-b, echo=FALSE, message=FALSE, purl=FALSE}
-# The following Google Doc is published to CSV and loaded using read_csv():
-# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
-
-if (!file.exists("rds/sampling_scenarios.rds")) {
-  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>%
-    read_csv(na = "") %>%
-    slice(1:5)
-  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
-} else {
-  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
-}
-
-sampling_scenarios %>%
-  # Only first two scenarios
-  filter(Scenario <= 2) %>%
-  kable(
-    caption = "Scenarios of sampling for inference",
-    booktabs = TRUE,
-    escape = FALSE,
-    linesep = ""
-  ) %>%
-  kable_styling(
-    font_size = ifelse(knitr::is_latex_output(), 10, 16),
-    latex_options = c("hold_position")
-  ) %>%
-  column_spec(1, width = "0.5in") %>%
-  column_spec(2, width = "0.7in") %>%
-  column_spec(3, width = "1in") %>%
-  column_spec(4, width = "1.1in") %>%
-  column_spec(5, width = "1in")
-```
-
-
-
-
-### Virtual samples {#virtual-samples-mean}
-
-
-In the previous Section \@ref(resampling-tactile), we obtained a physical sample from a bowl with chocolate-covered almonds by hand. A we did in Section \@ref(sampling-simulation), we can perform sampling virtually. The bowl seen in Figure \@ref(fig:bowl_almond) is represented by the data frame `bowl_almonds` included in the `moderndive` package. The rows of `bowl_almonds` correspond exactly to the contents of the actual bowl. 
-
-```{r}
-bowl_almonds
-```
-
-The data frame `bowl_almonds` has `r num_almonds` rows, each representing an almond in the bowl. The first variable `unit_ID` is used as an *identification variable* and the second variable `weight` indicates the weight, in grams, of each chocolate-covered almond. As we did in Section \@ref(sampling-simulation) we use again the `rep_slice_sample()` function to obtain 1000 random samples with a sample `size` set to be 25, and with the number of replicates `reps` set to `1000`. Be sure to scroll through the contents of `virtual_samples` in RStudio's viewer. 
-
-```{r}
-virtual_samples <- bowl_almonds |> 
-  rep_slice_sample(n = 25, reps = 1000)
-virtual_samples
-```
-
-Observe that now `virtual_samples` has 1000 $\cdot$ 25 = 25,000 rows. Using the appropriate data wrangling code, we obtain `virtual_mean_weight` with the almond mean weight for each 1000 random samples. 
-
-```{r echo = -1}
-set.seed(1)
-virtual_mean_weight <- virtual_samples |> 
-  summarize(mean_weight = mean(weight))
-virtual_mean_weight
-```
-
-Let's construct a histogram for these 1000 sample means. It is shown in Figure \@ref(fig:sampling-mean-virtual-1000).
-
-```{r eval=FALSE}
-ggplot(virtual_mean_weight, aes(x = mean_weight)) +
-  geom_histogram(binwidth = 0.02, boundary = 3.5, color = "white") +
-  labs(x = "Sample mean", 
-       title = "Histogram of 1000 sample means") 
-```
-
-```{r sampling-mean-virtual-1000, echo=FALSE, fig.cap="The distribution of 1000 means based on 1000 random samples of size 25.", purl=FALSE}
-set.seed(1)
-virtual_mean_weight <- virtual_samples |> 
-  summarize(mean_weight = mean(weight))
-virtual_histogram <- ggplot(virtual_mean_weight, aes(x = mean_weight)) +
-  geom_histogram(binwidth = 0.02, boundary = 0.4, color = "white")
-
-virtual_histogram +
-  labs(x = "Sample mean", 
-       title = "Histogram of 1000 sample means")
-summary(virtual_mean_weight)
-``` 
-
-The sample means observed in the histogram could be as low as 3.45 gr or as high as 3.83 gr, but those extreme sample means are rare. The most frequent sample means obtained are those between 3.6 and 3.7 grams. 
-Furthermore, the histogram shows a symmetric, bell-shaped distribution that can be approximated well by a normal distribution. While we are dealing with sample means now, the conclusions obtained are strikingly similar to those presented in Chapter \@ref(sampling) when discussing the sampling distribution for the sample proportion.
-
-### The sampling distribution of the sample mean  
-
-As we saw in Chapter \@ref(sampling) when working with sample proportion, the size of the sample has a direct effect on the magnitude of sampling variation of the sample means. To see this, 
-let's consider now the sample mean weight of almonds using three different sample sizes: 25, 50, and 100.
-
-We follow the same process performed in subsection \@ref(virtual-samples-mean): we generate 1000 samples, obtain the sample means, and use them to draw a histogram. We do this three times with the `size` argument set to `25`, `50`, and `100`, respectively. We run each of the following code segments individually and then compare the resulting histograms.
-
-```{r, eval=FALSE}
-# Segment 1: sample size = 25 ------------------------------
-# 1.a) Obtaining the 1000 sample means, each from random samples of size 25
-virtual_mean_weight_25 <- bowl_almonds |> 
-  rep_slice_sample(n = 25, reps = 1000)|>
-  summarize(mean_weight = mean(weight), n = n())
-
-# 1.b) Plot distribution via a histogram
-ggplot(virtual_mean_weight_25, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.02, boundary = 3.5, color = "white") +
-  labs(x = "Sample mean weights for random samples of 25 almonds", title = "25") 
-
-
-# Segment 2: sample size = 50 ------------------------------
-# 2.a) Obtaining the 1000 sample means, each from random samples of size 50
-virtual_mean_weight_50 <- bowl_almonds |> 
-  rep_slice_sample(n = 50, reps = 1000)|>
-  summarize(mean_weight = mean(weight), n = n())
-
-# 2.b) Plot distribution via a histogram
-ggplot(virtual_mean_weight_50, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.02, boundary = 3.5, color = "white") +
-  labs(x = "Sample mean weights for random samples of 50 almonds", title = "50") 
-
-# Segment 3: sample size = 100 ------------------------------
-# 3.a) Obtaining the 1000 sample means, each from random samples of size 100
-virtual_mean_weight_100 <- bowl_almonds |> 
-  rep_slice_sample(n = 100, reps = 1000)|>
-  summarize(mean_weight = mean(weight), n = n())
-
-# 3.b) Plot distribution via a histogram
-ggplot(virtual_mean_weight_100, aes(x = prop_red)) +
-  geom_histogram(binwidth = 0.02, boundary = 3.5, color = "white") +
-  labs(x = "Sample mean weights for random samples of 100 almonds", title = "100") 
-```
-
-For easy comparison, we present the three resulting histograms in a single row with matching x and y axes in Figure \@ref(fig:comparing-sampling-distributions-means).
-
-```{r comparing-sampling-distributions-means, echo=FALSE, fig.height=3, fig.cap="Histograms of sample means for different sample sizes.", purl=FALSE}
-# n = 25
-if (!file.exists("rds/virtual_sample_means_25.rds")) {
-  virtual_samples_25 <- bowl_almonds |>
-    rep_slice_sample(n = 25, reps = 1000)
-  write_rds(virtual_samples_25, "rds/virtual_sample_means_25.rds")
-} else {
-  virtual_sample_means_25 <- read_rds("rds/virtual_sample_means_25.rds")
-}
-virtual_mean_weight_25 <- bowl_almonds |> 
-  rep_slice_sample(n = 25, reps = 1000)|>
-  summarize(mean_weight = mean(weight), n = n())
-
-# n = 50
-if (!file.exists("rds/virtual_sample_means_50.rds")) {
-  virtual_sample_means_50 <- bowl_almonds |>
-    rep_slice_sample(n = 50, reps = 1000)
-  write_rds(virtual_sample_means_50, "rds/virtual_sample_means_50.rds")
-} else {
-  virtual_sample_means_50 <- read_rds("rds/virtual_sample_means_50.rds")
-}
-virtual_mean_weight_50 <- bowl_almonds |> 
-  rep_slice_sample(n = 50, reps = 1000)|>
-  summarize(mean_weight = mean(weight), n = n())
-
-# n = 100
-if (!file.exists("rds/virtual_sample_means_100.rds")) {
-  virtual_sample_means_100 <- bowl_almonds |>
-    rep_slice_sample(n = 100, reps = 1000)
-  write_rds(virtual_sample_means_100, "rds/virtual_sample_means_100.rds")
-} else {
-  virtual_sample_means_100 <- read_rds("rds/virtual_sample_means_100.rds")
-}
-virtual_mean_weight_100 <- virtual_sample_means_100 |>
-  summarize(mean_weight = mean(weight), n = n())
-
-
-virtual_mean <- bind_rows(
-  virtual_mean_weight_25,
-  virtual_mean_weight_50,
-  virtual_mean_weight_100
-)
-
-comparing_sampling_distributions <- ggplot(virtual_mean, aes(x = mean_weight)) +
-  geom_histogram(binwidth = 0.02, boundary = 3.5, color = "white") +
-  labs(
-    x = "Sample means for chocolate-covered almonds",
-    title = "Comparing histograms of sample means for three different sample sizes"
-  ) +
-  facet_wrap(~n)
-
-if (knitr::is_latex_output()) {
-  comparing_sampling_distributions +
-    theme(
-      strip.text = element_text(colour = "black"),
-      strip.background = element_rect(fill = "grey93")
-    )
-} else {
-  comparing_sampling_distributions
-}
-```
-
-
-Observe that all three histograms are bell-shaped and appear to center around a middle value,  somewhere around 3.65. In addition, as the sample size increases, the variation among the 1000 sample proportions decreases and there are fewer differences due to sampling variation.
-
-Moreover, the amount of sampling variation is actually proportional to the sample size used. As we did when dealing with proportions, we obtain the \index{standard deviation} *standard deviation* (see Appendix \@ref(appendix-stat-terms) for a brief discussion on the properties of the standard deviation). The following data wrangling code introduces the `sd()` summary function to calculate the standard deviation of 1000 sample proportions of the same sample size. Therefore, three standard deviations are obtained, one for each sample size, as shown below.
-
-```{r, eval=FALSE}
-# n = 25
-virtual_mean_weight_25 |> 
-  summarize(sd = sd(mean_weight))
-
-# n = 50
-virtual_mean_weight_50 |> 
-  summarize(sd = sd(mean_weight))
-
-# n = 100
-virtual_mean_weight_100 |> 
-  summarize(sd = sd(mean_weight))
-```
-
-Let's compare these three measures of distributional variation in Table \@ref(tab:comparing-n1).
-
-```{r comparing-n1, echo=FALSE, purl=FALSE}
-comparing_n_table <- virtual_mean |>
-  group_by(n) |>
-  summarize(sd = sd(mean_weight)) |>
-  rename(`Sample size` = n, `Standard deviation of sample means` = sd)
-
-comparing_n_table |>
-  kable(
-    digits = 3,
-    caption = "Comparing standard deviations of sample means for three different sample sizes",
-    booktabs = TRUE,
-    linesep = ""
-  ) |>
-  kable_styling(
-    font_size = ifelse(knitr::is_latex_output(), 10, 16),
-    latex_options = c("hold_position")
-  )
-```
-
-As we observed in Figure \@ref(fig:comparing-sampling-distributions-means), as the sample size increases, the sampling variation decreases. 
-
-
-
-
-### Random Variables
-
-As we did in the case of proportions, we can use a theoretical approach to understand some important properties of the sample mean. We randomly select one almond at a time from the bowl and assign its weight in grams. We denote this assignmnet as $X_1$. We return the almond to the bowl, select another almond at random, and denote this weight as $X_2$, and so on. 
-Since we want to take a sample of 25 almonds, we do this 25 times. The sample mean is the average of these values: $$\bar X = \frac{X_1+X_2+\dots+X_{25}}{25}.$$
-
-Observe that the possible values of $\bar X$ are all the possible means of 25 almonds. The distribution of $\bar X$, is also called the **sampling distribution of the sample mean**. An intuitive way to think about this distribution is by answering these questions: what are the sample means that can be obtained? and how likely are those sample means of happening? As we have shown with earlier simulations, the sampling distribution of the sample mean is approximately normal.
-
-### The mean and standard deviation of $\bar X$
-
-The mean of $\bar X$ represents what sample mean we would expect to get, on average, if we were to perform the experiment a large number of times. Based on probability theory, the mean of $\bar X$ happens to be equal to the population mean weight of almonds in the bowl. 
-
-```{r}
-mu <- bowl_almonds |>
-  summarise(mean(weight))
-mu
-```
-
-Since we have information of the entire bowl, we can see that the population mean weight is $\mu =`r mu`$. We can check, using our simulation, whether this results holds:
-
-```{r}
-virtual_mean_weight_25 |> 
-  summarize(mean(mean_weight))
-```
-
-Indeed, the results of our simulation is very close to the theoretical population mean. Similarly, the standard deviation of $\bar X$, or standard error, can be understood as how far, on average, the sample mean observed may be from the population mean. Theoretical results show that the standard error can be obtained using the formula: $$SE_{\bar X} = \sqrt{\frac{s^2}{n}} = \frac{s}{\sqrt n}$$ where $s$ is the sample standard deviation and $n$ is the size of our sample. In our example, the standard error is $$SE_{\bar X} = \sqrt{\frac{0.323}{25}} = 0.065$$
-
-
-We use the simulation again to check if this result holds:
-
-```{r}
-virtual_mean_weight_25 |> 
-  summarize(sd(mean_weight))
-```
-
-Again, this result is really close to the theoretical value of the standard error. The Central Limit Theorem introduced earlier hold here as well. 
-
-### Computer simulation of resampling {#resampling-simulation}
-
-Let's now mimic our tactile resampling activity virtually with a computer.
-
-
-#### Virtually resampling once
-
-First, let's perform the virtual analog of resampling once. Recall that the `almonds_sample` data frame included in the `moderndive` package contains the weights of our original sample of `r num_almonds` almonds from the bank. Furthermore, recall in Chapter \@ref(sampling) on sampling that we used the `rep_sample_n()` function as a virtual shovel to sample balls from our virtual bowl of `r nrow(bowl)` balls as follows: 
-
-```{r, eval=FALSE}
-virtual_shovel <- bowl %>% 
-  rep_sample_n(size = 50)
-```
-
-Let's modify this code to perform the resampling with replacement of the `r num_almonds` slips of paper representing our original sample `r num_almonds` almonds:
-
-```{r}
-virtual_resample <- almonds_sample %>% 
-  rep_sample_n(size = 50, replace = TRUE)
-```
-
-Observe how we explicitly set the `replace` argument to `TRUE` in order to tell `rep_sample_n()` that we would like to sample almonds \index{sampling!with replacement} *with* replacement. Had we not set `replace = TRUE`, the function would've assumed the default value of `FALSE` and hence done resampling *without* replacement. Additionally, since we didn't specify the number of replicates via the `reps` argument, the function assumes the default of one replicate `reps = 1`. Lastly, observe also that the `size` argument is set to match the original sample size of `r num_almonds` almonds. 
-
-Let's look at only the first 10 out of `r num_almonds` rows of `virtual_resample`:
-
-```{r}
-virtual_resample
-```
-
-The `replicate` variable only takes on the value of 1 corresponding to us only having `reps = 1`, the `ID` variable indicates which of the `r num_almonds` almonds from `almonds_sample` was resampled, and `weight` denotes the weight of minting. Let's now compute the mean `weight` in our virtual resample of size `r num_almonds` using data wrangling functions included in the `dplyr` package:
-
-```{r}
-virtual_resample %>% 
-  summarize(resample_mean = mean(weight))
-```
-
-As we saw when we did our tactile resampling exercise, the resulting mean weight is different than the mean weight of our `r num_almonds` originally sampled almonds of `r x_bar %>% pull(mean_weight) %>% round(2)`.
 
 <!--
-v2 TODO: Add discussion on why tidyverse opts for 3 sigfigs. For ex:
-
-Note that tibbles will try to print as pretty as possible which may result in
-numbers being rounded. In this chapter, we have set the default number of values
-to be printed to six in tibbles with `options(pillar.sigfig = 6)`.
-
--->
-
-
-#### Virtually resampling `r n_resample_friends` times {#bootstrap-35-replicates}
-
-Let's now perform the virtual analog of our `r n_resample_friends` friends' resampling. Using these results, we'll be able to study the variability in the sample means from `r n_resample_friends` resamples of size `r num_almonds`. Let's first add a ``reps = `r n_resample_friends` `` argument to `rep_sample_n()` \index{infer!rep\_sample\_n()} to indicate we would like `r n_resample_friends` replicates. Thus, we want to repeat the resampling with the replacement of `r num_almonds` almonds `r n_resample_friends` times.
-
-```{r}
-virtual_resamples <- almonds_sample %>% 
-  rep_sample_n(size = 50, replace = TRUE, reps = 35)
-virtual_resamples
-```
-
-The resulting `virtual_resamples` data frame has `r n_resample_friends` $\cdot$ `r num_almonds` = `r n_resample_friends * num_almonds` rows corresponding to `r n_resample_friends` resamples of `r num_almonds` almonds. Let's now compute the resulting `r n_resample_friends` sample means using the same `dplyr` code as we did in the previous section, but this time adding a `group_by(replicate)`:
-
-```{r}
-virtual_resampled_means <- virtual_resamples %>% 
-  group_by(replicate) %>% 
-  summarize(mean_weight = mean(weight))
-virtual_resampled_means
-```
-
-Observe that `virtual_resampled_means` has `r n_resample_friends` rows, corresponding to the `r n_resample_friends` resampled means. Furthermore, observe that the values of `mean_weight` vary. Let's visualize this variation using a histogram in Figure \@ref(fig:tactile-resampling-7).
-
-```{r tactile-resampling-7, fig.cap="Distribution of 35 sample means from 35 resamples."}
-ggplot(virtual_resampled_means, aes(x = mean_weight)) +
-  geom_histogram(binwidth = .01, color = "white", boundary = 3) +
-  labs(x = "Resample mean weight")
-```
-
-Let's compare our virtually constructed bootstrap distribution with the one our `r n_resample_friends` friends constructed via our tactile resampling exercise in Figure \@ref(fig:orig-and-resample-means). Observe how they are somewhat similar, but not identical.
-
-```{r orig-and-resample-means, echo=FALSE, fig.cap="Comparing distributions of means from resamples.", purl=FALSE}
-p3 <- ggplot(virtual_resampled_means, aes(x = mean_weight)) +
-  geom_histogram(binwidth = .1, color = "white", boundary = 1990) +
-  labs(x = "Resample mean weight", title = "35 means of virtual resamples") +
-  scale_x_continuous(breaks = seq(1990, 2000, 2))
-p4 <- ggplot(resampled_means, aes(x = mean_weight)) +
-  geom_histogram(binwidth = .1, color = "white", boundary = 1990) +
-  labs(x = "Resample mean weight", title = "35 means of tactile resamples") +
-  scale_x_continuous(breaks = seq(1990, 2000, 2))
-p3 + p4
-```
-
-Recall that in the "resampling with replacement" scenario we are illustrating here, both of these histograms have a special name: the *bootstrap distribution of the sample mean*. Furthermore, recall they are an approximation to the *sampling distribution* of the sample mean, a concept you saw in Chapter \@ref(sampling) on sampling. These distributions allow us to study the effect of sampling variation on our estimates of the true population mean, in this case the true mean weight for *all* US almonds. However, unlike in Chapter \@ref(sampling) where we took multiple samples (something one would never do in practice), bootstrap distributions are constructed by taking multiple resamples from a *single* sample: in this case, the `r num_almonds` original almonds from the bank. 
-
-
-#### Virtually resampling `r n_virtual_resample` times {#bootstrap-1000-replicates}
-
-Remember that one of the goals of resampling with replacement is to construct the bootstrap distribution, which is an approximation of the sampling distribution. However, the bootstrap distribution in Figure \@ref(fig:tactile-resampling-7) is based only on `r n_resample_friends` resamples and hence looks a little coarse. Let's increase the number of resamples to `r n_virtual_resample`, so that we can hopefully better see the shape and the variability between different resamples. 
-
-```{r}
-# Repeat resampling 1000 times
-virtual_resamples <- almonds_sample %>% 
-  rep_sample_n(size = 50, replace = TRUE, reps = 1000)
-
-# Compute 1000 sample means
-virtual_resampled_means <- virtual_resamples %>% 
-  group_by(replicate) %>% 
-  summarize(mean_weight = mean(weight))
-```
-
-However, in the interest of brevity, going forward let's combine these two operations into a single chain of pipe (`%>%`) operators:
-
-```{r}
-virtual_resampled_means <- almonds_sample %>% 
-  rep_sample_n(size = 50, replace = TRUE, reps = 1000) %>% 
-  group_by(replicate) %>% 
-  summarize(mean_weight = mean(weight))
-virtual_resampled_means
-```
-
-In Figure \@ref(fig:one-thousand-sample-means) let's visualize the bootstrap distribution of these `r n_virtual_resample` means based on `r n_virtual_resample` virtual resamples:
-
-```{r one-thousand-sample-means, message=FALSE, fig.cap="Bootstrap resampling distribution based on 1000 resamples."}
-ggplot(virtual_resampled_means, aes(x = mean_weight)) +
-  geom_histogram(binwidth = 1, color = "white", boundary = 1990) +
-  labs(x = "sample mean")
-```
-
-Note here that the bell shape is starting to become much more apparent. We now have a general sense for the range of values that the sample mean may take on. But where is this histogram centered? Let's compute the mean of the `r n_virtual_resample` resample means:
-
-```{r}
-virtual_resampled_means %>% 
-  summarize(mean_of_means = mean(mean_weight))
-```
-```{r echo=FALSE, purl=FALSE}
-mean_of_means <- virtual_resampled_means %>%
-  summarize(mean(mean_weight)) %>%
-  pull() %>%
-  round(2)
-```
-
-The mean of these `r n_virtual_resample` means is `r mean_of_means`, which is quite close to the mean of our original sample of `r num_almonds` almonds of `r x_bar %>% pull(mean_weight) %>% round(2)`. This is the case since each of the `r n_virtual_resample` resamples is based on the original sample of `r num_almonds` almonds.
-
-Congratulations! You've just constructed your first bootstrap distribution! In the next section, you'll see how to use this bootstrap distribution to construct *confidence intervals*.
-
-```{block, type="learncheck", purl=FALSE}
-\vspace{-0.15in}
-**_Learning check_**
-\vspace{-0.1in}
-```
-
-**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What is the chief difference between a bootstrap distribution and a sampling distribution?
-
-**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Looking at the bootstrap distribution for the sample mean in Figure \@ref(fig:one-thousand-sample-means), between what two values would you say *most* values lie?
-
-```{block, type="learncheck", purl=FALSE}
-\vspace{-0.25in}
-\vspace{-0.25in}
-```
-
-
-
+This was a previous sections that will be replaced. It has been hidden AV 8/16/23
 
 
 ## Understanding confidence intervals {#ci-build-up}
@@ -688,6 +199,9 @@ Point estimate           |  Confidence interval
 ![](images/shutterstock/shutterstock_149730074_cropped.jpg){ height=2.5in } |  ![](images/shutterstock/shutterstock_176684936.jpg){ height=2.5in }
 -->
 
+
+
+<!--
 ```{r point-estimate-vs-conf-int, echo=FALSE, fig.cap="Analogy of difference between point estimates and confidence intervals.", out.width="100%", purl=FALSE}
 knitr::include_graphics("images/shutterstock/point_estimate_vs_conf_int.png")
 ```
@@ -727,7 +241,7 @@ ggplot(virtual_resampled_means, aes(x = mean_weight)) +
 ```
 
 
-### Standard error method {#se-method}
+### Percentile method {#percentile-method}
 
 ```{r echo=FALSE, purl=FALSE}
 # Can also use get_confidence_interval() instead of get_ci(),
@@ -806,6 +320,8 @@ standard_error_ci
 ```
 -->
 
+
+<!--
 ```{block, type="learncheck", purl=FALSE}
 \vspace{-0.15in}
 **_Learning check_**
@@ -820,6 +336,74 @@ standard_error_ci
 \vspace{-0.25in}
 \vspace{-0.25in}
 ```
+
+-->
+
+
+## Revisiting the bowl activities {#ci-activity1}
+
+
+<!-- 
+This section needs to be completed. Use text placed in ch08_estimation. AV 8/18/23
+-->
+
+<!--
+Talk about estimation
+-->
+
+### Estimating the proportion of red balls in the bowl
+
+<!-- 
+This section needs to be completed. Use text placed in ch08_estimation. AV 8/18/23
+-->
+
+<!--
+Show any given sample proportion and compare it with the population proportion
+
+Pick any 33 sample proportions and show how close they are for the population proportion
+
+Show how about 95% of the sample proportions are within 2 SE from the true population proportion
+
+Construct an interval based on any one sample and show how this interval contains the true population proportion
+-->
+
+### Estimate the average weight of chocolate-covered almonds
+
+<!-- 
+This section needs to be completed. Use text placed in ch08_estimation. AV 8/18/23
+-->
+
+<!--
+Show how about 95% of the sample means are within 2 SE from the sample mean
+
+Construct an interval based on any one sample and show how this interval contains the true population proportion
+
+Obtain one sample and introduce resampling with replacements from this sample. Discuss bootstrap sampling.
+
+Obtain 1000 bootstrap samples and obtain their sample means. Show how the histogram compares to the histogram of 1000 samples.
+
+Use the bootstrap samples to obtain the 95% interval
+-->
+
+## Confidence Intervals framework
+
+<!-- 
+This section needs to be completed. Use text placed in ch08_estimation. AV 8/18/23
+-->
+
+### Precision and accuracy (perhaps unbiasedness and consistency)
+### Confidence Interval: the theory-based approach
+### Confidence interval: the simulation-based approach
+
+<!--
+Introduce some theory about bootstrap sampling
+-->
+
+### Comparing theory- and simulation-based approaches
+
+<!--
+Add a note that in the remainder of the text, we’ll focus on the simulation-based approach
+-->
 
 
 
@@ -1857,6 +1441,21 @@ In fact, the standard error is another related factor in determining confidence 
 
 
 
+
+
+## Theoretical Framework
+
+### Why the simulation-based approach
+
+Here comes the theory supporting the use of bootstrapping for inference
+Some results based on simulations showing this (as hinted by Robert) would be useful here too
+
+### Some details to take into account when using simulation-based confidence intervals
+
+Best practices when using these methods
+Introduce some theory/simulations/reference that show the bootstrap sample is an adequate method and could have some advantages over the theory-based approach
+
+
 ## Case study: Is yawning contagious? {#case-study-two-prop-ci}
 
 Let's apply our knowledge of confidence intervals to answer the question: "Is yawning contagious?". If you see someone else yawn, are you more likely to yawn? In an episode of the US show [*Mythbusters*](http://www.discovery.com/tv-shows/mythbusters/mythbusters-database/yawning-contagious/), the hosts conducted an experiment to answer this question. The episode is available to view in the United States on the Discovery Network website [here](https://www.discovery.com/tv-shows/mythbusters/videos/is-yawning-contagious) and more information about the episode is also available on [IMDb](https://www.imdb.com/title/tt0768479/).
@@ -2163,6 +1762,10 @@ statement.
 
 
 
+
+
+
+## Summary and Final Remarks
 
 
 ## Conclusion {#ci-conclusion}
