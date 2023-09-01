@@ -68,7 +68,7 @@ prop_red <- num_red / num_balls
 percent_red_chr <- prop_red |> percent(accuracy = 0.1)
 ```
 
-## First bowl activity {#sampling-activity}
+## First bowl activity: red balls {#sampling-activity}
 
 Take a look at the bowl in Figure \@ref(fig:sampling-exercise-1). It has a certain number of red balls and a certain number of white balls all of equal size. `r if_else(is_latex_output(), '(Note that in this printed version of the book "red" corresponds to the darker-colored balls, and "white" corresponds to the lighter-colored balls. We kept the reference to "red" and "white" throughout this book since those are the actual colors of the balls as seen in the background of the image on our book\'s [cover](https://moderndive.com/images/logos/book_cover.png).)', '')` The balls have been mixed beforehand and there does not seem to be any particular pattern for the location of red and white balls inside the bowl. We would like to determine the proportion of red balls in the bowl. 
 
@@ -598,41 +598,19 @@ In both tactile and virtual sampling activities, we obtain sample proportions fr
 Now that we have acquired some intuition about sampling, we introduce statistical definitions, terminology, and notation related to sampling. We use those to succinctly summarize and refer to the ideas behind sampling in the rest of this book. 
 
 
-### Statistical terminology and notation {#terminology-and-notation}
+### Populations and Samples {#terminology-and-notation}
 
 
 We introduce additional terminology and some mathematical notation. We illustrate these concepts by connecting them to different elements of the sampling bowl activities described in previous sections. 
 
-A **population** or **study population** is a collection of all individuals or observations that we are interested in. A **population parameter** or simply **parameter** is a numerical summary, a number, that represents some characteristic of the population. In the bowl activities the **population** is the collection of all the balls inside the bowl and the population proportion of red balls in the bowl is a **parameter**. 
+A **population** or **study population** is a collection of all individuals or observations that we are interested in. In the bowl activities the **population** is the collection of all the balls inside the bowl and the population proportion of red balls in the bowl is a **parameter**. A **sample** is a subsets of the population. **Sampling** is the act of collecting samples from the population. **Simple random sampling** is *sampling* where each member of the population has the same chance of being selected, for example, by using a shovel to select balls from a bowl. A **random sample** is a sample obtained using simple random sampling. In the bowl activities, tactile and virtual, we performed simple random sampling when getting random samples from the bowl. 
 
-A **sample** is a subsets of the population. **Sampling** is the act of collecting samples from the population. **Simple random sampling** is *sampling* where each member of the population has the same chance of being selected, for example, by using a shovel to select balls from a bowl. A **random sample** is a sample obtained using simple random sampling. In the bowl activities, tactile and virtual, we performed simple random sampling when getting samples from the bowl. A **sample statistic** or simply a **statistic** is a numerical summary, a number, computed from a sample.
-1. A **sample statistic** or simply a **statistic** is a numerical summary, a number, computed from a sample.
-    - Two statistics that are often used are the average (or mean) and the proportion of the sample. We call them *sample mean* and *sample proportion*
+A **population parameter** or simply **parameter** is a numerical summary, a number, that represents some characteristic of the population. A **sample statistic** or simply a **statistic** is a numerical summary computed from a sample. In the bowl activities the parameter of interest was the population proportion $p$=`r prop_red`. Similarly, in subsection \@ref(one-sample) a sample of 50 balls was obtained and 17 were red, the statistic was the *sample proportion* which is equal to $\widehat{p}= 0.34$. Observe how we use $p$ to represent the population proportion (parameter) and $\widehat{p}$ for the sample proportion (statistic).
 
-The first set of terms and notations relate to **populations**:
+### The sampling distribution of the sample proportion
 
-1. A **population** or **study population** is a collection of all individuals or observations that we are interested in. 
-    - In our sampling activities, the **population** is the collection of balls in the bowl shown in Figure \@ref(fig:sampling-exercise-1).
-1. If the size of the population is known, as in the bowl activity, we may use the upper-case letter $N$ to represent this size. 
-    - For our sampling activities, for example, we use the virtual `bowl` to determine that the population size, the total number of balls in the bowl, was $N$ = `r num_balls`. 
-    - For more general settings, it is not uncommon to deal with situations where the size of the population is in the thousands, millions, or even more. In real-life problems, the size of the population is often unknown and for some theoretical populations, we could deal with an infinite number of outcomes.
-1. A **population parameter** or simply **parameter** is a numerical summary, a number, that represents some characteristic of the population. 
-    - In our sampling activities, the *population proportion*, denoted by the letter $p$, is the *parameter* of interest. In subsection \@ref(population-proportion) we calculated this value, $p$=`r prop_red`. 
-    - Another relevant parameter is the average (or mean) of the population. We call it *population mean* and use the Greek letter $\mu$ to denote it. Most of our work in the next chapter deals with the population mean. 
-    - Interestingly enough, the population proportion can be viewed as a special case of the population mean, as we show in the next subsection.
+The **distribution** of a list of numbers is the set of the possible values in the list and how often they occur. The **sampling distribution of the sample proportion** is the **distribution**  of all the possible sample proportions obtained from all the possible random samples of a given size. \index{sampling distributions} To illustrate this concept recall that in Subsection \@ref(different-shovels) we obtained three histograms shown in Figure \@ref(fig:comparing-sampling-distributions). We use here the histogram on the left, the one produced using 1000 sample proportions obtained from random samples of size $n=25$. These 1000 sample proportions is a large enough number to make this histogram a good visual approximation of the **sampling distribution of the sample proportion** of red balls for samples of size $n=25$. This distribution allows us to make statements about what values we can typically expect when we take a random sample. Be careful, people learning this terminology sometimes confuse the term *sampling distribution* with a *sample's distribution* which is merely the distribution of the values in a single sample.
 
-
-The second set of terms and notations relate to **samples** and **sampling**:
-
-1. **Samples** are subsets of the population. 
-    - We denote the sample size using the lowercase $n$. For example, in our tactile activities, we obtained samples of size $n=50$, and in our virtual sampling activities, we used three sample sizes: $n=25$, $n=50$, and $n=100$.
-1. **Sampling** is the act of collecting samples from the population. **Simple random sampling** is *sampling* where each member of the population has the same chance of being selected, for example, by using a shovel to select balls from a bowl. 
-    - A **random sample** is a sample obtained using simple random sampling. 
-    - In all our bowl activities, tactile and virtual, we performed simple random sampling.
-1. A **sample statistic** or simply a **statistic** is a numerical summary, a number, computed from a sample.
-    - Two statistics that are often used are the average (or mean) and the proportion of the sample. We call them *sample mean* and *sample proportion* and use $\widehat {\mu}$  and $\widehat{p}$ to denote them, respectively. The hat above the letter is a common convention in statistics to differentiate statistics (samples) from parameters (populations). 
-    - In subsection \@ref(one-sample) a sample of 50 balls was obtained and 17 were red so the *sample proportion* was $\widehat{p}= 0.34$.
-    - As in the case of population parameters, the sample proportion can be viewed as a special type of sample mean. 
 
 
 <!-- 
@@ -778,7 +756,7 @@ Learning checks need to be updated. AV 8/17/23
 
 ### Random Variables
 
-We now introduce a simple theoretical approach to understanding some important properties of the sample proportion. To do this we modify the bowl activity slightly. Instead of using a shovel to select all 25 balls at once, we randomly select one ball at a time. If the ball is red we call it a success and record a 1 (one); if it is not red we call it a failure and record a 0 (zero). Then, we return the ball to the bowl so the proportion of red balls in the bowl doesn't change. 
+We now introduce a simple theoretical approach to understand some important properties of the sampling distribution of the sample proportion. To do this we modify the bowl activity slightly. Instead of using a shovel to select all 25 balls at once, we randomly select one ball at a time, 25 times. If the ball is red we call it a success and record a 1 (one); if it is not red we call it a failure and record a 0 (zero). Then, we return the ball to the bowl so the proportion of red balls in the bowl doesn't change. 
 This process is called a trial or a Bernoulli trial in honor of Jacob Bernoulli, a 17th-century mathematician who is among the first ones to work with these trials. 
 Getting a sample of 25 balls is running 25 trials and obtaining 25 numbers, ones or zeros, representing whether we have observed red balls or not on each trial, respectively. 
 The average of these 25 numbers (zeros or ones) represents precisely the proportion or red balls in a sample of 25 balls.
@@ -787,39 +765,41 @@ It is useful to represent a trial as a random variable that takes the value of 1
 We denote the first trial $X_1$, the second trial $X_2$, and so on. 
 After the first trial is completed, if the ball observed is red then $X_1 = 1$ otherwise $X_1=0$. Observe that after the first trial, $X_1$ is no longer a random variable, it is either 0 or 1. After the second trial, $X_2$ is 0 or 1, etc.
 Since our experiment is to perform 25 trials and then find the average of them, this average or mean, before the trials are carried out, can also be expressed as a random variable: $$\bar X = \frac{X_1+X_2+\dots+X_{25}}{25}.$$
-Observe that $\bar X$ is the average, or mean, of these 25 trials. But we also know that this average represents the proportion of red balls in our sample. In the context of Bernoulli trials, **sample proportions** are **sample means**!
-This is why $\bar X$ is called the **sample mean** and in our context here, also the **sample proportion**, because it represents the sample proportions or red balls. Using the notation introduced earlier, observe that $\bar X = \widehat{p}$.
+Observe that $\bar X$ is the average, or mean, of these 25 trials. This is why $\bar X$ is called the **sample mean**. In the context of Bernoulli trials, because they are only zeros or ones, **sample means** are **sample proportions**! Connecting with the notation used earlier, observe that $\bar X = \widehat{p}$.
 
 For example, if the results of the trials are: $$\{0,0,0,1,0,1,0,1,0,0,1,0,0,1,1,0,0,0,1,1,0,1,0,0,0,1 \}$$  The observed value of $\bar X$ will be 
 $$\bar X = \frac{0+0+0+1+0+1+\dots+1+0+0+0+1}{25} = \frac{10}{25}=0.4.$$ 
 So, for this particular example, the sample proportion is $\bar X = 0.4$. If you perform this experiment again and you now get: $$\{1,0,0,1,0,0,0,1,0,0,1,0,1,0,1,1,0,0,0,1,0,1,0,0,0,0\}$$ 
 then, the realization of $\bar X$ will be $\bar X = 9/25 = 0.36$.
-Observe that the possible values of $\bar X$ are all the possible means of 25 trials or, equivalently, all the possible sample proportions of red balls.
+Observe that the possible values of $\bar X$ are all the possible proportions of red balls in a sample of 25 balls.
 
 Moreover, while any given trial can result in choosing a red ball or not (1 or 0), the chances or getting a red ball are determined by the proportion of red balls in the bowl, the population proportion. The higher the population proportion of red balls is, the higher the chances of getting a red ball (or 1) in any trial. 
 
 
 ### The sampling distribution of the sample proportion
 
-The distribution of $\bar X$, when constructed using Bernoulli trials, is precisely the **sampling distribution of the sample proportion** introduced in Subsection \@ref(sampling-definitions). An intuitive way to think about this distribution is by answering these questions: what are the sample proportions that can be obtained? and how likely are those sample proportions of happening?
+The **distribution** of a list of numbers is the set of the possible values in the list and how often they occur. The **sampling distribution of the sample proportion** is the **distribution**  of all the possible sample proportions obtained from all the possible random samples of a given size. \index{sampling distributions} To illustrate this concept recall that in Subsection \@ref(different-shovels) we obtained three histograms shown in Figure \@ref(fig:comparing-sampling-distributions). We use here the histogram on the left, the one produced using 1000 sample proportions obtained from random samples of size $n=25$. These 1000 sample proportions is a large enough number to make this histogram a good visual approximation of the **sampling distribution of the sample proportion** of red balls for samples of size $n=25$. This distribution allows us to make statements about what values we can typically expect when we take a random sample. Be careful, people learning this terminology sometimes confuse the term *sampling distribution* with a *sample's distribution* which is merely the distribution of the values in a single sample.
 
-A very useful way to answer those questions is using simulations. 
-Simulations seldom provide the exact structure of the distribution, because we would need an infinite number of samples for this, but a large number of replications often produce a really good approximation of the distribution and can be used to study the distribution's characteristics. As we did in earlier sections, we obtain sample proportions of red balls from samples of 25 balls, but this time we perform the experiment 10,000 times. 
+If we use random variables to represent our problem, where $\bar X$ is constructed as the average of Bernoulli trials, observe that the distribution of $\bar X$ is precisely the **sampling distribution of the sample proportion**. An intuitive way to think about this distribution is by answering these questions: what are the sample proportions that can be obtained? and how likely are those sample proportions of happening?
+
+Our next task is the be able to answer these questions. To do this we use simulations. 
+
+Simulations seldom provide the exact structure of the distribution, because an infinite number of samples may be needed for this, but a large number of replications often produce a really good approximation of the distribution and can be used to understand well the distribution's characteristics. As we did in earlier sections, we obtain sample proportions of red balls from samples of 25 balls, but this time we obtain 10,000 samples. 
 
 ```{r}
-simul_X_bar_25 <- bowl |>
+samp_prop_25 <- bowl |>
   rep_slice_sample(n = 25, replace = TRUE, reps = 10000) |>
   summarize(prop_red = mean(color == "red"))
 ```
 
-The object `simul_X_bar_25` contains 10,000 sample proportions; each replicate was obtained following the experiment described earlier, so each sample proportion is a possible value of $\bar X$. 
+The object `samp_prop_25` contains 10,000 sample proportions; each replicate was obtained following the experiment described earlier, so each sample proportion is a possible value of $\bar X$. We now use these sample proportions to illustrate properties of the sampling distribution of the sample proportion.
 
 #### The expected value and standard error of $\bar X$
 
 The expected value of $\bar X$ represents what sample proportion we would expect to get, on average, if we were to perform the experiment a large number of times. Based on probability theory, the mean of $\bar X$ happens to be equal to the population proportion of red balls in the bowl, that is $p = 900/2400 = 0.375$. We can check, using our simulation, whether this result holds:
 
 ```{r}
-simul_X_bar_25 |> summarise(mean_Xbar = mean(prop_red))
+samp_prop_25 |> summarise(mean_Xbar = mean(prop_red))
 ```
 
 Indeed, the result obtained above is very close to the theoretical population proportion. Similarly, the standard error of $\bar X$ can be understood as how far, on average, the sample proportion observed may be from the population proportion. Theoretical results show that the standard error of $\bar X$ can be obtained using the formula: $$SE_{\bar X} = \sqrt{\frac{p(1-p)}{n}}$$ where $p$ is the population proportion and $n$ is the size of our sample. In our example, the standard error is $$SE_{\bar X} = \sqrt{\frac{0.375\cdot(1-0.375)}{25}} = 0.0968$$
@@ -828,7 +808,7 @@ Indeed, the result obtained above is very close to the theoretical population pr
 We use the simulation again to check if this result holds:
 
 ```{r}
-simul_X_bar_25 |> summarise(SE_Xbar = sd(prop_red))
+samp_prop_25 |> summarise(SE_Xbar = sd(prop_red))
 ```
 
 where the R function `sd()` produces the sample standard deviation of all our simulation values. Again, this result is really close to the theoretical value of the standard error.
@@ -1034,64 +1014,73 @@ include_graphics("images/copyright/CLT_video_preview.png")
 
 
 
-## Second bowl activity {#sampling-activity-mean}
+## Second bowl activity: chocolate-covered almonds {#sampling-activity-mean}
 
+We want to extend the results obtained for the sample proportion to another statistic: the **sample mean**. In what follows, we show how 
+most of the results obtained for sample proportions extend directly to sample means, in particular we learn important similarities and differences of the **sampling distribution of the sample mean**.
 
-
-### Manual sampling and sample means {#resampling-tactile-bowl}
-
-### Virtual sampling {#virtual-samples-mean-bowl}
-
-
-### The sampling distribution of the sample mean
-
-#### The mean and standard deviation of $\bar X$
-
-#### The Central Limit Theorem revisited
-
-
-
-
-### The relationship between proportions and means
-
-
-
-In section \@ref(sampling-activity), a bowl with red and white balls was used to study the sampling distribution of the sample proportion. We repeat the activity, this time with a bowl of chocolate-covered almonds, as seen in Figure \@ref(fig:bowl_almond). 
+We start, as we did with sample proportions, by illustrating this results with another activity: sampling from a bowl of chocolate-covered almonds, as seen in Figure \@ref(fig:bowl_almond). 
 
 ```{r bowl_almond, echo=FALSE, fig.cap="A bowl of chocolate-covered almonds.", purl=FALSE, out.width = "40%", purl=FALSE}
 knitr::include_graphics("images/sampling/almonds/almond_bowl_aux.png")
 ```
 
-For simplicity we refer to each chocolate covered almond simply as an almond. We are now interested in the average weight in grams of *all*  the almonds in the bowl. We call this the *population average* weight or *population mean* weight.
+For ease of exposition we refer to each chocolate-covered almond simply as an almond. We are now interested in the average weight in grams of *all*  the almonds in the bowl; this is the *population average* weight or *population mean* weight.
 
+The weight of all the almonds in the bowl 
 
-### Manual sampling {#resampling-tactile-bowl}
+The population of interest is given by all the almonds in the bowl. The bowl is represented virtually by the data frame `almonds_bowl` included in the `moderndive` package. The first ten rows are shown here for illustration purposes:
+
+<!--
+need to add almonds_bowl to the moderndive package. AV 9-1-23
+-->
+
+```{r echo = -1}
+almonds_bowl <- read_rds("rds/almonds_bowl.rds")
+almonds_bowl
+```
+
+The first variable `ID` represent a virtual ID number given to each almond and the variable `weight` contains the weight in grams for each almond in the bowl. The **population mean** weight of almonds, a population parameter, can be obtained in R using again the `dplyr` data wrangling verbs presented in Chapter \@ref(wrangling). Observe, in particular the use of the `summarize()` function and the `mean()` argument:
+
+```{r}
+almonds_bowl |> 
+  summarize(mean_weight = mean(weight))
+```
+
+The population mean weight is 3.54 gr. We continue our exploration of the sampling distribution of the sample mean weights of almonds by constructing samples.
+
+### Manual sampling and sample means {#resampling-tactile-bowl}
 
 If we randomly select one almond from the bowl, we could determine its weight using a scale, as shown in Figure \@ref(fig:one_almond)
 
 ```{r one_almond, echo=FALSE, fig.show="hold", fig.cap="One almond on a scale.", purl=FALSE, out.width = "40%", purl=FALSE}
-knitr::include_graphics("images/sampling/almonds/one_almond.png")
+include_graphics("images/sampling/almonds/one_almond.png")
 ```
 
 Let's now obtain a random sample of 25 almonds, as shown in Figure \@ref(fig:twenty_five_almonds), and determine the sample average weight, or *sample mean* weight, in grams.
 
 ```{r twenty_five_almonds, echo=FALSE, fig.cap="A random sample of 25 almonds on a scale.", purl=FALSE, out.width = "40%", purl=FALSE}
-knitr::include_graphics("images/sampling/almonds/twenty_five_almonds.png")
+include_graphics("images/sampling/almonds/twenty_five_almonds.png")
 ```
 
-Since the total weight is 88.6 grams, as shown in the Figure \@ref(fig:twenty_five_almonds), the average weight will be $88.6/25 = 3.544$. Is this sample mean a good *estimate* of the population mean? The `moderndive` \index{moderndive!almonds\_sample} package contains the information of this sample in the `almonds_sample` data frame:
+Since the total weight is 88.6 grams, as shown in the Figure \@ref(fig:twenty_five_almonds), the average weight will be $88.6/25 = 3.544$. The `moderndive` \index{moderndive!almonds\_sample} package contains the information of this sample in the `almonds_sample` data frame. Here, we present the weight of the first 10 almonds in the sample:
+ 
+<!--
+Info about almonds needs to be added onto the moderndive package. AV 9-1-23
+-->
 
-```{r echo=-1}
+
+```{r echo=2}
 almonds_sample <- read_rds("rds/almonds_sample.rds")
 almonds_sample
+num_almonds <- length(almonds_sample$weight)
 ```
 
-The `almonds_sample` data frame has `r num_almonds` rows corresponding to each almond with two variables. 
-The first variable `ID` identifies individual almonds from top-left to bottom right, by rows in Figure \@ref(fig:twenty_five_almonds), whereas the second variable `weight` corresponds to the corresponding weight of each almond in grams as a numeric variable, also known as a double (`dbl`).
+The `almonds_sample` data frame has $n=$`r num_almonds` rows corresponding to each almond in the sample shown in Figure \@ref(fig:twenty_five_almonds).
+The first variable `replicate` indicates this is the first and only replicate since it is a single sample while the second variable `weight` gives the corresponding weight for each almond in grams as a numeric variable, also known as a double (`dbl`). 
 
 Based on these `r num_almonds` sampled almonds, what can we say about the almonds in the bowl? 
-Let's study some properties of our sample by performing an exploratory data analysis. 
-Let's first visualize the distribution of the weights of these `r num_almonds_sample` almonds using our data visualization tools from Chapter \@ref(viz). 
+Let's first visualize the distribution of the weights of these `r num_almonds` almonds using our data visualization tools from Chapter \@ref(viz). 
 Since `weight` is a numerical variable, we use a histogram in Figure \@ref(fig:almonds-sample-histogram) to visualize its distribution.
 
 ```{r almonds-sample-histogram, fig.cap="Distribution of weight on a sample of 25 almonds."}
@@ -1099,18 +1088,15 @@ ggplot(almonds_sample, aes(x = weight)) +
   geom_histogram(binwidth = .1, color = "white")
 ```
 
-Observe a slightly left-skewed \index{skew} distribution, since most almonds in the sample weight between 3.6 and 3.8 gr. What is the average weight for the `r num_almonds` sampled almonds? Eyeballing the histogram it appears to be around 3.5. Let's now compute this value exactly using our data wrangling tools from Chapter \@ref(wrangling).
+The weights of almonds in the sample range from 2.9 to 4.1 gr. There is not an obvious pattern in the distribution of this sample. The weight that appears the most is 3.7 grams as eight almonds out of 25 weigh this much, but no almond weighs 3.6 grams. We now compute the sample mean using our data wrangling tools from Chapter \@ref(wrangling).
 
 ```{r}
 x_bar <- almonds_sample %>% 
   summarize(mean_weight = mean(weight))
 x_bar
-write_rds(almonds_bowl,"rds/almonds_bowl.rds")
 ```
 
-Thus, if we're willing to assume that `almonds_sample` is a representative sample from *all* the almonds in the ball, a "good guess" of the average almond weight would be `r x_bar %>% pull(mean_weight) %>% round(2)` gr. This should all start sounding similar to what we did in \@ref(sampling-activity)!
 
-The population of interest are all the chocolate-covered almonds in the bowl. The population parameter of interest is now the *population mean* weight of all these almonds, a value denoted by the Greek letter $\mu$ (pronounced "mu"). In order to estimate $\mu$, a sample of `r num_almonds_sample` almonds from the bowl was obtained and the *sample mean* weight computed. This sample mean, denoted by $\overline{x}$ (pronounced "x-bar"), is the point estimate of $\mu$. Occasionally, the point estimate for the sample mean is also written $\hat \mu$.
 
 We summarize the relationship and notation between population parameters and correspondin point estimates for both, proportions and means, in Table \@ref(tab:table-ch7-b).
 
@@ -1147,6 +1133,28 @@ sampling_scenarios %>%
   column_spec(5, width = "1in")
 ```
 
+
+
+
+
+### Virtual sampling {#virtual-samples-mean-bowl}
+
+
+### The sampling distribution of the sample mean
+
+#### The mean and standard deviation of $\bar X$
+
+#### The Central Limit Theorem revisited
+
+
+
+
+### The relationship between proportions and means
+
+
+
+
+### Manual sampling {#resampling-tactile-bowl}
 
 
 
