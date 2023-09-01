@@ -37,7 +37,7 @@ set.seed(76)
 
 The third portion of this book introduces statistical inference. This chapter is about *sampling*. Sampling involves drawing repeated random samples from a population and then using the information from those samples to learn more about the entire population. In Section \@ref(sampling-activity) we illustrate sampling using a tactile example and simultaneously introducing key concepts and terminology. In Section \@ref(sampling-simulation) we extend this by performing virtual sampling via simulations. The tools used in the data science portion of this book, in particular data visualization and data wrangling, continue to be useful in this context. In Section \@ref(sampling-framework) we introduce more definitions, terminology, and a theoretical framework to introduce one of the fundamental theoretical results in Statistics: the *Central Limit Theorem*. In Section \@ref(sampling-case-study) we tie the contents of this chapter to the real world by presenting a case study: a 2023 Gallup poll conducted in the US asking whether coronavirus pre-pandemic normalcy was attainable.
 
-The concepts behind *sampling* form the basis for constructing confidence intervals and performing tests of significance also called hypothesis tests; these are the best-known and used inferential methods and are presented in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing).
+The concepts behind *sampling* form the basis for constructing confidence intervals and performing tests of significance also called hypothesis tests; these are the best-known and most-used inferential methods and are presented in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing).
 
 ### Needed packages {-#sampling-packages}
 
@@ -125,12 +125,13 @@ In the previous section we were able to obtain the proportion of red ball in the
 
 In real-life situations, it is often the case that we are interested in finding the proportion of a very large number of objects, or subjects, and obtaining an exhaustive count could be tedious, costly, impractical, or even impossible.
 
-Because of these limitations, we often rely on an alternative method; namely, taking a sample of balls from the bowl, finding the proportion of red balls in the sample, and using this proportion as an approximation of the proportion of red balls in the entire bowl. As we show in the next sections and chapters doing this could result in a very good approximation. For now, we focus in understanding the process of taking samples of balls and finding their proportion of red balls.
+Because of these limitations, we typically do not perform exhaustive counts; rather, we randomly select a sample of balls from the bowl, find the proportion of red balls in the sample, and use this proportion as an approximation of the proportion of red balls in the entire bowl. To understand why this method generally produces a good approximation, we first observe what happens with proportions of red balls for different samples.
+
 
 
 #### One sample {#one-sample}
 
-Instead of performing an exhaustive count, we insert a shovel into the bowl as seen in Figure \@ref(fig:sampling-exercise-2) and collect $5 \cdot 10 = 50$ balls as shown in Figure \@ref(fig:sampling-exercise-3). The set of balls obtained is called a _sample_. 
+We start by inserting a shovel into the bowl as seen in Figure \@ref(fig:sampling-exercise-2) and collect $5 \cdot 10 = 50$ balls as shown in Figure \@ref(fig:sampling-exercise-3). The set of balls obtained is called a _sample_. 
 
 ```{r sampling-exercise-2, echo=FALSE, fig.cap="Inserting a shovel into the bowl.", purl=FALSE, out.width = "100%", purl=FALSE}
 include_graphics("images/sampling/balls/sampling_bowl_2.jpg")
@@ -141,14 +142,14 @@ include_graphics("images/sampling/balls/sampling_bowl_2.jpg")
 include_graphics("images/sampling/balls/sampling_bowl_3_cropped.jpg")
 ```
 
-Observe that 17 of the balls are red and thus the proportion of red balls in the sample is 17/50 = 0.34 or 34%. Think of the proportion of red balls in the sample as a guess of the proportion of red balls in the entire bowl. While the proportion of red balls in the entire bowl is not exactly 34%, this is a good guess and it took much less time and energy to obtain.
+Observe that 17 of the balls are red and thus the proportion of red balls in the sample is 17/50 = 0.34 or 34%. While the proportion of red balls in the entire bowl is not exactly 34%, this seems to be a good approximation of the proportion of red balls in the entire bowl and it took much less time and energy to obtain.
 
 
 
 
 #### Thirty-three samples {#student-shovels}
 
-To understand why this works well, we repeat this activity many times as shown in Figure \@ref(fig:sampling-exercise-3b). Each time we do the following: 
+We repeat this activity many times as shown in Figure \@ref(fig:sampling-exercise-3b). Each time we do the following: 
 
 - Return the 50 balls used earlier back into the bowl and mix the contents of the bowl. This is done to ensure that each new sample is not influenced in any way by the previous sample.
 - Take a new sample with the shovel and obtain a new proportion of red balls.
@@ -180,6 +181,7 @@ tactile_prop_red
 
 <!--
 Note: first 10 values on tactile_prop_red do not match the first 10 values of hand-drawn histogram tactile_3_c.jpg, consider updating one of them. AV
+Also, names are not homogeneously formatted, Julia doesn't have last names. Should we remove last names altogether? AV 8-31-23
 -->
 
 
@@ -199,16 +201,16 @@ tactile_histogram <- ggplot(tactile_prop_red, aes(x = prop_red)) +
 tactile_histogram +
   labs(
     x = "Proportion of red balls in each sample",
-    title = "Histogram of 33 proportions of red balls for each sample"
+    title = "Histogram of 33 proportions"
   )
 ```
 
 
-#### Recap and additional remarks {#sampling-what-did-we-just-do}
+#### Recap and some statistical parlance {#sampling-what-did-we-just-do}
 
-Recall that the goal of our bowl activity was to estimate the proportion of red balls in a bowl. We first took a *sample* of 50 balls and determined that the proportion of red balls in this sample, or *sample proportion*, was 34%. This was an *estimate* of the proportion of red balls in the entire bowl. We then took more samples and obtained more sample proportions, 33 in total. This activity introduced what in statistics we call \index{sampling} *sampling*.
+Recall that we started by taking a *sample* of 50 balls and obtaining the *sample proportion*, the proportion of red balls in the sample. We then took more samples and obtained more sample proportions, 33 in total. In statistics, we call this \index{sampling} *sampling*.
 
-Since we return the observed balls to the bowl before getting another sample, we call this *sampling with replacement* and because we mix the balls before taking a new sample, the samples were *randomly drawn* and are called *random samples*. As shown in Figure \@ref(fig:samplingdistribution-tactile), different random samples produce different sample proportions. This phenomenon is called *sampling variation* and it is central to the ideas we develop in this chapter. \index{sampling!variation}
+Since we returned the observed balls to the bowl before getting another sample, we say that we performed *sampling with replacement* and because we mixed the balls before taking a new sample, the samples were *randomly drawn* and are called *random samples*. As shown in Figure \@ref(fig:samplingdistribution-tactile), different random samples produce different sample proportions. This phenomenon is called *sampling variation* and it is central to the ideas we develop in this chapter. \index{sampling!variation}
 
 
 
@@ -236,7 +238,7 @@ Since we return the observed balls to the bowl before getting another sample, we
 
 In the previous Section \@ref(sampling-activity), we performed a *tactile* sampling activity: we asked students to take physical samples using a real shovel from a bowl with colored balls by hand. This activity helps us develop the appropriate intuition about sampling. We are ready to extend the entire process using simulations on a computer, a sort of *virtual* sampling activity.
 
-The use of simulations permits us to study *sampling variation* not only for 33 random samples but for thousands, tens of thousands, or even more samples. In addition, we do not need to restrict the samples to 50 balls, we can change the size of the virtual shovel to any size. As we show later in this section, the sample size of the samples taken has a direct effect on the magnitude of the *sampling variation*.
+The use of simulations permits us to study *sampling variation* not only for 33 random samples but for thousands, tens of thousands, or even more samples. In addition, we do not need to restrict the samples to 50 balls, we can change the size of the virtual shovel to any size. As we show later in this section, the sample size of the samples taken has a direct effect on the magnitude of *sampling variation*.
 
 
 #### One virtual sample
@@ -266,7 +268,7 @@ virtual_shovel
 
 Observe that `virtual_shovel` has 50 rows corresponding to our virtual sample of size 50. The `ball_ID` variable identifies which of the `r num_balls` balls from `bowl` are included in our sample of 50 balls while `color` denotes its color. The `replicate` variable is equal to 1 for all 50 rows because we have decided to take only one sample right now. Later on, we take more samples, and `replicate` would take more values. 
 
-We compute the proportion of red balls in our virtual sample as we did for the entire bowl in Subsection \@ref(population-proportion):
+We compute the proportion of red balls in our virtual sample. The code we use is similar to the one used for finding the proportion of red balls in the entire bowl in Subsection \@ref(population-proportion):
 
 
 ```{r echo=-1}
@@ -275,11 +277,11 @@ virtual_shovel |>
  summarize(prop_red = mean(color == "red"))
 ```
 
-Great! `r prop_red_sample1*100`% of the `virtual_shovel`'s 50 balls were red! Based on this particular random sample of 50 balls, our estimated proportion of red balls in the bowl is `r prop_red_sample1*100`%. But remember that if we obtain another random sample of 50 balls the sample proportion of red balls may be different due to sampling variation. 
+Great! `r prop_red_sample1*100`% of the `virtual_shovel`'s 50 balls were red! Based on this particular random sample of 50 balls, our estimated proportion of red balls in the bowl is `r prop_red_sample1*100`%.
 
 #### Thirty-three virtual samples {#shovel-33-times}
 
-In our tactile activity in Section \@ref(sampling-activity), students got 33 samples and computed 33 sample proportions. They repeated/replicated the sampling process 33 times. We do this virtually by again using the function `rep_slice_sample()`, but this time adding the `reps = 33` argument; this tells R that we want to repeat the sampling 33 times. We save these samples in the data frame `virtual_samples`, as shown below, and then provide a preview of its first 10 rows. We may want to inspect the entire `virtual_samples` data frame by using RStudio's data viewer by running `View(virtual_samples)`. 
+In Section \@ref(sampling-activity), students got 33 samples and sample proportions. They repeated/replicated the sampling process 33 times. We do this virtually by again using the function `rep_slice_sample()` and this time adding the `reps = 33` argument as we want to perform sampling 33 times. We save these samples in the data frame `virtual_samples`, as shown below, and then provide a preview of its first 10 rows. If you want to inspect the entire `virtual_samples` data frame, use RStudio's data viewer by running `View(virtual_samples)`. 
 
 ```{r echo=-1}
 set.seed(76)
@@ -288,9 +290,9 @@ virtual_samples <- bowl |>
 virtual_samples
 ```
 
-Observe in the spreadsheet viewer that the first 50 rows of `replicate` are equal to `1` while the next 50 rows of `replicate` are equal to `2`. This is telling us that the first 50 rows correspond to the first sample of 50 balls while the next 50 rows correspond to the second sample of 50 balls. This pattern continues for all `reps = 33` replicates and thus `virtual_samples` has 33 $\cdot$ 50 = 1650 rows. 
+Observe in the spreadsheet viewer that the first 50 rows of `replicate` are equal to `1`, the next 50 rows of `replicate` are equal to `2`, and so on. The first 50 rows correspond to the first sample of 50 balls while the next 50 rows correspond to the second sample of 50 balls. This pattern continues for all `reps = 33` replicates and thus `virtual_samples` has 33 $\cdot$ 50 = 1650 rows. 
 
-Using `virtual_samples` we obtain the proportion of red balls for each replicate. We use the same `dplyr` verbs as before. In particular, we add `group_by()` of the `replicate` variable. Recall from Section \@ref(groupby) that by assigning the grouping variable "meta-data" before `summarize()`, we perform the calculations needed for each replicate separately. The other line of code, as explained in the case of one sample, calculates the proportion of red balls. We display a preview of the first 10 rows below:
+Using `virtual_samples` we obtain the proportion of red balls for each replicate. We use the same `dplyr` verbs as before. In particular, we add `group_by()` of the `replicate` variable. Recall from Section \@ref(groupby) that by assigning the grouping variable "meta-data" before `summarize()`, we perform the calculations needed for each replicate separately. The other line of code, as explained in the case of one sample, calculates the sample proportion of red balls. A preview of the first 10 rows is presented below:
 
 ```{r}
 virtual_prop_red <- virtual_samples |> 
@@ -373,7 +375,7 @@ if (is_latex_output()) {
 
 #### One thousand virtual samples {#shovel-1000-times}
 
-We now study the effects of sampling variation with 1000 random samples. Trying to do this manually would be impractical while obtaining virtual samples can be done quickly and efficiently. We repeat the steps performed at the end of Subsection \@ref(shovel-33-times) using the `rep_slice_sample()` function with a sample `size` set to be 50, the number of replicates `reps` set to `1000`, and `summarize()` and `mean()` used again on the Boolean values to obtain the sample proportions. We obtain `virtual_prop_red` with the count of red balls and the corresponding sample proportion for all 1000 random samples. The proportions for the first 10 samples are shown below:
+We now study the effects of sampling variation with 1000 random samples. Trying to do this manually could be impractical while obtaining virtual samples can be done quickly and efficiently. We repeat the steps performed at the end of Subsection \@ref(shovel-33-times) using the `rep_slice_sample()` function with a sample `size` set to be 50, the number of replicates `reps` set to `1000`, and `summarize()` and `mean()` used again on the Boolean values to obtain the sample proportions. We obtain `virtual_prop_red` with the count of red balls and the corresponding sample proportion for all 1000 random samples. The proportions for the first 10 samples are shown below:
 
 ```{r echo=-1}
 set.seed(76)
@@ -425,7 +427,7 @@ Learning checks need to be updated. AV 8/17/23
 
 #### Different sample sizes {#different-shovels}
 
-We consider again the goal of our activity in Section \@ref(sampling-activity); we want to determine the proportion of red balls in the bowl. But now, assume that we can use three shovels of sizes 25, 50, and 100; as shown in Figure \@ref(fig:three-shovels). That is, we can take samples of different sizes. As we show later in this subsection, the size of the sample has a direct effect on the magnitude of sampling variation.
+Instead of using only one shovel of size 50, as we did before, we anow use three shovels of sizes 25, 50, and 100; as shown in Figure \@ref(fig:three-shovels). That is, we can take samples of different sizes. As we show later in this subsection, the size of the sample has a direct effect on the magnitude of sampling variation.
 
 <!--
 A shovel with 25 slots          |  A shovel with 50 slots  | A shovel with 100 slots
@@ -1074,6 +1076,7 @@ knitr::include_graphics("images/sampling/almonds/twenty_five_almonds.png")
 Since the total weight is 88.6 grams, as shown in the Figure \@ref(fig:twenty_five_almonds), the average weight will be $88.6/25 = 3.544$. Is this sample mean a good *estimate* of the population mean? The `moderndive` \index{moderndive!almonds\_sample} package contains the information of this sample in the `almonds_sample` data frame:
 
 ```{r}
+almonds_sample <- read_rds("rds/almonds_sample_generate.rds")
 almonds_sample
 ```
 
@@ -1096,6 +1099,7 @@ Observe a slightly left-skewed \index{skew} distribution, since most almonds in 
 x_bar <- almonds_sample %>% 
   summarize(mean_weight = mean(weight))
 x_bar
+write_rds(almonds_bowl,"rds/almonds_bowl.rds")
 ```
 
 Thus, if we're willing to assume that `almonds_sample` is a representative sample from *all* the almonds in the ball, a "good guess" of the average almond weight would be `r x_bar %>% pull(mean_weight) %>% round(2)` gr. This should all start sounding similar to what we did in \@ref(sampling-activity)!
