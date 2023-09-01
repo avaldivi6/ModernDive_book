@@ -403,7 +403,7 @@ virtual_histogram +
   )
 ``` 
 
-The sample proportions observed in the histogram could be as low as 15% or as high as 60%, but those extreme proportions are rare. The most frequent proportions obtained are those between 35% and 40%. Furthermore, the histogram shows now a symmetric and bell-shaped distribution that can be approximated well by a normal distribution. Please read the "Normal distribution" section (Appendix \@ref(appendix-normal-curve)) for a brief discussion of this distribution and its properties.
+The sample proportions represented by the histogram could be as low as 15% or as high as 60%, but those extreme proportions are rare. The most frequent proportions obtained are those between 35% and 40%. Furthermore, the histogram shows now a symmetric and bell-shaped distribution that can be approximated well by a normal distribution. Please read the "Normal distribution" section (Appendix \@ref(appendix-normal-curve)) for a brief discussion of this distribution and its properties.
 
 <!-- 
 Learning checks need to be updated. AV 8/17/23
@@ -427,7 +427,7 @@ Learning checks need to be updated. AV 8/17/23
 
 #### Different sample sizes {#different-shovels}
 
-Instead of using only one shovel of size 50, as we did before, we anow use three shovels of sizes 25, 50, and 100; as shown in Figure \@ref(fig:three-shovels). That is, we can take samples of different sizes. As we show later in this subsection, the size of the sample has a direct effect on the magnitude of sampling variation.
+Instead of using only one shovel of size 50, as we did before, we now use three shovels of sizes 25, 50, and 100; as shown in Figure \@ref(fig:three-shovels). That is, we can take samples of different sizes. As we show later in this subsection, the size of the sample has a direct effect on the magnitude of sampling variation.
 
 <!--
 A shovel with 25 slots          |  A shovel with 50 slots  | A shovel with 100 slots
@@ -439,7 +439,7 @@ A shovel with 25 slots          |  A shovel with 50 slots  | A shovel with 100 s
 include_graphics("images/sampling/balls/three_shovels.png")
 ```
 
-We follow the same process performed in subsection \@ref(shovel-1000-times): we generate 1000 samples, obtain the sample proportions, and use them to draw a histogram. We do this three times with the `size` argument set to `25`, `50`, and `100`, respectively. Run each of the following code segments individually and then compare the resulting histograms.
+We follow the same process performed in subsection \@ref(shovel-1000-times): we generate 1000 samples, obtain the sample proportions, and use them to draw a histogram. We follow this process three different times, setting the `size` argument in the code equal to `25`, `50`, and `100`, respectively. We run each of the following code segments individually and then compare the resulting histograms.
 
 ```{r, eval=FALSE}
 # Segment 1: sample size = 25 ------------------------------
@@ -546,7 +546,7 @@ if (is_latex_output()) {
 ```
 
 
-Observe that all three histograms are somewhat bell-shaped and appear to center around the same middle value, somewhere between 0.35 and 0.4. In addition, as the sample size increases from 25 to 50 to 100, the sample proportions seem to be closer to this middle value; in other words, sample proportions obtained from larger samples, such as those in the right histogram (sample size 100) exhibit less sampling variation than sample proportions obtained from smaller samples, such as those in the left histogram (sample size 25).
+Observe that all three histograms are somewhat bell-shaped and appear to center around the same middle value, somewhere between 0.35 and 0.4. In addition, as the sample size increases from 25 to 50 to 100, the sample proportions seem to be closer to this middle value; in other words, sample proportions obtained from larger samples, such as those in the right histogram (sample size 100) are closer to the center and exhibit less dispersion, or less *sampling variation*, than sample proportions obtained from smaller samples, such as those in the left histogram (sample size 25).
 
 These results are not coincidental or isolated to the example of sample proportions of red balls in a bowl. In the next subsection, a theoretical framework is introduced that helps explain with precise mathematical equations the behavior of sample proportions obtained from random samples.
 
@@ -602,6 +602,12 @@ Now that we have acquired some intuition about sampling, we introduce statistica
 
 
 We introduce additional terminology and some mathematical notation. We illustrate these concepts by connecting them to different elements of the sampling bowl activities described in previous sections. 
+
+A **population** or **study population** is a collection of all individuals or observations that we are interested in. A **population parameter** or simply **parameter** is a numerical summary, a number, that represents some characteristic of the population. In the bowl activities the **population** is the collection of all the balls inside the bowl and the population proportion of red balls in the bowl is a **parameter**. 
+
+A **sample** is a subsets of the population. **Sampling** is the act of collecting samples from the population. **Simple random sampling** is *sampling* where each member of the population has the same chance of being selected, for example, by using a shovel to select balls from a bowl. A **random sample** is a sample obtained using simple random sampling. In the bowl activities, tactile and virtual, we performed simple random sampling when getting samples from the bowl. A **sample statistic** or simply a **statistic** is a numerical summary, a number, computed from a sample.
+1. A **sample statistic** or simply a **statistic** is a numerical summary, a number, computed from a sample.
+    - Two statistics that are often used are the average (or mean) and the proportion of the sample. We call them *sample mean* and *sample proportion*
 
 The first set of terms and notations relate to **populations**:
 
@@ -790,7 +796,7 @@ So, for this particular example, the sample proportion is $\bar X = 0.4$. If you
 then, the realization of $\bar X$ will be $\bar X = 9/25 = 0.36$.
 Observe that the possible values of $\bar X$ are all the possible means of 25 trials or, equivalently, all the possible sample proportions of red balls.
 
-Moreover, while any given trial can result in choosing a red ball or not (1 or 0), the chances or getting a red ball are determined by the proportion of red balls in the bowl, the population proportion. The higher the population proportion is, the higher the chances of getting a red ball (or 1) in any trial.
+Moreover, while any given trial can result in choosing a red ball or not (1 or 0), the chances or getting a red ball are determined by the proportion of red balls in the bowl, the population proportion. The higher the population proportion of red balls is, the higher the chances of getting a red ball (or 1) in any trial. 
 
 
 ### The sampling distribution of the sample proportion
@@ -1075,8 +1081,8 @@ knitr::include_graphics("images/sampling/almonds/twenty_five_almonds.png")
 
 Since the total weight is 88.6 grams, as shown in the Figure \@ref(fig:twenty_five_almonds), the average weight will be $88.6/25 = 3.544$. Is this sample mean a good *estimate* of the population mean? The `moderndive` \index{moderndive!almonds\_sample} package contains the information of this sample in the `almonds_sample` data frame:
 
-```{r}
-almonds_sample <- read_rds("rds/almonds_sample_generate.rds")
+```{r echo=-1}
+almonds_sample <- read_rds("rds/almonds_sample.rds")
 almonds_sample
 ```
 
