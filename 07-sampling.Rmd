@@ -1035,9 +1035,10 @@ The population of interest is given by all the almonds in the bowl. The bowl is 
 need to add almonds_bowl to the moderndive package. AV 9-1-23
 -->
 
-```{r echo = -1}
+```{r echo = 2}
 almonds_bowl <- read_rds("rds/almonds_bowl.rds")
 almonds_bowl
+num_pop_almonds = length(almonds_bowl$weight)
 ```
 
 The first variable `ID` represent a virtual ID number given to each almond and the variable `weight` contains the weight in grams for each almond in the bowl. The **population mean** weight of almonds, a population parameter, can be obtained in R using again the `dplyr` data wrangling verbs presented in Chapter \@ref(wrangling). Observe, in particular the use of the `summarize()` function and the `mean()` argument:
@@ -1091,86 +1092,16 @@ ggplot(almonds_sample, aes(x = weight)) +
 The weights of almonds in the sample range from 2.9 to 4.1 gr. There is not an obvious pattern in the distribution of this sample. The weight that appears the most is 3.7 grams as eight almonds out of 25 weigh this much, but no almond weighs 3.6 grams. We now compute the sample mean using our data wrangling tools from Chapter \@ref(wrangling).
 
 ```{r}
-x_bar <- almonds_sample %>% 
-  summarize(mean_weight = mean(weight))
-x_bar
+almonds_sample %>% 
+  summarize(sample_mean_weight = mean(weight))
 ```
-
-
-
-We summarize the relationship and notation between population parameters and correspondin point estimates for both, proportions and means, in Table \@ref(tab:table-ch7-b).
-
-```{r table-ch7-b, echo=FALSE, message=FALSE, purl=FALSE}
-# The following Google Doc is published to CSV and loaded using read_csv():
-# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
-
-if (!file.exists("rds/sampling_scenarios.rds")) {
-  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>%
-    read_csv(na = "") %>%
-    slice(1:5)
-  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
-} else {
-  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
-}
-
-sampling_scenarios %>%
-  # Only first two scenarios
-  filter(Scenario <= 2) %>%
-  kable(
-    caption = "Scenarios of sampling for inference",
-    booktabs = TRUE,
-    escape = FALSE,
-    linesep = ""
-  ) %>%
-  kable_styling(
-    font_size = ifelse(knitr::is_latex_output(), 10, 16),
-    latex_options = c("hold_position")
-  ) %>%
-  column_spec(1, width = "0.5in") %>%
-  column_spec(2, width = "0.7in") %>%
-  column_spec(3, width = "1in") %>%
-  column_spec(4, width = "1.1in") %>%
-  column_spec(5, width = "1in")
-```
-
-
-
-
 
 ### Virtual sampling {#virtual-samples-mean-bowl}
 
-
-### The sampling distribution of the sample mean
-
-#### The mean and standard deviation of $\bar X$
-
-#### The Central Limit Theorem revisited
-
-
-
-
-### The relationship between proportions and means
-
-
-
-
-### Manual sampling {#resampling-tactile-bowl}
-
-
-
-### Virtual samples {#virtual-samples-mean}
-
-
-In the previous Section \@ref(resampling-tactile), we obtained a physical sample from a bowl with chocolate-covered almonds by hand. A we did in Section \@ref(sampling-simulation), we can perform sampling virtually. The bowl seen in Figure \@ref(fig:bowl_almond) is represented by the data frame `bowl_almonds` included in the `moderndive` package. The rows of `bowl_almonds` correspond exactly to the contents of the actual bowl. 
+We now perform sampling virtually. The data frame `almonds_bowl` has `r num_pop_almonds` rows, each representing an almond in the bowl. As we did in Section \@ref(sampling-simulation) we use again the `rep_slice_sample()` function to obtain 1000 random samples with a sample `size` set to be 25, and with the number of replicates `reps` set to `1000`. Be sure to scroll through the contents of `virtual_samples` in RStudio's viewer. 
 
 ```{r}
-bowl_almonds
-```
-
-The data frame `bowl_almonds` has `r num_almonds` rows, each representing an almond in the bowl. The first variable `unit_ID` is used as an *identification variable* and the second variable `weight` indicates the weight, in grams, of each chocolate-covered almond. As we did in Section \@ref(sampling-simulation) we use again the `rep_slice_sample()` function to obtain 1000 random samples with a sample `size` set to be 25, and with the number of replicates `reps` set to `1000`. Be sure to scroll through the contents of `virtual_samples` in RStudio's viewer. 
-
-```{r}
-virtual_samples <- bowl_almonds |> 
+virtual_samples <- almonds_bowl |> 
   rep_slice_sample(n = 25, reps = 1000)
 virtual_samples
 ```
@@ -1219,7 +1150,7 @@ We follow the same process performed in subsection \@ref(virtual-samples-mean): 
 ```{r, eval=FALSE}
 # Segment 1: sample size = 25 ------------------------------
 # 1.a) Obtaining the 1000 sample means, each from random samples of size 25
-virtual_mean_weight_25 <- bowl_almonds |> 
+virtual_mean_weight_25 <- almonds_bowl |> 
   rep_slice_sample(n = 25, reps = 1000)|>
   summarize(mean_weight = mean(weight), n = n())
 
@@ -1231,7 +1162,7 @@ ggplot(virtual_mean_weight_25, aes(x = prop_red)) +
 
 # Segment 2: sample size = 50 ------------------------------
 # 2.a) Obtaining the 1000 sample means, each from random samples of size 50
-virtual_mean_weight_50 <- bowl_almonds |> 
+virtual_mean_weight_50 <- almonds_bowl |> 
   rep_slice_sample(n = 50, reps = 1000)|>
   summarize(mean_weight = mean(weight), n = n())
 
@@ -1242,7 +1173,7 @@ ggplot(virtual_mean_weight_50, aes(x = prop_red)) +
 
 # Segment 3: sample size = 100 ------------------------------
 # 3.a) Obtaining the 1000 sample means, each from random samples of size 100
-virtual_mean_weight_100 <- bowl_almonds |> 
+virtual_mean_weight_100 <- almonds_bowl |> 
   rep_slice_sample(n = 100, reps = 1000)|>
   summarize(mean_weight = mean(weight), n = n())
 
@@ -1257,31 +1188,31 @@ For easy comparison, we present the three resulting histograms in a single row w
 ```{r comparing-sampling-distributions-means, echo=FALSE, fig.height=3, fig.cap="Histograms of sample means for different sample sizes.", purl=FALSE}
 # n = 25
 if (!file.exists("rds/virtual_sample_means_25.rds")) {
-  virtual_samples_25 <- bowl_almonds |>
+  virtual_samples_25 <- almonds_bowl |>
     rep_slice_sample(n = 25, reps = 1000)
   write_rds(virtual_samples_25, "rds/virtual_sample_means_25.rds")
 } else {
   virtual_sample_means_25 <- read_rds("rds/virtual_sample_means_25.rds")
 }
-virtual_mean_weight_25 <- bowl_almonds |> 
+virtual_mean_weight_25 <- almonds_bowl |> 
   rep_slice_sample(n = 25, reps = 1000)|>
   summarize(mean_weight = mean(weight), n = n())
 
 # n = 50
 if (!file.exists("rds/virtual_sample_means_50.rds")) {
-  virtual_sample_means_50 <- bowl_almonds |>
+  virtual_sample_means_50 <- almonds_bowl |>
     rep_slice_sample(n = 50, reps = 1000)
   write_rds(virtual_sample_means_50, "rds/virtual_sample_means_50.rds")
 } else {
   virtual_sample_means_50 <- read_rds("rds/virtual_sample_means_50.rds")
 }
-virtual_mean_weight_50 <- bowl_almonds |> 
+virtual_mean_weight_50 <- almonds_bowl |> 
   rep_slice_sample(n = 50, reps = 1000)|>
   summarize(mean_weight = mean(weight), n = n())
 
 # n = 100
 if (!file.exists("rds/virtual_sample_means_100.rds")) {
-  virtual_sample_means_100 <- bowl_almonds |>
+  virtual_sample_means_100 <- almonds_bowl |>
     rep_slice_sample(n = 100, reps = 1000)
   write_rds(virtual_sample_means_100, "rds/virtual_sample_means_100.rds")
 } else {
@@ -1317,7 +1248,7 @@ if (knitr::is_latex_output()) {
 ```
 
 
-Observe that all three histograms are bell-shaped and appear to center around a middle value,  somewhere around 3.65. In addition, as the sample size increases, the variation among the 1000 sample proportions decreases and there are fewer differences due to sampling variation.
+Observe that all three histograms are bell-shaped and appear to center around a middle value,  somewhere around 3.55. In addition, as the sample size increases, the variation among the 1000 sample proportions decreases and there are fewer differences due to sampling variation.
 
 Moreover, the amount of sampling variation is actually proportional to the sample size used. As we did when dealing with proportions, we obtain the \index{standard deviation} *standard deviation* (see Appendix \@ref(appendix-stat-terms) for a brief discussion on the properties of the standard deviation). The following data wrangling code introduces the `sd()` summary function to calculate the standard deviation of 1000 sample proportions of the same sample size. Therefore, three standard deviations are obtained, one for each sample size, as shown below.
 
@@ -1361,6 +1292,59 @@ As we observed in Figure \@ref(fig:comparing-sampling-distributions-means), as t
 
 
 
+
+
+### The sampling distribution of the sample mean
+
+#### The mean and standard deviation of $\bar X$
+
+#### The Central Limit Theorem revisited
+
+
+
+
+### The relationship between proportions and means
+
+
+We summarize the relationship and notation between population parameters and correspondin point estimates for both, proportions and means, in Table \@ref(tab:table-ch7-b).
+
+```{r table-ch7-b, echo=FALSE, message=FALSE, purl=FALSE}
+# The following Google Doc is published to CSV and loaded using read_csv():
+# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
+
+if (!file.exists("rds/sampling_scenarios.rds")) {
+  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>%
+    read_csv(na = "") %>%
+    slice(1:5)
+  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
+} else {
+  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
+}
+
+sampling_scenarios %>%
+  # Only first two scenarios
+  filter(Scenario <= 2) %>%
+  kable(
+    caption = "Scenarios of sampling for inference",
+    booktabs = TRUE,
+    escape = FALSE,
+    linesep = ""
+  ) %>%
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  ) %>%
+  column_spec(1, width = "0.5in") %>%
+  column_spec(2, width = "0.7in") %>%
+  column_spec(3, width = "1in") %>%
+  column_spec(4, width = "1.1in") %>%
+  column_spec(5, width = "1in")
+```
+
+
+
+
+
 ### Random Variables
 
 As we did in the case of proportions, we can use a theoretical approach to understand some important properties of the sample mean. We randomly select one almond at a time from the bowl and assign its weight in grams. We denote this assignmnet as $X_1$. We return the almond to the bowl, select another almond at random, and denote this weight as $X_2$, and so on. 
@@ -1373,7 +1357,7 @@ Observe that the possible values of $\bar X$ are all the possible means of 25 al
 The mean of $\bar X$ represents what sample mean we would expect to get, on average, if we were to perform the experiment a large number of times. Based on probability theory, the mean of $\bar X$ happens to be equal to the population mean weight of almonds in the bowl. 
 
 ```{r}
-mu <- bowl_almonds |>
+mu <- almonds_bowl |>
   summarise(mean(weight))
 mu
 ```
