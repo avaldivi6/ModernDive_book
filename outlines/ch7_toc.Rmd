@@ -1257,12 +1257,6 @@ Recall in our Obama poll case study in Section \@ref(sampling-case-study) that b
 Note the term *margin of error*, which here is "plus or minus 2.1 percentage points." Most polls won't produce an estimate that's perfectly right; there will always be a certain amount of error caused by *sampling variation*. The margin of error of plus or minus 2.1 percentage points is saying that a typical range of errors for polls of this type is about $\pm$ 2.1%, in words from about 2.1% too small to about 2.1% too big. We can restate this as the interval of $[41\% - 2.1\%, 41\% + 2.1\%] = [37.9\%, 43.1\%]$ (this notation indicates the interval contains all values between 37.9% and 43.1%, including the end points of 37.9% and 43.1%). We'll see in the next chapter that such intervals are known as *confidence intervals*.
 
 
-
-
-
-
-
-
 ### The relationship between proportions and means
 
 
@@ -1338,8 +1332,6 @@ virtual_mean_weight_25 |>
 ```
 
 Again, this result is really close to the theoretical value of the standard error. The Central Limit Theorem introduced earlier holds here as well. 
-
-
 
 ### Difference in means
 
