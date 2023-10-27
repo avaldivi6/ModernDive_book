@@ -960,6 +960,8 @@ if (is_latex_output()) {
 
 We also saw in this section that as your sample size $n$ increases, your point estimates will vary less and less and be more and more concentrated around the true population parameter. This variation is quantified by the decreasing *standard error*. In other words, the typical error of your point estimates will decrease. In our sampling exercise, as the sample size increased, the variation of our sample proportions $\widehat{p}$ decreased. You can observe this behavior in Figure \@ref(fig:comparing-sampling-distributions-3).  This is also known as having a *precise* estimate\index{precision}. 
 
+#### Accuracy vs precision
+
 So random sampling ensures our point estimates are *accurate*, while on the other hand having a large sample size ensures our point estimates are *precise*. While the terms "accuracy" and "precision" may sound like they mean the same thing, there is a subtle difference. Accuracy describes how "on target" our estimates are, whereas precision describes how "consistent" our estimates are. Figure \@ref(fig:accuracy-vs-precision) illustrates the difference.
 
 ```{r accuracy-vs-precision, echo=FALSE, fig.cap="Comparing accuracy and precision.", purl=FALSE, out.width="75%", out.height="75%", purl=FALSE}
@@ -1483,6 +1485,8 @@ options(scipen = 99, digits = 3)
 # Set random number generator seed value for replicable pseudorandomness
 set.seed(76)
 ```
+
+## Introduction
 
 The third portion of this book introduces statistical inference. This chapter is about *sampling*. Sampling involves drawing repeated random samples from a population. In Section \@ref(sampling-activity) we illustrate sampling by working with samples of colored balls and the proportion of red balls in these samples. In Section \@ref(sampling-framework) we present a theoretical framework and define what is the sampling distribution. In Section \@ref(sampling-activity-mean) we present
 a second sampling activity, this time working with samples of chocolate-covered almonds and the average weight of these samples. In Section \@ref{CLT} we introduce one of the fundamental theoretical results in Statistics: the *Central Limit Theorem*. In Section \@ref(sampling-other-scenarios) we present the sampling distribution in other scenarios. The concepts behind *sampling* form the basis of inferential methods, in particular confidence intervals and hypothesis tests; methods that are studied in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing).

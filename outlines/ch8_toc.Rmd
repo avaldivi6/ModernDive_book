@@ -2493,6 +2493,8 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
 
 # Estimation, Confidence Intervals, and Bootstrapping V2 {#confidence-intervals}
 
+## Intro
+
 - Introducing the idea of estimation as the real goal. 
 - Highlight sampling as a tool to understand estimation.
     - Introduce the idea of precision and accuracy
@@ -2503,33 +2505,95 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
 ### Needed packages {-#CI-packages}
 
 
-## Estimation: Revisiting the bowl activities {#estimation-bowl-activities}
+## Revisiting the Bowl Activities for Estimation
 
-### Estimating the proportion of red balls in the bowl {#estimation-proportion}
+Revisiting the red balls activity {#estimation-bowl-activities}
 
-- Show any given sample proportion and compare it with the population proportion
-- Pick the 33 sample proportions obtained earlier and show how close they are for the population proportion
-- Discuss preShow how about 95% of the 20000 sample proportions are within 2 SE from the true population proportion
+Brief comments about using activities as a tool for estimation
+
+### Red balls: Sample proportions as estimates of the population proportion?
+
+#### One sample proportion
+
+Use the first sample proportion obtained in ch7 and show how far is this from the population proportion in terms of the SE of $\bar X$
+
+#### 33 sample proportions
+
+Use the 33 sample proportions obtained earlier and show how close they are for the population proportion in terms of SE of $\bar X$
+
+#### 1000 sample proportions
+
+- Revisit the sampling distribution of the sample proportion
+- Show how the sampling variation is present
+- Highlight the percentage of sample proportions that are within 2 SE from the population proportion
+
+#### Constructing intervals as estimate {#estimation-proportion}
+
+- Show how can we use the sampling distribution as a tool to construct intervals
+- Show how about 95% of the 1000 sample proportions are within 2 SE from the true population proportion
 - Construct an interval based on any one sample and show how this interval contains the true population proportion
+- Show the image where 95% of the intervals contain the population proportion
 
-### Estimate the average weight of chocolate-covered almonds
+### Case Study: COVID (return to normalcy)
 
-- Show how about 95% of the 20000 sample means obtained earlier are within 2 SE from the sample mean
+Introduce the case study, focus on the sample proportion and SE obtained and use them to construct a 95% confidence interval
+
+### Chocolate-covered almonds: Sample means as estimates of the population mean?
+
+- Use again one, 33, and 1000 sample means. Use the latter to reiterate the sampling distribution of the sample mean.
+- Show the dispersion and highlight the percentage of sample means that are within 2 SE from the population mean
+
+#### Constructing confidence intervals
+
 - Construct an interval based on any one sample and show how this interval contains the true population proportion
+- Show how about 95% of the confidence intervals obtained earlier include the population proportion and 5% don't
 
-## Bootstrap sampling: Computer simulation of resampling {#resampling-simulation}
+### When we only have one sample of almonds: Bootstrap sampling
+
+Introduce bootstrap sampling in the context of the activity only, deeper explanation come later
+
+#### Resampling one bootstrap samplece
+
+#### Resampling 33 bootstrap samples
+
+#### Resampling 1000 bootstrap samples
+
+- Construct the confidence interval using bootstrap samples
+- Compare with the confidence interval for the sample obtained earlier
+
+
+
+
+
+
+
+
+
+
+Computer simulation of resampling {#resampling-simulation}
 
 - Obtain one sample and introduce resampling with replacements from this sample. Introduce bootstrap sampling.
 - Obtain 20000 bootstrap samples and obtain their sample means. Show how the histogram compares to the histogram of 20000 samples.
 - Use the bootstrap samples to obtain the 95% interval
 
 ## Confidence Intervals framework
+### Precision and accuracy
 
-### Precision and accuracy (perhaps unbiasedness and consistency)
-### Confidence Interval: the theory-based approach
-### Confidence interval: the simulation-based approach
+### The sampling distribution approach
+### The bootstrap sampling approach
 
 - Introduce some theory about bootstrap sampling
+
+
+
+### Why bootstrap sampling works
+
+- Introduce some theory about bootstrap sampling
+
+
+
+
+#### The Russian doll
 
 ### Comparing theory- and simulation-based approaches
 
@@ -2537,17 +2601,20 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
     - Add a simulation that shows this
 - Add a note that in the remainder of the text, we’ll mainly focus on the simulation-based approach, but we'll use the traditional method for comparison
 
-
-
 ## Constructing confidence intervals using the simulation-based approach {#bootstrap-process}
 
 ### Original workflow
+
+#### `dplyr` versus `infer`
+
 
 ### `infer` package workflow {#infer-workflow}
 #### 1. `specify` variables {-}
 #### 2. `generate` replicates {-}
 #### 3. `calculate` summary statistics {-}
 #### 4. `visualize` the results {-}
+
+
 
 
 ### Percentile method with `infer` {#percentile-method-infer}
@@ -2567,18 +2634,6 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
 #### Impact of sample size {-}
 
 
-## Theoretical Framework
-### Why the simulation-based approach
-
-Here comes the theory supporting the use of bootstrapping for inference
-Some results based on simulations showing this (as hinted by Robert) would be useful here too
-
-### Some details to take into account when using simulation-based confidence intervals
-
-Best practices when using these methods
-Introduce some theory/simulations/reference that show the bootstrap sample is an adequate method and could have some advantages over the theory-based approach
-
-
 
 
 
@@ -2596,4 +2651,22 @@ Introduce some theory/simulations/reference that show the bootstrap sample is an
 ### Interpreting the confidence interval
 
 ## Summary and Final Remarks
+
+### Bootstrap sampling: theoretical framework
+
+#### Simulation results
+
+Here comes the theory supporting the use of bootstrapping for inference
+Some results based on simulations showing this (as hinted by Robert) would be useful here too
+
+#### Best practices when using bootstrap samples for confidence intervals
+
+Best practices when using these methods
+Introduce some theory/simulations/reference that show the bootstrap sample is an adequate method and could have some advantages over the theory-based approach
+
+
+
+
+
+
 
