@@ -7,6 +7,7 @@ output:
     number_sections: true
 ---
 
+
 # Bootstrapping and Confidence Intervals {#confidence-intervals}
     
 ```{r setup_ci, include=FALSE, purl=FALSE}
