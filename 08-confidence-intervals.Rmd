@@ -1,3 +1,68 @@
+## Intro
+
+
+In Chapter \ref(chapter7) we worked with sampling. Specifically, we work with some statistics such as the sample proportion, obtained many random samples of the same size from a population of interest, calculate the corresponding sample proportions from each of those samples, and studied what was the distribution of those sample proportions. We learned that
+
+- the sampling distribution of the sampling proportion followed, approximately, the normal distribution; 
+- the expected value of the sample proportion, located at the center of the distribution, was exactly equal to the population proportion, and
+- the sampling variation of the sample proportion, measured by the standard error of the sample proportion, was equal to the standard deviation of the population divided by the square root of the sample size used to collect the samples.
+
+We also learned that the characteristics of the sampling distribution were not limited to sample proportions. The same characteristics were present when working with the sampling distribution of the sample mean as we showed with the almonds' activities, and they also apply to sampling distributions for the difference of samples means, difference of sample proportions, etc. And for all these cases, the sampling distribution is not dependent on the distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
+
+Furthermore, you may remember that the original motivation was to be able to determine population parameter values, such as the proportion of red balls in the entire bowl, or the average weight of almonds in the entire bowl of almonds.
+
+How can we determine the population proportion of red balls in the bowl if we do not have access to the entire bowl? Well, since we have learned the characteristics of the sampling distribution, if we could have access to a large number of random samples, we know that the average of all those sample proportions will be, almost exactly, the population proportion.
+
+However, in real life situations, we do not have access to many random samples. Typically, we have access to a single random sample. How can we determine the population proportion of red balls in the bowl if all we have is a single random sample of red and white balls from the bowl?
+
+The short answer to this question is that we cannot determine exactly what the population proportion is, unless you have access to the entire population or to all the possible random samples of a given size from this population. However, we could __estimate__ the population proportion based on our knowledge of a single sample, and this estimate could be really good. 
+
+But because of sampling variation we know 
+
+In Section \@ref(traditional_CI) we show how to use the sample proportion observed and our knowledge of the sampling distribution of the sample proportion to construct an interval estimate of the population proportion. In Section \@ref(bootstrap_CI) we introduce a technique call the bootstrap that allows us to construct confidence intervals based on resampling from the original sample. In Section \@ref(compare_CI) we compare these two techniques and show advantage and disadvantage of using them. Finally, in Section \@ref(infer) we introduce predefined syntax in R to perform bootstrap confidence intervals.
+
+## Revisiting the Almond Activity for Estimation
+
+In Chapter \@ref(chapter7) one of the activities was to take many random samples of size 100 from a bowl of chocolate covered almonds, get the sample means of these samples, construct a histogram using these sample means, and show how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw), the histogram obtained using sample means from random samples of size $n=100$, and add a smooth curve for the normal distribution with appropriate expected value and standard error.
+
+```{r sample-mean-100-with-normal-redraw, echo=FALSE, fig.height=3, fig.cap="The distribution of the sample mean.", purl=FALSE}
+n = 100
+x = almonds_bowl$weight
+mu = mean(x)
+sigma = sqrt(mean(x^2)-mean(x)^2)
+if (!file.exists("rds/virtual_mean_weight_100.rds")) {
+  virtual_mean_weight_100 <- almonds_bowl |>
+    rep_slice_sample(n = 100, replace = TRUE, reps = 1000) |>
+    summarize(mean_weight = mean(weight), n = n())
+  write_rds(virtual_mean_weight_100, "rds/virtual_mean_weight_100.rds")
+} else {
+  virtual_mean_weight_100 <- read_rds("rds/virtual_mean_weight_100.rds")
+}
+
+
+ggplot(virtual_mean_weight_100, aes(x = mean_weight)) +
+  geom_histogram(aes(y=..density..), binwidth = 0.018, color = "white") + 
+  stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + xlim(3.4,4) + ylim(0,12) +
+  labs(
+    x = "Sample means with n=100"
+  )
+
+```
+
+
+As mentioned before, histograms, such as those seen in Figure \@ref(fig:comparing-sampling-distributions-3) provide a good approximation of the sampling distribution of the sample proportion, the distribution of $\bar X$. Since we are interested in the shape of the distribution, we redraw again the histogram obtained using sample proportions from random samples of size $n=25$, $n=50$, and $n=100$ but this time we add a smooth curve that appears to connect the top parts of each bar in the histogram. These histograms are presented in Figures \@ref(fig:sample-proportion-25-with-normal-pdf), \@ref(fig:sample-proportion-50-with-normal-pdf)
+
+
+
+
+
+
+
+- Introducing the idea of estimation as the real goal. 
+- Highlight sampling as a tool to understand estimation.
+    - Introduce the idea of precision and accuracy
+- Remark that in real-life examples one sample is all we get.
+
 # Bootstrapping and Confidence Intervals {#confidence-intervals}
     
 ```{r setup_ci, include=FALSE, purl=FALSE}
