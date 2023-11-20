@@ -1,25 +1,110 @@
-## Intro
+# Estimation, Confidence Intervals, and Bootstrapping V2 {#confidence-intervals}
+
+```{r setup_ci, include=FALSE, purl=FALSE}
+# Used to define Learning Check numbers:
+chap <- 8
+lc <- 0
+
+# Set R code chunk defaults:
+opts_chunk$set(
+  echo = TRUE,
+  eval = TRUE,
+  warning = FALSE,
+  message = TRUE,
+  tidy = FALSE,
+  purl = TRUE,
+  out.width = "\\textwidth",
+  fig.height = 4,
+  fig.align = "center"
+)
+
+# Set output digit precision
+options(scipen = 99) # , digits = 3)
+options(pillar.sigfig = 6)
+
+# Set random number generator seed value for replicable pseudorandomness.
+set.seed(76)
+```
+
+```{r echo=FALSE, message=FALSE, purl=FALSE}
+# This code is used for dynamic non-static in-line text output purposes
+library(dplyr)
+library(moderndive)
+p_red <- bowl %>%
+  summarize(mean(color == "red")) %>%
+  pull()
+n_balls_sample <- 50L
+```
 
 
-In Chapter \ref(chapter7) we worked with sampling. Specifically, we work with some statistics such as the sample proportion, obtained many random samples of the same size from a population of interest, calculate the corresponding sample proportions from each of those samples, and studied what was the distribution of those sample proportions. We learned that
+```{r echo=FALSE, purl=FALSE}
+# This code is used for dynamic non-static in-line text output purposes
+n_virtual_resample <- 1000L
+n_gallup_survey <- 1000L
+```
 
-- the sampling distribution of the sampling proportion followed, approximately, the normal distribution; 
-- the expected value of the sample proportion, located at the center of the distribution, was exactly equal to the population proportion, and
-- the sampling variation of the sample proportion, measured by the standard error of the sample proportion, was equal to the standard deviation of the population divided by the square root of the sample size used to collect the samples.
+## Introduction
 
-We also learned that the characteristics of the sampling distribution were not limited to sample proportions. The same characteristics were present when working with the sampling distribution of the sample mean as we showed with the almonds' activities, and they also apply to sampling distributions for the difference of samples means, difference of sample proportions, etc. And for all these cases, the sampling distribution is not dependent on the distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
 
-Furthermore, you may remember that the original motivation was to be able to determine population parameter values, such as the proportion of red balls in the entire bowl, or the average weight of almonds in the entire bowl of almonds.
+In Chapter \ref(chapter7) we worked with sampling. Specifically, the activities with red and white balls consisted on getting many random samples of the same size from a bowl, calculate the corresponding sample proportions of red balls from each of those samples, and studied what was the distribution of those sample proportions. We learned that
 
-How can we determine the population proportion of red balls in the bowl if we do not have access to the entire bowl? Well, since we have learned the characteristics of the sampling distribution, if we could have access to a large number of random samples, we know that the average of all those sample proportions will be, almost exactly, the population proportion.
+- the sampling distribution of the sampling proportion follows, approximately, the normal distribution, 
+- the expected value of the sample proportion, located at the center of the distribution, is exactly equal to the population proportion, and
+- the sampling variation, measured by the standard error of the sample proportion, is equal to the standard deviation of the population divided by the square root of the sample size used to collect the samples.
 
-However, in real life situations, we do not have access to many random samples. Typically, we have access to a single random sample. How can we determine the population proportion of red balls in the bowl if all we have is a single random sample of red and white balls from the bowl?
+We also performed sampling with chocolate covered almonds where the statistic of interest was the sample mean weight. We learned that the characteristics of the sampling distribution of the sample proportion apply in exactly the same way to the sampling distribution of the sample mean; namely,
 
-The short answer to this question is that we cannot determine exactly what the population proportion is, unless you have access to the entire population or to all the possible random samples of a given size from this population. However, we could __estimate__ the population proportion based on our knowledge of a single sample, and this estimate could be really good. 
+- the sampling distribution of the sampling mean follows, approximately, the normal distribution; 
+- the expected value of the sample mean is the population mean, and
+- the standard error of the sample mean is the standard deviation of the population divided by the square root of the sample size.
 
-But because of sampling variation we know 
+We ended the chapter showing that these characteristics also apply to sampling distributions for the difference of samples means, the difference of sample proportions, etc. Note that the sampling distribution is not dependent on the original distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
 
-In Section \@ref(traditional_CI) we show how to use the sample proportion observed and our knowledge of the sampling distribution of the sample proportion to construct an interval estimate of the population proportion. In Section \@ref(bootstrap_CI) we introduce a technique call the bootstrap that allows us to construct confidence intervals based on resampling from the original sample. In Section \@ref(compare_CI) we compare these two techniques and show advantage and disadvantage of using them. Finally, in Section \@ref(infer) we introduce predefined syntax in R to perform bootstrap confidence intervals.
+On the other hand, you may remember that the original motivation was to determine population parameter values, such as the average weight of all the almonds in the entire bowl of almonds.
+
+How can we determine the population mean weight of almonds in the bowl if we do not have access to the entire bowl? 
+Based on the characteristics of the sampling distribution, stated above, if we have access to a large number of random samples, we know that the average of all those sample means will be a really good estimate of the expected value, which happen to be precisely the population mean weight.
+
+However, in real life situations, we do not have access to many random samples. In fact, we typically have access to a single random sample. How can we determine the population mean weight of almonds in the bowl if all we have is a single random sample of almonds? 
+
+While we cannot determine exactly what the population mean weight of almonds is from any one random sample, we could __estimate__ the population mean based on our knowledge of this sample. 
+The first idea would be to use the sample mean to estimate the population mean, but due to sampling variation we know that he sample mean is not equal to the population mean. Instead, we are going to build an interval based on the information from the sample and use this interval as an estimate of the population mean. 
+This chapter discusses how to do this and why this is a clever idea that often produces useful results.
+
+In Section \@ref(traditional_CI) we show how to use the sample mean observed and our knowledge of the sampling distribution of the sample mean to construct this interval. In Section \@ref(bootstrap_CI) we introduce a technique call the bootstrap that allows us to construct confidence intervals based on resampling from the original sample. In Section \@ref(compare_CI) we compare these two techniques and show advantage and disadvantage of using them. Finally, in Section \@ref(infer) we introduce syntax in R to perform bootstrap confidence intervals.
+
+### Needed packages {-#CI-packages}
+
+If needed, read Section \@ref(packages) for information on how to install and load R packages. 
+
+```{r message=FALSE}
+library(tidyverse)
+library(moderndive)
+library(infer)
+```
+
+Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
+
+
+```{r message=FALSE}
+library(tidyverse)
+library(moderndive)
+library(infer)
+```
+
+```{r message=FALSE, echo=FALSE, purl=FALSE}
+# Packages needed internally, but not in the text
+library(kableExtra)
+library(patchwork)
+library(purrr)
+library(scales)
+```
+
+
+
+
+
+
 
 ## Revisiting the Almond Activity for Estimation
 
@@ -63,112 +148,21 @@ As mentioned before, histograms, such as those seen in Figure \@ref(fig:comparin
     - Introduce the idea of precision and accuracy
 - Remark that in real-life examples one sample is all we get.
 
-# Bootstrapping and Confidence Intervals {#confidence-intervals}
-    
-```{r setup_ci, include=FALSE, purl=FALSE}
-# Used to define Learning Check numbers:
-chap <- 8
-lc <- 0
 
-# Set R code chunk defaults:
-opts_chunk$set(
-  echo = TRUE,
-  eval = TRUE,
-  warning = FALSE,
-  message = TRUE,
-  tidy = FALSE,
-  purl = TRUE,
-  out.width = "\\textwidth",
-  fig.height = 4,
-  fig.align = "center"
-)
-
-# Set output digit precision
-options(scipen = 99) # , digits = 3)
-options(pillar.sigfig = 6)
-
-# Set random number generator seed value for replicable pseudorandomness.
-set.seed(76)
-```
-
-```{r echo=FALSE, message=FALSE, purl=FALSE}
-# This code is used for dynamic non-static in-line text output purposes
-library(dplyr)
-library(moderndive)
-p_red <- bowl %>%
-  summarize(mean(color == "red")) %>%
-  pull()
-n_balls_sample <- 50L
-```
-
-
-```{r echo=F}
-#num_almonds <- almonds_sample %>% nrow()
-#x_bar <- almonds_sample %>% 
-#  summarize(mean_weight = mean(weight))
-# This code is used for dynamic non-static in-line text output purposes
-n_resample_friends <- pennies_resamples %>% 
-  select(name) %>% 
-  distinct() %>% 
-  nrow()
-resampled_means <- pennies_resamples %>% 
-  group_by(name) %>% 
-  summarize(mean_weight = mean(year))
-```
-
-<<<<<<< HEAD
-In Chapter \@ref(sampling) we introduced *sampling*. In particular, we discussed the *sampling distribution of the sample proportion*. 
-
-We illustrated this concept by using the bowl with red and white balls shown in Figure \@ref(fig:sampling-exercise-1) with values stored in the R object `bowl`. We obtained samples of balls selected at random and with a fixed sample size, for example, by mixing the balls in the ball beforehand and then using a shovel that could hold exactly $n= 50$ balls, or using the appropriate code in R to perform the virtual analog of this activity, as shown in subsection \@ref(sampling-simulation).
-
-By doing the latter, we were able to obtain thousands of random samples, of the same size, and the corresponding sample proportions of red balls. We then used those proportions to build a histogram as shown, for example, in Figure \@ref(fig:samplingdistribution-virtual-1000). The histogram was the visual approximation of the *sampling distribution of the sample proportion* of red balls.
-
-When studying numerical summaries of these sample proportions and visual characteristics of the histogram obtained, we were able to highlight important properties of the sample distribution. These were the most important conclusions:
-
-- The sample proportion of red balls obtained from a random sample is likely different than the sample proportion of any other random sample. This is called *sampling variation*.
-- When a large number of random samples and corresponding sample proportions are obtained, we *expect* the average of these sample proportions to be equal to the *population proportion*, the proportion of red balls in the entire bowl. This is why histograms of sample proportions, such as those in Figure \@ref(fig:samplingdistribution-virtual-1000), were centered precisely at the *population proportion* value. We can use statistical jargon to represent this idea: The *expected value* of the sample proportion is equal to the *population proportion*.
-- When comparing histograms of sample proportions for different sample sizes, such as those shown in Figure \@ref(fig:comparing-sampling-distributions-31): the larger the sample size used to obtained random samples, the closer the sample proportions will be to the population proportions. Sampling variation will always be present, but the sample proportions will get closer and closer, on average, to the population proportion. The sampling variation, determined by the standard deviation of sample proportions, properly called *standard error*, is given by the formula $SE = \sqrt{p(1-p)/n}$ where $p$ is the population proportion and $n$ is the sample size. By looking at the formula we can see that the standard error is inversely proportional to the square root of the sample size used to obtain the random samples.
-- When the sample size used is large enough, the sampling distribution of the sample proportion approximate the normal distribution, and the histogram of the sample proportions seems to come from a normal distribution. This is a direct application of the Central Limit Theorem formalized in Section \@ref(central-limit-theorem).
-
-Our original goal was to *estimate* the proportion of red balls in the bowl. Why did we learn about the sampling distribution of the sample proportion? The reason 
-
-
-
-Well, in real-life situations, it is impractical or even impossible to obtain thousands of samples from a population. Instead, as shown in Section \ref(sampling-case-study), we obtain a single sample and associated sample proportion and use it to *estimate* the population proportion. This is the topic of this chapter.
 
 This chapter is about *estimation*. An estimate is a number obtained from a sample that represents some characteristic of the population. Recall that in Chapter \@ref(sampling), our original goal was to *estimate* the proportion of red balls in the bowl. Why did we learn about the sampling distribution of the sample proportion? Well, this knowledge will allow us to 
 
 
-In Section \@ref(sampling-activity) we illustrate sampling using a tactile example and simultaneously introducing key concepts and terminology. In Section \@ref(sampling-simulation) we extend this by performing virtual sampling via simulations. The tools used in the data science portion of this book, in particular data visualization and data wrangling, continue to be useful in this context. In Section \@ref(sampling-framework) we introduce more definitions, terminology, and a theoretical framework to introduce one of the fundamental theoretical results in Statistics: the *Central Limit Theorem*. In Section \@ref(sampling-case-study) we tie the contents of this chapter to the real world by presenting a case study: a 2023 Gallup poll conducted in the US asking whether coronavirus pre-pandemic normalcy was attainable.
+
 
 The concepts behind *sampling* form the basis for constructing confidence intervals and performing tests of significance also called hypothesis tests; these are the best-known and used inferential methods and are presented in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing).
 
 Later in Chapter \@ref(sampling) in a case study was presented 
 
 
-and we cared about learning how much information we learned fr understand how sampling works and how much can we learn from it The real goal of learning this was to be able to use what we have learned 
 
 
 
-=======
-In Chapter \@ref(sampling), we introduced sampling
-.
-
-
-Te goal was to estimate the proportion of red balls in the bowl shown in Figure \@ref(fig:sampling-exercise-1). 
-To achieve this, a shovel was used to extract a random sample of `r n_balls_sample` balls, and the proportion of red balls in this sample, the sample proportion, was used as an *estimate* of the proportion of red balls in the entire bowl, the population proportion. When this activity was repeated a few times, different random samples produced different *estimates*, a phenomenon known as *sampling variation*.
->>>>>>> ee9906bd2b704946ef82a7f4d22b2b690fca5ebd
-
-```{r echo=FALSE, purl=FALSE}
-# This code is used for dynamic non-static in-line text output purposes
-n_virtual_resample <- 1000L
-```
-
-
-```{r echo=FALSE, purl=FALSE}
-# This code is used for dynamic non-static in-line text output purposes
-n_gallup_survey <- 1000L
-```
 
 
 Our study of the sampling distribution had the purpose of learning how it works 

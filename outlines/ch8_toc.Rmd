@@ -2494,7 +2494,7 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
 
 # Estimation, Confidence Intervals, and Bootstrapping V2 {#confidence-intervals}
 
-## Intro
+## Introduction
 
 - Introducing the idea of estimation as the real goal. 
 - Highlight sampling as a tool to understand estimation.
@@ -2506,7 +2506,18 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
 ### Needed packages {-#CI-packages}
 
 
-## Revisiting the Bowl Activities for Estimation
+## Revisiting the Almond Activity for Estimation
+
+### The normal curve
+
+### Using the normal curve for the sampling distribution of the sample mean
+
+## Constructing confidence intervals using the normal curve {#ci-theory-process}
+
+## Case study: yawning contagious or other case study {#case-study-two-prop-ci}
+
+
+## Revisiting the Activities for Estimation
 
 Revisiting the red balls activity {#estimation-bowl-activities}
 
