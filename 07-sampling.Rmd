@@ -1446,7 +1446,7 @@ The sampling distribution of the difference in sample proportions also looks bel
 
 Here are the mathematical details: $\overline X_1$ is the random variable that represents the sample proportion of red balls of size $n_1 = 50$, $\overline X_2$ is the random variable that represents the sample proportion of almonds heavier than 3.8 grams, taken from samples of size $n_2 = 60$. The proportion of red balls the population proportion and standard deviation are given by $p_1$ and $\sigma_1 = \sqrt{p_1(1-p_1)}$ and for the almonds' weight the population proportion and standard deviation are given by $p_2$ and $\sigma_2 = \sqrt{p_2(1-p_2)}$. 
 
-The expected value and standard error of the difference, $\overline X_1 - \overline X_2$ is given by $p_1 - p_2$ and $$\sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}},$$ respectively. If the distributions of $X_1$ and $X_2$ are approximately normal due to the CLT, so is the distribution of $\overline X_1 - \overline X_2$. We can write all these properties at once: $$\overline X_1 - \overline X_2 \sim Normal \left(p_1 - p_2, \sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}} \right)$$
+The expected value and standard error of the difference, $\overline X_1 - \overline X_2$, is given by $p_1 - p_2$ and $$\sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}},$$ respectively. If the distributions of $X_1$ and $X_2$ are approximately normal due to the CLT, so is the distribution of $\overline X_1 - \overline X_2$. We can write all these properties at once: $$\overline X_1 - \overline X_2 \sim Normal \left(p_1 - p_2, \sqrt{\frac{p_1(1-p_1)}{n_1} + \frac{p_2(1-p_2)}{n_2}} \right)$$
 
 ## Summary and Final Remarks {#sampling-final-remarks}
 
