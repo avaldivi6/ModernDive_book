@@ -4,9 +4,9 @@
 # Set up renv following instructions at https://www.emilhvitfeldt.com/post/bookdown-netlify-github-actions/
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, ch7_8_updates]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, ch7_8_updates]
   workflow_dispatch:
 
 name: bookdown
