@@ -27,15 +27,18 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install xquartz --cask
 
-      - name: Install tinytex and Inconsolata font
-        run: install.packages("tinytex"); tinytex::install_tinytex()
+      - name: Install tinytex
+        run: |
+          install.packages("tinytex")
+          tinytex::install_tinytex()
         shell: Rscript {0}
 
-      - name: Set up TinyTeX
+      - name: Set up TinyTeX and Inconsolata font
         run: |
-          ~/.TinyTeX/bin/*/tlmgr path add
+          export PATH=$HOME/.TinyTeX/bin/x86_64-darwin:$PATH
           tlmgr update --self
           tlmgr update --all
+          tlmgr install inconsolata
           tlmgr conf texmf TEXMFHOME "~/.TinyTeX/texmf-home"
           tlmgr conf texmf TEXMFCACHE "~/.TinyTeX/texmf-var/web2c"
           tlmgr conf auxtrees add "$(kpsewhich -var-value=TEXMFHOME)"
