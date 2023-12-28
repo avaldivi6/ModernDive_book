@@ -13,7 +13,7 @@ name: bookdown
 
 jobs:
   bookdown:
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
@@ -22,16 +22,20 @@ jobs:
       EMAIL: ${{ secrets.EMAIL }}
     steps:
       - uses: actions/checkout@v3
-      - uses: r-lib/actions/setup-tinytex@v2
-      - run: tlmgr --version
+      
+      - name: Install XQuartz on macOS
+        if: runner.os == 'macOS'
+        run: brew install xquartz --cask
 
-      - name: Install additional LaTeX packages
-        run: |
-            tlmgr install titlesec
-            tlmgr list --only-installed
-    
-      - uses: actions/checkout@v3
+     - name: Install Inconsolata font
+       run: |
+         brew tap homebrew/cask-fonts         # You only need to do this once!
+         brew install font-inconsolata
 
+      - name: Install tinytex
+        run: install.packages("tinytex"); tinytex::install_tinytex()
+        shell: Rscript {0}
+      
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
