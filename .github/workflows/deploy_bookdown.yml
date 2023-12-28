@@ -22,6 +22,15 @@ jobs:
       EMAIL: ${{ secrets.EMAIL }}
     steps:
       - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-tinytex@v2
+      - run: tlmgr --version
+
+      - name: Install additional LaTeX packages
+        run: |
+            tlmgr install titlesec
+            tlmgr list --only-installed
+    
+      - uses: actions/checkout@v3
 
       - uses: r-lib/actions/setup-pandoc@v2
 
