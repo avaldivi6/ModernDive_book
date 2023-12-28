@@ -27,10 +27,10 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install xquartz --cask
 
-     - name: Install Inconsolata font
-       run: |
-         brew tap homebrew/cask-fonts         # You only need to do this once!
-         brew install font-inconsolata
+      - name: Install Inconsolata font
+        run: |
+          brew tap homebrew/cask-fonts         # You only need to do this once!
+          brew install font-inconsolata
 
       - name: Install tinytex
         run: install.packages("tinytex"); tinytex::install_tinytex()
