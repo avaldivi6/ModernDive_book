@@ -33,7 +33,6 @@ jobs:
 
       - name: Set up TinyTeX
         run: |
-          wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
           ~/.TinyTeX/bin/*/tlmgr path add
           tlmgr update --self
           tlmgr update --all
