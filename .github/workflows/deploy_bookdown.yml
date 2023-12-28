@@ -46,6 +46,9 @@ jobs:
           key: bookdown-${{ hashFiles('**/*Rmd') }}
           restore-keys: bookdown-
 
+      - name: Try to install font again
+        run: tlmgr install inconsolata upquote courier courier-scaled helvetic
+
       - name: Build site
         run: bookdown::render_book("index.Rmd", quiet = TRUE)
         shell: Rscript {0}
