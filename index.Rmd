@@ -7,7 +7,7 @@ site: bookdown::bookdown_site
 documentclass: krantz
 bibliography: [bib/books.bib, bib/packages.bib, bib/articles.bib]
 biblio-style: apalike
-fontsize: '12pt, krantz2'
+fontsize: '11pt, krantz2'
 monofont: "Inconsolata" #"Source Code Pro"
 monofontoptions: "Scale=0.85"
 link-citations: yes
@@ -143,6 +143,18 @@ if (is_html_output()) {
 ```{r results="asis", echo=FALSE, purl=FALSE}
 if (is_html_output()) {
   cat("# Welcome to ModernDive {-}")
+}
+```
+
+```{r echo=FALSE}
+# To not have the next bash chunk error out on first build
+
+# Create `docs`` folder and `scripts` subfolder
+if (!dir.exists("docs")) {
+  dir.create("docs")
+}
+if (!dir.exists(here::here("docs", "scripts"))) {
+  dir.create(here::here("docs", "scripts"))
 }
 ```
 

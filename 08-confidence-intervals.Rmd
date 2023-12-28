@@ -6,7 +6,7 @@ chap <- 8
 lc <- 0
 
 # Set R code chunk defaults:
-opts_chunk$set(
+knitr::opts_chunk$set(
   echo = TRUE,
   eval = TRUE,
   warning = FALSE,
@@ -84,13 +84,6 @@ library(infer)
 ```
 
 Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
-
-
-```{r message=FALSE}
-library(tidyverse)
-library(moderndive)
-library(infer)
-```
 
 ```{r message=FALSE, echo=FALSE, purl=FALSE}
 # Packages needed internally, but not in the text
@@ -226,6 +219,10 @@ pop_ave_wt <- bowl_almonds |>
   summarize(mu = mean(weight)) |>
   pull(mu) |>
   round(3)
+
+x_bar <- almonds_sample %>% 
+  summarize(mean_weight = mean(weight))
+x_bar
 ```
 
 
