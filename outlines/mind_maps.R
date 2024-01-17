@@ -13,7 +13,7 @@ create_mindmaps <- function(input_file) {
 }
 
 getwd()
-setwd("/Users/artvaldi/Documents/MD2/ModernDive_book/outlines")
+setwd("/Users/arturovaldivia/MD2/ModernDive_book/outlines/")
 ch7_v1_v2_outline_widget <- create_mindmaps(input_file = "ch7_toc.Rmd")$widget
 
 ch8_v1_v2_outline_widget <- create_mindmaps(input_file = "ch8_toc.Rmd")$widget
