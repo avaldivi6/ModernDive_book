@@ -2489,12 +2489,121 @@ If you want more examples of the `infer` workflow to construct confidence interv
 ### What's to come?
 
 Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hypothesis-testing) we'll cover the other common tool for statistical inference: hypothesis testing. Just like confidence intervals, hypothesis tests are used to infer about a population using a sample. However, we'll see that the framework for making such inferences is slightly different. 
-
-
-
 # Estimation, Confidence Intervals, and Bootstrapping V2 {#confidence-intervals}
 
+```{r setup_ci, include=FALSE, purl=FALSE}
+# Used to define Learning Check numbers:
+chap <- 8
+lc <- 0
+
+# Set R code chunk defaults:
+opts_chunk$set(
+  echo = TRUE,
+  eval = TRUE,
+  warning = FALSE,
+  message = TRUE,
+  tidy = FALSE,
+  purl = TRUE,
+  out.width = "\\textwidth",
+  fig.height = 4,
+  fig.align = "center"
+)
+
+# Set output digit precision
+options(scipen = 99) # , digits = 3)
+options(pillar.sigfig = 6)
+
+# Set random number generator seed value for replicable pseudorandomness.
+set.seed(76)
+```
+
+```{r echo=FALSE, message=FALSE, purl=FALSE}
+# This code is used for dynamic non-static in-line text output purposes
+library(dplyr)
+library(moderndive)
+p_red <- bowl %>%
+  summarize(mean(color == "red")) %>%
+  pull()
+n_balls_sample <- 50L
+```
+
+
+```{r echo=FALSE, purl=FALSE}
+# This code is used for dynamic non-static in-line text output purposes
+n_virtual_resample <- 1000L
+n_gallup_survey <- 1000L
+```
+
 ## Introduction
+
+
+In Chapter \ref(chapter7) we worked with sampling. Specifically, the activities with red and white balls consisted on getting many random samples of the same size from a bowl, calculate the corresponding sample proportions of red balls from each of those samples, and studied what was the distribution of those sample proportions. We learned that
+
+- the sampling distribution of the sampling proportion follows, approximately, the normal distribution, 
+- the expected value of the sample proportion, located at the center of the distribution, is exactly equal to the population proportion, and
+- the sampling variation, measured by the standard error of the sample proportion, is equal to the standard deviation of the population divided by the square root of the sample size used to collect the samples.
+
+We also performed sampling with chocolate covered almonds where the statistic of interest was the sample mean weight. We learned that the characteristics of the sampling distribution of the sample proportion apply in exactly the same way to the sampling distribution of the sample mean; namely,
+
+- the sampling distribution of the sampling mean follows, approximately, the normal distribution; 
+- the expected value of the sample mean is the population mean, and
+- the standard error of the sample mean is the standard deviation of the population divided by the square root of the sample size.
+
+We ended the chapter showing that these characteristics also apply to sampling distributions for the difference of samples means, the difference of sample proportions, etc. Note that the sampling distribution is not dependent on the original distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
+
+On the other hand, you may remember that the original motivation was to determine population parameter values, such as the average weight of all the almonds in the entire bowl of almonds.
+
+How can we determine the population mean weight of almonds in the bowl if we do not have access to the entire bowl? 
+Based on the characteristics of the sampling distribution, stated above, if we have access to a large number of random samples and obtain the mean from each sample, we know that the average of those sample means will be a really good estimate of the expected value, which is precisely the population mean weight.
+
+However, in real life situations, we do not have access to many random samples. In fact, we typically have access to a single random sample. How can we determine the population mean weight of almonds in the bowl if all we have is a single random sample of almonds? 
+
+While we cannot determine exactly what the population mean weight of almonds is from any one random sample, we could __estimate__ the population mean based on our knowledge of this sample. 
+The first idea would be to use the sample mean to estimate the population mean, but due to sampling variation we know that he sample mean is not equal to the population mean. Instead, we are going to build an interval based on the information from the sample and use this interval as an estimate of the population mean. 
+This chapter discusses how to do this and why this is a clever idea that often produces useful results.
+
+In Section \@ref(traditional_CI) we show how to use the sample mean observed and our knowledge of the sampling distribution of the sample mean to construct this interval. In Section \@ref(bootstrap_CI) we introduce a technique call the bootstrap that allows us to construct confidence intervals based on resampling from the original sample. In Section \@ref(compare_CI) we compare these two techniques and show advantage and disadvantage of using them. Finally, in Section \@ref(infer) we introduce syntax in R to perform bootstrap confidence intervals.
+
+### Needed packages {-#CI-packages}
+
+If needed, read Section \@ref(packages) for information on how to install and load R packages. 
+
+```{r message=FALSE}
+library(tidyverse)
+library(moderndive)
+library(infer)
+```
+
+Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
+
+
+```{r message=FALSE}
+library(tidyverse)
+library(moderndive)
+library(infer)
+```
+
+```{r message=FALSE, echo=FALSE, purl=FALSE}
+# Packages needed internally, but not in the text
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(purrr)
+library(scales)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - Introducing the idea of estimation as the real goal. 
 - Highlight sampling as a tool to understand estimation.
@@ -2503,75 +2612,14 @@ Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hy
 
 
 
-### Needed packages {-#CI-packages}
+This chapter is about *estimation*. An estimate is a number obtained from a sample that represents some characteristic of the population. Recall that in Chapter \@ref(sampling), our original goal was to *estimate* the proportion of red balls in the bowl. Why did we learn about the sampling distribution of the sample proportion? Well, this knowledge will allow us to 
 
 
-## Revisiting the Almond Activity for Estimation
-
-### The normal curve
-
-### Using the normal curve for the sampling distribution of the sample mean
-
-## Constructing confidence intervals using the normal curve {#ci-theory-process}
-
-## Case study: yawning contagious or other case study {#case-study-two-prop-ci}
 
 
-## Revisiting the Activities for Estimation
+The concepts behind *sampling* form the basis for constructing confidence intervals and performing tests of significance also called hypothesis tests; these are the best-known and used inferential methods and are presented in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing).
 
-Revisiting the red balls activity {#estimation-bowl-activities}
-
-Brief comments about using activities as a tool for estimation
-
-### Red balls: Sample proportions as estimates of the population proportion?
-
-#### One sample proportion
-
-Use the first sample proportion obtained in ch7 and show how far is this from the population proportion in terms of the SE of $\bar X$
-
-#### 33 sample proportions
-
-Use the 33 sample proportions obtained earlier and show how close they are for the population proportion in terms of SE of $\bar X$
-
-#### 1000 sample proportions
-
-- Revisit the sampling distribution of the sample proportion
-- Show how the sampling variation is present
-- Highlight the percentage of sample proportions that are within 2 SE from the population proportion
-
-#### Constructing intervals as estimate {#estimation-proportion}
-
-- Show how can we use the sampling distribution as a tool to construct intervals
-- Show how about 95% of the 1000 sample proportions are within 2 SE from the true population proportion
-- Construct an interval based on any one sample and show how this interval contains the true population proportion
-- Show the image where 95% of the intervals contain the population proportion
-
-### Case Study: COVID (return to normalcy)
-
-Introduce the case study, focus on the sample proportion and SE obtained and use them to construct a 95% confidence interval
-
-### Chocolate-covered almonds: Sample means as estimates of the population mean?
-
-- Use again one, 33, and 1000 sample means. Use the latter to reiterate the sampling distribution of the sample mean.
-- Show the dispersion and highlight the percentage of sample means that are within 2 SE from the population mean
-
-#### Constructing confidence intervals
-
-- Construct an interval based on any one sample and show how this interval contains the true population proportion
-- Show how about 95% of the confidence intervals obtained earlier include the population proportion and 5% don't
-
-### When we only have one sample of almonds: Bootstrap sampling
-
-Introduce bootstrap sampling in the context of the activity only, deeper explanation come later
-
-#### Resampling one bootstrap samplece
-
-#### Resampling 33 bootstrap samples
-
-#### Resampling 1000 bootstrap samples
-
-- Construct the confidence interval using bootstrap samples
-- Compare with the confidence interval for the sample obtained earlier
+Later in Chapter \@ref(sampling) in a case study was presented 
 
 
 
@@ -2579,106 +2627,831 @@ Introduce bootstrap sampling in the context of the activity only, deeper explana
 
 
 
+Our study of the sampling distribution had the purpose of learning how it works 
+
+Now that we learn 
+
+
+We finished the chapter by presenting a case study in Section \@ref(sampling-case-study) when the  ["Gallup poll."](https://news.gallup.com/poll/471953/not-expect-return-pre-pandemic-normalcy.aspx) was presented. 
+
+In this situation a *single* random sample and associated sample proportion was obtained. It is clear that we cannot build the sampling distribution with a single sample proportion, we need several of them to do this.
+
+We also don't know if the sample obtained was 
+
+We cannot and the sample proportion obtained from this sample is used as the *estimate* of the population proportion. 
+This was the situation presented in 
+
+
+Pollsters wanted to estimate the proportion of *all* people living in the US who believed that pre-pandemic normalcy was no longer attainable for them. 
+They took a random sample of about 1000 people and determine that 47% of them believed that pre-pandemic normalcy was not attainable. 
+This sample proportion is an *estimate* of the population proportion.
+
+But, how can we know if this is a good estimate of the population proportion? Is it precise? Is it useful? As it turns out, we do not know exactly how precise this particular estimate is, but we know it comes from the sampling distribution of the sample proportion and in Chapter \@ref(sampling) we have learned important characteristics of this distribution. While the Gallup poll article did not provide additional information, oftentimes studies such as this provide a *margin of error* based on some level of confidence. As an illustration, a statement could have been: "We are 95% confident that the proportion of *all* people living in the US who believed that pre-pandemic normalcy was no longer attainable for them was 47% with a margin of error of plus or minus 2.3%". Based on this information we could construct the interval [47% - 2.3%, 47% + 2.3%] = [44.7%, 49.3%]. This range of plausible values is called a *confidence interval* and provides an interval as an estimate of the sample proportion instead of a single value. This method, its construction, and its interpretation will be the central focus of this chapter.
+
+In Section 8.1, we introduce another sampling activity, we sample chocolate-covered almonds from a bowl and determine the average weight of the sample. As we did earlier with the sample proportion, we use the average weight in the sample, or sample mean, as an estimate of the average weight of all the chocolate-covered almonds in the entire bowl, or population mean. We also show, using simulations, the properties of the sampling distribution for the sample mean. In section 8.2. we revisit the Central Limit Theorem, introduce the standard error for the sample mean, and show that the sample mean is a generalization of the sample proportion studied earlier. In Section 8.3. we discuss the real-life limitations of having a single sample and introduce bootstrapping, a resampling method that uses a single sample to approximate the sampling distribution of the sample mean. In Section 8.4. we return to the central topic of using a sample mean (or sample proportion) to estimate the population mean (or population proportion). We formally introduce *confidence intervals*, provide their rationale and present two different methods to obtain them. The first one is called the *theory-based approach* and relies on large enough samples and the Central Limit Theorem. This method has been the central tool for statistical analysis for about two centuries. The second method is called the *simulation-based approach* and takes advantage of bootstrapping. In Section 8.5. we provide the details for the construction of confidence intervals under both approaches. In Section 8.6. we expand on the meaning and interpretation of confidence intervals and in Section 8.7. we conclude with a Case Study.
+
+
+## Tying Sampling Distribution to Estimation
+
+
+We revisit the almond activity to understand how the sampling distribution of the sample mean can help us in the estimation of the population mean 
+
+### Revisiting the Almond Activity
+
+In Chapter \@ref(chapter7) one of the activities was to take many random samples of size 100 from a bowl of chocolate covered almonds, get the sample means of these samples, construct a histogram using these sample means, and show how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw), the histogram obtained using sample means from random samples of size $n=100$, and add a smooth curve for the normal distribution with appropriate expected value and standard error.
+
+```{r sample-mean-100-with-normal-redraw, echo=FALSE, fig.height=3, fig.cap="The distribution of the sample mean.", purl=FALSE}
+almonds_bowl <- read_rds("rds/almonds_bowl.rds")
+n = 100
+x = almonds_bowl$weight
+mu = mean(x)
+sigma = sqrt(mean(x^2)-mean(x)^2)
+if (!file.exists("rds/virtual_mean_weight_100.rds")) {
+  virtual_mean_weight_100 <- almonds_bowl |>
+    rep_slice_sample(n = 100, replace = TRUE, reps = 1000) |>
+    summarize(mean_weight = mean(weight), n = n())
+  write_rds(virtual_mean_weight_100, "rds/virtual_mean_weight_100.rds")
+} else {
+  virtual_mean_weight_100 <- read_rds("rds/virtual_mean_weight_100.rds")
+}
+
+
+ggplot(virtual_mean_weight_100, aes(x = mean_weight)) +
+  geom_histogram(aes(y=..density..), binwidth = 0.018, color = "white") + 
+  stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + xlim(3.4,4) + ylim(0,12) +
+  labs(
+    x = "Sample means with n=100"
+  )
+
+```
+
+
+As mentioned before, histograms, such as those seen in Figure \@ref(fig:comparing-sampling-distributions-3) provide a good approximation of the sampling distribution of the sample proportion, the distribution of $\bar X$. Since we are interested in the shape of the distribution, we redraw again the histogram obtained using sample proportions from random samples of size $n=25$, $n=50$, and $n=100$ but this time we add a smooth curve that appears to connect the top parts of each bar in the histogram. These histograms are presented in Figures \@ref(fig:sample-proportion-25-with-normal-pdf), \@ref(fig:sample-proportion-50-with-normal-pdf)
 
 
 
-Computer simulation of resampling {#resampling-simulation}
-
-- Obtain one sample and introduce resampling with replacements from this sample. Introduce bootstrap sampling.
-- Obtain 20000 bootstrap samples and obtain their sample means. Show how the histogram compares to the histogram of 20000 samples.
-- Use the bootstrap samples to obtain the 95% interval
-
-## Confidence Intervals framework
-### Precision and accuracy
-
-### The sampling distribution approach
-### The bootstrap sampling approach
-
-- Introduce some theory about bootstrap sampling
 
 
+### The Normal Distribution
 
-### Why bootstrap sampling works
+- Connect the sampling distribution of the sample mean with the normal due to the central limit theorem
+- Show the properties of the normal, in particular the 68 - 95 - 99.7 rule
+- Let's focus in 95%
 
-- Introduce some theory about bootstrap sampling
+### Using the sampling distribution of the sample mean to estimate the population mean
+
+- Recall that the sampling distribution is normal with mean equal to the population mean and standard deviation equal to the standard error
+- Argue that 95% of the sample means that we may get are within 1.96 standard errors of the population mean
+- Show that the sample standard deviation of the sample can be use to estimate the standard deviation of the population
+- Construct the estimated standard error using the sample standard deviation
+- Introduce the logic behind a confidence interval
+
+### The confidence interval using one sample of almonds
+
+- Show the steps of how to do this for the almond activity with one sample
+
+### Confidence intervals using many samples of almonds
+
+- Show how most of them do include the population mean but some of them don't
 
 
+### Interpreting Confidence Intervals
+
+#### Pole versus net fishing {#ilyas-yohan1}
+#### Precise and shorthand interpretation {#shorthand}
+#### Width of confidence intervals {#ci-width}
+
+##### Impact of confidence level {-}
 
 
-#### The Russian doll
-
-### Comparing theory- and simulation-based approaches
-
-- Show benefits of using bootstrap over traditional methods
-    - Add a simulation that shows this
-- Add a note that in the remainder of the text, we’ll mainly focus on the simulation-based approach, but we'll use the traditional method for comparison
-
-## Constructing confidence intervals using the simulation-based approach {#bootstrap-process}
-
-### Original workflow
-
-#### `dplyr` versus `infer`
+##### Impact of sample size {-}
 
 
-### `infer` package workflow {#infer-workflow}
+## Estimation with the Bootstrap
+
+- Discuss the bootstrap in general terms
+
+### Computer Simulation of Resampling
+
+
+- Show how the assumption is now using the sample as an estimate of the population and resampling from this sample
+- Discuss briefly some of the merits of this method over the theory-based approach
+
+### Revisiting the Almond Activity using Bootstrap
+
+- Construct the bootsrap samples of size 50
+- Compare them with the sampling distribution obtained in chapter 7
+- Construct a confidence interval using bootstrap samples and the percentile method
+- Construct a confidence interval using bootstrap samples and the standard error method
+- Construct a confidence interval using bootstrap samples and the bca method
+- Compare these confidence intervals with the theory-based confidence interval
+- Mention that later in the chapter we will show more formally why the bootstrap method work
+
+### Constructing confidence intervals: original workflow {#bootstrap-process}
+
+Recall that the process of resampling with replacement we performed by hand in Section \@ref(resampling-tactile) and virtually in Section \@ref(resampling-simulation) is known as \index{bootstrap!colloquial definition} *bootstrapping*. The term bootstrapping originates in the expression of "pulling oneself up by their bootstraps," meaning to ["succeed only by one's own efforts or abilities."](https://en.wiktionary.org/wiki/pull_oneself_up_by_one%27s_bootstraps) 
+
+From a statistical perspective, bootstrapping alludes to succeeding in being able to study the effects of sampling variation on estimates from the "effort" of a single sample. Or more precisely, \index{bootstrap!statistical reference} it refers to constructing an approximation to the sampling distribution using only one sample.
+
+To perform this resampling with replacement virtually in Section \@ref(resampling-simulation), we used the `rep_sample_n()` function, making sure that the size of the resamples matched the original sample size of `r num_almonds`. In this section, we'll build off these ideas to construct confidence intervals using a new package: the `infer` package for "tidy" and transparent statistical inference. 
+
+
+#### Original workflow
+
+Recall that in Section \@ref(resampling-simulation), we virtually performed bootstrap resampling with replacement to construct bootstrap distributions. Such distributions are approximations to the sampling distributions we saw in Chapter \@ref(sampling), but are constructed using only a single sample. Let's revisit the original workflow using the `%>%` pipe operator.
+
+First, we used the `rep_sample_n()` function to resample ``size = `r num_almonds` `` almonds with replacement from the original sample of `r num_almonds` almonds in `almonds_sample` by setting `replace = TRUE`. Furthermore, we repeated this resampling `r n_virtual_resample` times by setting ``reps = `r n_virtual_resample` ``:
+
+```{r eval=FALSE}
+almonds_sample %>% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 1000)
+```
+
+Second, since for each of our `r n_virtual_resample` resamples of size `r num_almonds`, we wanted to compute a separate sample mean, we used the `dplyr` verb `group_by()` to group observations/rows together by the `replicate` variable...
+
+```{r eval=FALSE}
+almonds_sample %>% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 1000) %>% 
+  group_by(replicate) 
+```
+
+... followed by using `summarize()` to compute the sample `mean()` weight for each `replicate` group:
+
+```{r eval=FALSE}
+almonds_sample %>% 
+  rep_sample_n(size = 50, replace = TRUE, reps = 1000) %>% 
+  group_by(replicate) %>% 
+  summarize(mean_weight = mean(weight))
+```
+
+For this simple case, we can get by with using the `rep_sample_n()` function and a couple of `dplyr` verbs to construct the bootstrap distribution. However, using only `dplyr` verbs only provides us with a limited set of tools. For more complicated situations, we'll need a little more firepower. Let's repeat this using the `infer` package.
+
+### Constructing confidence intervals: `infer` package workflow {#infer-workflow}
+
+<!--
+v2 TODO: Using infer to compute observed point estimate
+
+1. Showing `dplyr` code to compute observed point estimate
+1. Showing `infer` verbs to compute observed point estimate. i.e. no generate()
+step.
+1. Only after these two steps, showing `infer` verb pipeline to construct
+bootstrap distribution of point estimate. i.e. with generate() and showing
+diagram.
+-->
+
+The `infer` package is an R package for statistical inference. It makes efficient use of the `%>%` pipe operator we introduced in Section \@ref(piping) to spell out the sequence of steps necessary to perform statistical inference in a "tidy" and transparent fashion.\index{operators!pipe} Furthermore, just as the `dplyr` package provides functions with verb-like names to perform data wrangling, the `infer` package provides functions with intuitive verb-like names to perform statistical inference.
+
+Let's go back to our almonds. Previously, we computed the value of the sample mean $\overline{x}$ using the `dplyr` function `summarize()`:
+
+```{r, eval=FALSE}
+almonds_sample %>% 
+  summarize(stat = mean(weight))
+```
+
+We'll see that we can also do this using `infer` functions `specify()` and `calculate()`: \index{infer!observed statistic shortcut}
+
+```{r, eval=FALSE}
+almonds_sample %>% 
+  specify(response = weight) %>% 
+  calculate(stat = "mean")
+```
+
+You might be asking yourself: "Isn't the `infer` code longer? Why would I use that code?". While not immediately apparent, you'll see that there are three chief benefits to the `infer` workflow as opposed to the `dplyr` workflow.
+
+First, the `infer` verb names better align with the overall resampling framework you need to understand to construct confidence intervals and to conduct hypothesis tests (in Chapter \@ref(hypothesis-testing)). We'll see flowchart diagrams of this framework in the upcoming Figure \@ref(fig:infer-workflow-ci) and in Chapter \@ref(hypothesis-testing) with Figure \@ref(fig:htdowney).
+
+Second, you can jump back and forth seamlessly between confidence intervals and hypothesis testing with minimal changes to your code. This will become apparent in Subsection \@ref(comparing-infer-workflows) when we'll compare the `infer` code for both of these inferential methods.
+
+Third, the `infer` workflow is much simpler for conducting inference when you have *more than one variable*. We'll see two such situations. We'll first see situations of *two-sample* inference\index{two-sample inference} where the sample data is collected from two groups, such as in Section \@ref(case-study-two-prop-ci) where we study the contagiousness of yawning and in Section \@ref(ht-activity) where we compare promotion rates of two groups at banks in the 1970s. Then in Section \@ref(infer-regression), we'll see situations of *inference for regression* using the regression models you fit in Chapter \@ref(regression). 
+
+Let's now illustrate the sequence of verbs necessary to construct a confidence interval for $\mu$, the population mean weight of minting of all US almonds in 2019.
+
 #### 1. `specify` variables {-}
+
+```{r infer-specify, out.width="20%", out.height="20%", echo=FALSE, fig.cap="Diagram of the specify() verb.", purl=FALSE}
+knitr::include_graphics("images/flowcharts/infer/specify.png")
+```
+
+As shown in Figure \@ref(fig:infer-specify), the `specify()` \index{infer!specify()} function is used to choose which variables in a data frame will be the focus of our statistical inference. We do this by `specify`ing the `response` argument. For example, in our `almonds_sample` data frame of the `r num_almonds` almonds sampled from the bank, the variable of interest is `weight`:
+
+```{r}
+almonds_sample %>% 
+  specify(response = weight)
+```
+
+Notice how the data itself doesn't change, but the `Response: weight (numeric)` *meta-data* does\index{meta-data}. This is similar to how the `group_by()` verb from `dplyr` doesn't change the data, but only adds "grouping" meta-data, as we saw in Section \@ref(groupby).
+
+We can also specify which variables will be the focus of our statistical inference using a `formula = y ~ x`. This is the same formula notation you saw in Chapters \@ref(regression) and \@ref(multiple-regression) on regression models: the response variable `y` is separated from the explanatory variable `x` by a `~` ("tilde"). The following use of `specify()` with the `formula` argument yields the same result seen previously:
+
+```{r, eval=FALSE}
+almonds_sample %>% 
+  specify(formula = weight ~ NULL)
+```
+
+Since in the case of almonds we only have a response variable and no explanatory variable of interest, we set the `x` on the right-hand side of the `~` to be `NULL`. 
+
+While in the case of the almonds either specification works just fine, we'll see examples later on where the `formula` specification is simpler. In particular, this comes up in the upcoming Section \@ref(case-study-two-prop-ci) on comparing two proportions and Section \@ref(infer-regression) on inference for regression.
+
 #### 2. `generate` replicates {-}
+
+```{r infer-generate, out.width="60%", out.height="60%", echo=FALSE, fig.cap="Diagram of generate() replicates.", purl=FALSE}
+knitr::include_graphics("images/flowcharts/infer/generate.png")
+```
+
+After we `specify()` the variables of interest, we pipe the results into the `generate()` function to generate replicates. Figure \@ref(fig:infer-generate) shows how this is combined with `specify()` to start the pipeline. In other words, repeat the resampling process a large number of times. Recall in Sections \@ref(bootstrap-35-replicates) and \@ref(bootstrap-1000-replicates) we did this `r n_resample_friends` and `r n_virtual_resample` times.
+
+The `generate()` \index{infer!generate()} function's first argument is `reps`, which sets the number of replicates we would like to generate. Since we want to resample the `r num_almonds` almonds in `almonds_sample` with replacement `r n_virtual_resample` times, we set ``reps = `r n_virtual_resample` ``. The second argument `type` determines the type of computer simulation we'd like to perform. We set this to `type = "bootstrap"` indicating that we want to perform bootstrap resampling. You'll see different options for `type` in Chapter \@ref(hypothesis-testing). 
+
+```{r eval=FALSE}
+almonds_sample %>% 
+  specify(response = weight) %>% 
+  generate(reps = 1000, type = "bootstrap")
+```
+
+```{r echo=FALSE, purl=FALSE}
+if (!file.exists("rds/almonds_sample_generate.rds")) {
+  almonds_sample_generate <- almonds_sample %>%
+    specify(response = weight) %>%
+    generate(reps = 1000, type = "bootstrap")
+  write_rds(almonds_sample_generate, "rds/almonds_sample_generate.rds")
+} else {
+  almonds_sample_generate <- read_rds("rds/almonds_sample_generate.rds")
+}
+almonds_sample_generate
+```
+
+Observe that the resulting data frame has `r (num_almonds * n_virtual_resample) %>% comma()` rows. This is because we performed resampling of `r num_almonds` almonds with replacement `r n_virtual_resample` times and `r (num_almonds * n_virtual_resample) %>% comma()` = `r num_almonds` $\cdot$ `r n_virtual_resample`. 
+
+The variable `replicate` indicates which resample each row belongs to. So it has the value `1` `r num_almonds` times, the value `2` `r num_almonds` times, all the way through to the value `` `r n_virtual_resample` `` `r num_almonds` times. The default value of the `type` argument is `"bootstrap"` in this scenario, so if the last line was written as ``generate(reps = `r n_virtual_resample`)``, we'd obtain the same results. 
+
+**Comparing with original workflow**: Note that the steps of the `infer` workflow so far produce the same results as the original workflow using the `rep_sample_n()` function we saw earlier. In other words, the following two code chunks produce similar results:
+
+```{r eval=FALSE, purl=FALSE}
+# infer workflow:                   # Original workflow:
+almonds_sample %>%                  almonds_sample %>% 
+  specify(response = weight) %>%        rep_sample_n(size = 50, replace = TRUE, 
+  generate(reps = 1000)                            reps = 1000)              
+             
+```
+
 #### 3. `calculate` summary statistics {-}
+
+```{r infer-calculate, out.width="80%", out.height="80%", echo=FALSE, fig.cap="Diagram of calculate() summary statistics.", purl=FALSE}
+knitr::include_graphics("images/flowcharts/infer/calculate.png")
+```
+
+After we `generate()` many replicates of bootstrap resampling with replacement, we next want to summarize each of the `r n_virtual_resample` resamples of size `r num_almonds` to a single sample statistic value. As seen in the diagram, the `calculate()` \index{infer!calculate()} function does this.
+
+In our case, we want to calculate the mean `weight` for each bootstrap resample of size `r num_almonds`. To do so, we set the `stat` argument to `"mean"`. You can also set the `stat` argument to a variety of other common summary statistics, like `"median"`, `"sum"`, `"sd"` (standard deviation), and `"prop"` (proportion). To see a list of all possible summary statistics you can use, type `?calculate` and read the help file.
+
+Let's save the result in a data frame called `bootstrap_distribution` and explore its contents:
+
+```{r eval=FALSE}
+bootstrap_distribution <- almonds_sample %>% 
+  specify(response = weight) %>% 
+  generate(reps = 1000) %>% 
+  calculate(stat = "mean")
+bootstrap_distribution
+```
+
+```{r echo=FALSE, purl=FALSE}
+if (!file.exists("rds/bootstrap_distribution_almonds.rds")) {
+  bootstrap_distribution <- almonds_sample %>%
+    specify(response = weight) %>%
+    generate(reps = 1000) %>%
+    calculate(stat = "mean")
+  write_rds(bootstrap_distribution, "rds/bootstrap_distribution_almonds.rds")
+} else {
+  bootstrap_distribution <- read_rds("rds/bootstrap_distribution_almonds.rds")
+}
+bootstrap_distribution
+```
+
+Observe that the resulting data frame has `r n_virtual_resample` rows and 2 columns corresponding to the `r n_virtual_resample` `replicate` values. It also has the mean weight for each bootstrap resample saved in the variable `stat`. 
+
+**Comparing with original workflow**: You may have recognized at this point that the `calculate()` step in the `infer` workflow produces the same output as the `group_by() %>% summarize()` steps in the original workflow.
+
+```{r eval=FALSE, purl=FALSE}
+# infer workflow:                   # Original workflow:
+almonds_sample %>%                  almonds_sample %>% 
+  specify(response = weight) %>%        rep_sample_n(size = 50, replace = TRUE, 
+  generate(reps = 1000) %>%                        reps = 1000) %>%              
+  calculate(stat = "mean")            group_by(replicate) %>% 
+                                      summarize(stat = mean(weight))
+```
+
 #### 4. `visualize` the results {-}
 
+```{r infer-visualize, out.width="70%", echo=FALSE, fig.cap="Diagram of visualize() results.", purl=FALSE}
+knitr::include_graphics("images/flowcharts/infer/visualize.png")
+```
+
+The `visualize()` \index{infer!visualize()} verb provides a quick way to visualize the bootstrap distribution as a histogram of the numerical `stat` variable's values. The pipeline of the main `infer` verbs used for exploring bootstrap distribution results is shown in Figure \@ref(fig:infer-visualize).  
+
+```{r eval=FALSE}
+visualize(bootstrap_distribution)
+```
+
+```{r boostrap-distribution-infer, echo=FALSE, fig.show="hold", fig.cap="Bootstrap distribution.", purl=FALSE}
+# Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here (added to `develop` branch on 2019-10-26)
+visualize(bootstrap_distribution) #+
+#  ggtitle("Simulation-Based Bootstrap Distribution")
+```
+
+**Comparing with original workflow**: In fact, `visualize()` is a *wrapper function* for the `ggplot()` function that uses a `geom_histogram()` layer. Recall that we illustrated the concept of a wrapper function in Figure \@ref(fig:moderndive-figure-wrapper) in Subsection \@ref(model1table).
+
+```{r eval=FALSE, purl=FALSE}
+# infer workflow:                    # Original workflow:
+visualize(bootstrap_distribution)    ggplot(bootstrap_distribution, 
+                                            aes(x = stat)) +
+                                       geom_histogram()
+```
+
+The `visualize()` function can take many other arguments which we'll see momentarily to customize the plot further. It also works with helper functions to do the shading of the histogram values corresponding to the confidence interval values.
+
+Let's recap the steps of the `infer` workflow for constructing a bootstrap distribution and then visualizing it in Figure \@ref(fig:infer-workflow-ci).
+
+```{r infer-workflow-ci, out.width="100%", echo=FALSE, fig.cap="infer package workflow for confidence intervals.", purl=FALSE}
+knitr::include_graphics("images/flowcharts/infer/ci_diagram.png")
+```
+
+Recall how we introduced two different methods for constructing 95% confidence intervals for an unknown population parameter in Section \@ref(ci-build-up): the *percentile method* and the *standard error method*. Let's now check out the `infer` package code that explicitly constructs these. There are also some additional neat functions to visualize the resulting confidence intervals built-in to the `infer` package!
+
+
+### Different Bootstrap methods with `infer`
+
+#### Percentile bootstrap {#percentile-method-infer}
+
+Recall the percentile method for constructing 95% confidence intervals we introduced in Subsection \@ref(percentile-method). This method sets the lower endpoint of the confidence interval at the 2.5th percentile of the bootstrap distribution and similarly sets the upper endpoint at the 97.5th percentile. The resulting interval captures the middle 95% of the values of the sample mean in the bootstrap distribution.
+
+We can compute the 95% confidence interval by piping `bootstrap_distribution` into the `get_confidence_interval()` \index{infer!get\_confidence\_interval()} function from the `infer` package, with the confidence `level` set to 0.95 and the confidence interval `type` to be `"percentile"`. Let's save the results in `percentile_ci`.
+
+```{r}
+percentile_ci <- bootstrap_distribution %>% 
+  get_confidence_interval(level = 0.95, type = "percentile")
+percentile_ci
+```
+
+Alternatively, we can visualize the interval (`r percentile_ci[["lower_ci"]] %>% round(2)`, `r percentile_ci[["upper_ci"]] %>% round(2)`) by piping the `bootstrap_distribution` data frame into the `visualize()` function and adding a `shade_confidence_interval()` \index{infer!shade\_confidence\_interval()} layer. We set the `endpoints` argument to be `percentile_ci`.
+
+```{r eval=FALSE}
+visualize(bootstrap_distribution) + 
+  shade_confidence_interval(endpoints = percentile_ci)
+```
+
+(ref:perc-ci-viz) Percentile method 95% confidence interval shaded corresponding to potential values.
+
+```{r percentile-ci-viz, echo=FALSE, fig.cap="(ref:perc-ci-viz)", purl=FALSE, fig.height=3}
+# Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here (added to `develop` branch on 2019-10-26)
+if (knitr::is_html_output()) {
+  visualize(bootstrap_distribution) +
+    shade_confidence_interval(endpoints = percentile_ci) #+
+  #  ggtitle("Simulation-Based Bootstrap Distribution")
+} else {
+  visualize(bootstrap_distribution) +
+    shade_confidence_interval(
+      endpoints = percentile_ci,
+      fill = "grey40", color = "grey30"
+    ) #+
+  #  ggtitle("Simulation-Based Bootstrap Distribution")
+}
+```
+
+Observe in Figure \@ref(fig:percentile-ci-viz) that 95% of the sample means stored in the `stat` variable in `bootstrap_distribution` fall between the two endpoints marked with the darker lines, with 2.5% of the sample means to the left of the shaded area and 2.5% of the sample means to the right. You also have the option to change the colors of the shading using the `color` and `fill` arguments. 
+
+You can also use the shorter named function `shade_ci()` and the results will be the same. This is for folks who don't want to type out all of `confidence_interval` and prefer to type out `ci` instead. Try out the following code!
+
+```{r eval=FALSE}
+visualize(bootstrap_distribution) + 
+  shade_ci(endpoints = percentile_ci, color = "hotpink", fill = "khaki")
+```
+
+
+#### Studentized bootstrap {#infer-se}
+
+Recall the standard error method for constructing 95% confidence intervals we introduced in Subsection \@ref(se-method). For any distribution that is normally shaped, roughly 95% of the values lie within two standard deviations of the mean. In the case of the bootstrap distribution, the standard deviation has a special name: the _standard error_. 
+
+So in our case, 95% of values of the bootstrap distribution will lie within $\pm `r qnorm(0.975) %>% round(2)`$ standard errors of $\overline{x}$. Thus, a 95% confidence interval is 
+
+$$\overline{x} \pm `r qnorm(0.975) %>% round(2)` \cdot SE = (\overline{x} - `r qnorm(0.975) %>% round(2)` \cdot SE, \, \overline{x} + `r qnorm(0.975) %>% round(2)` \cdot SE).$$
+
+Computation of the 95% confidence interval can once again be done by piping the `bootstrap_distribution` data frame we created into the `get_confidence_interval()` function. However, this time we set the first `type` argument to be `"se"`. Second, we must specify the `point_estimate` argument in order to set the center of the confidence interval. We set this to be the sample mean of the original sample of `r num_almonds` almonds of `r x_bar_point <- x_bar %>% pull(mean_weight) %>% round(2); x_bar_point` we saved in `x_bar` earlier.
+
+```{r}
+standard_error_ci <- bootstrap_distribution %>% 
+  get_confidence_interval(type = "se", point_estimate = x_bar)
+standard_error_ci
+```
+
+
+If we would like to visualize the interval (`r standard_error_ci[["lower_ci"]] %>% round(2)`, `r standard_error_ci[["upper_ci"]] %>% round(2)`), we can once again pipe the `bootstrap_distribution` data frame into the `visualize()` function and add a `shade_confidence_interval()` layer to our plot. We set the `endpoints` argument to be `standard_error_ci`. The resulting standard-error method based on a 95% confidence interval for $\mu$ can be seen in Figure \@ref(fig:se-ci-viz).
+
+(ref:se-viz) Standard-error-method 95% confidence interval.
+
+```{r eval=FALSE}
+visualize(bootstrap_distribution) + 
+  shade_confidence_interval(endpoints = standard_error_ci)
+```
+
+```{r se-ci-viz, echo=FALSE, fig.show="hold", fig.cap="(ref:se-viz)", purl=FALSE, fig.height=3.4}
+# Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here
+# (added to `develop` branch on 2019-10-26)
+
+if (knitr::is_html_output()) {
+  visualize(bootstrap_distribution) +
+    shade_confidence_interval(endpoints = standard_error_ci) #+
+  #    ggtitle("Simulation-Based Bootstrap Distribution")
+} else {
+  visualize(bootstrap_distribution) +
+    shade_confidence_interval(
+      endpoints = standard_error_ci,
+      fill = "grey40", color = "grey30"
+    ) #+
+  #    ggtitle("Simulation-Based Bootstrap Distribution")
+}
+```
+
+As noted in Section \@ref(ci-build-up), both methods produce similar confidence intervals:
+
+* Percentile method: (`r percentile_ci[["lower_ci"]] %>% round(2)`, `r percentile_ci[["upper_ci"]] %>% round(2)`)
+* Standard error method: (`r standard_error_ci[["lower_ci"]] %>% round(2)`, `r standard_error_ci[["upper_ci"]] %>% round(2)`)
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.15in}
+**_Learning check_**
+\vspace{-0.1in}
+```
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Construct a 95% confidence interval for the *median* weight of minting of *all* US almonds. Use the percentile method and, if appropriate, then use the standard-error method.
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.25in}
+\vspace{-0.25in}
+```
 
 
 
-### Percentile method with `infer` {#percentile-method-infer}
-### Standard error method with `infer` {#infer-se}
-
-## Interpreting confidence intervals {#one-prop-ci}
-
-### Did the net capture the fish? {#ilyas-yohan}
-#### 1. `specify` variables {-}
-#### 2. `generate` replicates {-}
-#### 3. `calculate` summary statistics {-}
-#### 4. `visualize` the results {-}
-
-### Precise and shorthand interpretation {#shorthand}
-### Width of confidence intervals {#ci-width}
-#### Impact of confidence level {-}
-#### Impact of sample size {-}
 
 
 
+#### Bias-corrected and accelerated bootstrap {#bca}
+
+### Interpretations revisited using bootstrap {#one-prop-ci}
+## Theoretical Framework
+
+### Why the bootstrap-based approach
+
+- Here comes the theory supporting the use of bootstrapping for inference
+- Some results based on simulations showing this (as hinted by Robert) would be useful here too
+- The Russian doll
+
+### Precision and accuracy (perhaps unbiasedness and consistency)
+### The sampling-based vs bootstrap-based 
+### Best Practices
+
+- Clarifying why they are different, what to take into account on each case
+- When one could be used instead of the other 
+
+<!--
+Introduce some theory about bootstrap sampling
+-->
 
 
 
-## Case study: Is yawning contagious? {#case-study-two-prop-ci}
-### *Mythbusters* study data
+
+
+
+
+
+
+## Case study {#case-study-two-prop-ci}
+
+Let's apply our knowledge of confidence intervals to answer the question: "Is yawning contagious?". If you see someone else yawn, are you more likely to yawn? In an episode of the US show [*Mythbusters*](http://www.discovery.com/tv-shows/mythbusters/mythbusters-database/yawning-contagious/), the hosts conducted an experiment to answer this question. The episode is available to view in the United States on the Discovery Network website [here](https://www.discovery.com/tv-shows/mythbusters/videos/is-yawning-contagious) and more information about the episode is also available on [IMDb](https://www.imdb.com/title/tt0768479/).
+
+
+
+Fifty adult participants who thought they were being considered for an appearance on the show were interviewed by a show recruiter. In the interview, the recruiter either yawned or did not. Participants then sat by themselves in a large van and were asked to wait. While in the van, the *Mythbusters* team watched the participants using a hidden camera to see if they yawned. The data frame containing the results of their experiment is available in the `mythbusters_yawn` data frame included in the `moderndive` package: \index{moderndive!mythbusters\_yawn}
+
+```{r}
+mythbusters_yawn
+```
+
+```{r echo=FALSE, purl=FALSE}
+# This code is used for dynamic non-static in-line text output purposes
+n_participants <- 50L
+```
+
+The variables are:
+
+- `subj`: The participant ID with values 1 through `r n_participants`.
+- `group`: A binary *treatment* variable indicating whether the participant was exposed to yawning. `"seed"` indicates the participant was exposed to yawning while `"control"` indicates the participant was not. 
+- `yawn`: A binary *response* variable indicating whether the participant ultimately yawned.
+
+Recall that you learned about treatment and response variables in Subsection \@ref(correlation-is-not-causation) in our discussion on confounding variables. \index{variables!treatment}\index{variables!response}
+
+Let's use some data wrangling to obtain counts of the four possible outcomes:
+
+```{r}
+mythbusters_yawn %>% 
+  group_by(group, yawn) %>% 
+  summarize(count = n())
+```
+
+Let's first focus on the `"control"` group participants who were not exposed to yawning. 12 such participants did not yawn, while 4 such participants did. So out of the 16 people who were not exposed to yawning, 4/16 = 0.25 = 25% did yawn. 
+
+Let's now focus on the `"seed"` group participants who were exposed to yawning where 24 such participants did not yawn, while 10 such participants did yawn. So out of the 34 people who were exposed to yawning, 10/34 = 0.294 = 29.4% did yawn. Comparing these two percentages, the participants who were exposed to yawning yawned 29.4% - 25% = 4.4% more often than those who were not.
+
+
 ### Sampling scenario
+
+Let's review the terminology and notation related to sampling we studied in Subsection \@ref(terminology-and-notation). In Chapter \@ref(sampling) our *study population* was the bowl of $N$ = `r nrow(bowl)` balls. Our *population parameter* of interest was the *population proportion* of these balls that were red, denoted mathematically by $p$. In order to estimate $p$, we extracted a sample of 50 balls using the shovel and computed the relevant *point estimate*: the *sample proportion* that were red, denoted mathematically by $\widehat{p}$.
+
+Who is the study population here? All humans? All the people who watch the show *Mythbusters*? It's hard to say! This question can only be answered if we know how the show's hosts recruited participants! In other words, what was the *sampling methodology*\index{sampling methodology} used by the *Mythbusters* to recruit participants? We alas are not provided with this information. Only for the purposes of this case study, however, we'll *assume* that the 50 participants are a representative sample of all Americans given the popularity of this show. Thus, we'll be assuming that any results of this experiment will generalize to all $N$ = 327 million Americans (2018 population). 
+
+Just like with our sampling bowl, the population parameter here will involve proportions. However, in this case it will be the *difference in population proportions* $p_{seed} - p_{control}$, where $p_{seed}$ is the proportion of *all* Americans who if exposed to yawning will yawn themselves, and $p_{control}$ is the proportion of *all* Americans who if not exposed to yawning still yawn themselves. Correspondingly, the point estimate/sample statistic based the *Mythbusters*' sample of participants will be the *difference in sample proportions* $\widehat{p}_{seed} - \widehat{p}_{control}$. Let's extend Table \@ref(tab:table-ch8) of scenarios of sampling for inference to include our latest scenario. 
+
+```{r table-ch8-c, echo=FALSE, message=FALSE, purl=FALSE}
+# The following Google Doc is published to CSV and loaded using read_csv():
+# https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
+
+if (!file.exists("rds/sampling_scenarios.rds")) {
+  sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>%
+    read_csv(na = "") %>%
+    slice(1:5)
+  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
+} else {
+  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
+}
+
+sampling_scenarios %>%
+  # Only first two scenarios
+  filter(Scenario <= 3) %>%
+  kable(
+    caption = "Scenarios of sampling for inference",
+    booktabs = TRUE,
+    escape = FALSE,
+    linesep = ""
+  ) %>%
+  kable_styling(
+    font_size = ifelse(knitr::is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  ) %>%
+  column_spec(1, width = "0.5in") %>%
+  column_spec(2, width = "1.5in") %>%
+  column_spec(3, width = "0.65in") %>%
+  column_spec(4, width = "1.6in") %>%
+  column_spec(5, width = "0.65in")
+```
+
+This is known as a *two-sample* inference\index{two-sample inference} situation since we have two separate samples. Based on their two-samples of size $n_{seed}$ = 34 and $n_{control}$ = 16, the point estimate is
+
+$$
+\widehat{p}_{seed} - \widehat{p}_{control} = \frac{24}{34} - \frac{12}{16} = 0.04411765 \approx 4.4\%
+$$
+
+However, say the *Mythbusters* repeated this experiment. In other words, say they recruited 50 new participants and exposed 34 of them to yawning and 16 not. Would they obtain the exact same estimated difference of 4.4%? Probably not, again, because of *sampling variation*. 
+
+How does this sampling variation affect their estimate of 4.4%? In other words, what would be a plausible range of values for this difference that accounts for this sampling variation? We can answer this question with confidence intervals! Furthermore, since the *Mythbusters* only have a single two-sample of 50 participants, they would have to construct a 95% confidence interval for $p_{seed} - p_{control}$ using *bootstrap resampling with replacement*.
+
+We make a couple of important notes. First, for the comparison between the `"seed"` and `"control"` groups to make sense, however, both groups need to be *independent* from each other. Otherwise, they could influence each other's results. This means that a participant being selected for the `"seed"` or `"control"` group has no influence on another participant being assigned to one of the two groups. As an example, if there were a mother and her child as participants in the study, they wouldn't necessarily be in the same group. They would each be assigned randomly to one of the two groups of the explanatory variable.
+
+Second, the order of the subtraction in the difference doesn't matter so long as you are consistent and tailor your interpretations accordingly. In other words, using a point estimate of $\widehat{p}_{seed} - \widehat{p}_{control}$ or $\widehat{p}_{control} - \widehat{p}_{seed}$ does not make a material difference, you just need to stay consistent and interpret your results accordingly. 
+
+
 ### Constructing the confidence interval {#ci-build}
 
+As we did in Subsection \@ref(infer-workflow), let's first construct the bootstrap distribution for $\widehat{p}_{seed} - \widehat{p}_{control}$ and then use this to construct 95% confidence intervals for $p_{seed} - p_{control}$. We'll do this using the `infer` workflow again. However, since the difference in proportions is a new scenario for inference, we'll need to use some new arguments in the `infer` functions along the way.
+
 #### 1. `specify` variables {-}
+
+Let's take our `mythbusters_yawn` data frame and `specify()` which variables are of interest using the `y ~ x` formula interface where:
+
+* Our response variable is `yawn`: whether or not a participant yawned. It has levels `"yes"` and `"no"`.
+* The explanatory variable is `group`: whether or not a participant was exposed to yawning. It has levels `"seed"` (exposed to yawning) and `"control"` (not exposed to yawning).
+
+```{r eval=FALSE}
+mythbusters_yawn %>% 
+  specify(formula = yawn ~ group)
+```
+
+```
+Error: A level of the response variable `yawn` needs to be 
+specified for the `success` argument in `specify()`.
+```
+
+Alas, we got an error message similar to the one from Subsection \@ref(ilyas-yohan): `infer` is telling us that one of the levels of the categorical variable `yawn` needs to be defined as the `success`. Recall that we define `success` to be the event of interest we are trying to count and compute proportions of. Are we interested in those participants who `"yes"` yawned or those who `"no"` didn't yawn? This isn't clear to R or someone just picking up the code and results for the first time, so we need to set the `success` argument to `"yes"` as follows to improve the transparency of the code:
+
+```{r}
+mythbusters_yawn %>% 
+  specify(formula = yawn ~ group, success = "yes")
+```
+
 #### 2. `generate` replicates {-}
+
+Our next step is to perform *bootstrap resampling with replacement* like we did with the slips of paper in our almonds activity in Section \@ref(resampling-tactile). We saw how it works with both a single variable in computing bootstrap means in Section \@ref(bootstrap-process) and in computing bootstrap proportions in Section \@ref(one-prop-ci), but we haven't yet worked with bootstrapping involving multiple variables. 
+
+In the `infer` package, bootstrapping with multiple variables means that each *row* is potentially resampled. Let's investigate this by focusing only on the first six rows of `mythbusters_yawn`:
+
+```{r}
+first_six_rows <- head(mythbusters_yawn)
+first_six_rows
+```
+
+When we bootstrap this data, we are potentially pulling the subject's readings multiple times. Thus, we could see the entries of `"seed"` for `group` and `"no"` for `yawn` together in a new row in a bootstrap sample. This is further seen by exploring the `sample_n()` function in `dplyr` on this smaller 6-row data frame comprised of `head(mythbusters_yawn)`. The `sample_n()` function can perform this bootstrapping procedure and is similar to the `rep_sample_n()` function in `infer`, except that it is not repeated, but rather only performs one sample with or without replacement.
+
+```{r}
+first_six_rows %>% 
+  sample_n(size = 6, replace = TRUE)
+```
+
+We can see that in this bootstrap sample generated from the first six rows of `mythbusters_yawn`, we have some rows repeated. The same is true when we perform the `generate()` step in `infer` as done in what follows. Using this fact, we `generate` `r n_virtual_resample` replicates, or, in other words, we bootstrap resample the `r n_participants` participants with replacement `r n_virtual_resample` times. 
+
+```{r eval=FALSE}
+mythbusters_yawn %>% 
+  specify(formula = yawn ~ group, success = "yes") %>% 
+  generate(reps = 1000, type = "bootstrap")
+```
+
+```{r echo=FALSE, purl=FALSE}
+if (!file.exists("rds/generate_yawn.rds")) {
+  generate_yawn <- mythbusters_yawn %>%
+    specify(formula = yawn ~ group, success = "yes") %>%
+    generate(reps = 1000, type = "bootstrap")
+  write_rds(generate_yawn, "rds/generate_yawn.rds")
+} else {
+  generate_yawn <- read_rds("rds/generate_yawn.rds")
+}
+generate_yawn
+```
+
+Observe that the resulting data frame has `r (n_virtual_resample * n_participants) %>% comma()` rows. This is because we performed resampling of `r n_participants` participants with replacement `r n_virtual_resample` times and `r (n_virtual_resample * n_participants) %>% comma()` = `r n_virtual_resample` $\cdot$ `r n_participants`. The variable `replicate` indicates which resample each row belongs to. So it has the value `1` `r n_participants` times, the value `2` `r n_participants` times, all the way through to the value `` `r n_virtual_resample` `` `r n_participants` times. 
+
 #### 3. `calculate` summary statistics {-}
+
+After we `generate()` many replicates of bootstrap resampling with replacement, we next want to summarize the bootstrap resamples of size `r n_participants` with a single summary statistic, the difference in proportions. We do this by setting the `stat` argument to `"diff in props"`:
+
+<!-- 
+Chester: A challenging Learning check for those {dplyr} diehards is to get these values 
+without using {infer}. It takes a double group_by() and some trickery, but could 
+be a good exercise for those that don't quite see the power of {infer}.
+
+Albert: Great idea!
+-->
+
+```{r, eval=FALSE}
+mythbusters_yawn %>% 
+  specify(formula = yawn ~ group, success = "yes") %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "diff in props")
+```
+```
+Error: Statistic is based on a difference; specify the `order` in which to
+subtract the levels of the explanatory variable.
+```
+
+We see another error here. We need to specify the order of the subtraction. Is it $\widehat{p}_{seed} - \widehat{p}_{control}$ or $\widehat{p}_{control} - \widehat{p}_{seed}$. We specify it to be $\widehat{p}_{seed} - \widehat{p}_{control}$ by setting `order = c("seed", "control")`.  Note that you could've also set `order = c("control", "seed")`. As we stated earlier, the order of the subtraction does not matter, so long as you stay consistent throughout your analysis and tailor your interpretations accordingly. 
+
+Let's save the output in a data frame `bootstrap_distribution_yawning`:
+
+```{r eval=FALSE}
+bootstrap_distribution_yawning <- mythbusters_yawn %>% 
+  specify(formula = yawn ~ group, success = "yes") %>% 
+  generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "diff in props", order = c("seed", "control"))
+bootstrap_distribution_yawning
+```
+
+```{r echo=FALSE, purl=FALSE}
+if (!file.exists("rds/bootstrap_distribution_yawning.rds")) {
+  bootstrap_distribution_yawning <- mythbusters_yawn %>%
+    specify(formula = yawn ~ group, success = "yes") %>%
+    generate(reps = 1000, type = "bootstrap") %>%
+    calculate(stat = "diff in props", order = c("seed", "control"))
+  write_rds(
+    bootstrap_distribution_yawning,
+    "rds/bootstrap_distribution_yawning.rds"
+  )
+} else {
+  bootstrap_distribution_yawning <- read_rds(
+    "rds/bootstrap_distribution_yawning.rds"
+  )
+}
+bootstrap_distribution_yawning
+```
+
+Observe that the resulting data frame has `r n_virtual_resample` rows and 2 columns corresponding to the `r n_virtual_resample` `replicate` ID's and the `r n_virtual_resample` differences in proportions for each bootstrap resample in `stat`.
+
 #### 4. `visualize` the results {-}
+
+In Figure \@ref(fig:bootstrap-distribution-mythbusters) we `visualize()` the resulting bootstrap resampling distribution. Let's also add a vertical line at 0 by adding a `geom_vline()` layer. 
+
+```{r eval=FALSE}
+visualize(bootstrap_distribution_yawning) +
+  geom_vline(xintercept = 0)
+```
+```{r bootstrap-distribution-mythbusters, echo=FALSE, fig.show="hold", fig.cap="Bootstrap distribution.", purl=FALSE, fig.height=3.5}
+# Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here (added to `develop` branch on 2019-10-26)
+visualize(bootstrap_distribution_yawning) +
+  #  ggtitle("Simulation-Based Bootstrap Distribution") +
+  geom_vline(xintercept = 0)
+```
+
+First, let's compute the 95% confidence interval for $p_{seed} - p_{control}$ using the percentile method, in other words, by identifying the 2.5th and 97.5th percentiles which include the middle 95% of values. Recall that this method does not require the bootstrap distribution to be normally shaped. 
+
+```{r}
+bootstrap_distribution_yawning %>% 
+  get_confidence_interval(type = "percentile", level = 0.95)
+```
+```{r include=FALSE, purl=FALSE}
+myth_ci_percentile <- bootstrap_distribution_yawning %>%
+  get_confidence_interval(type = "percentile", level = 0.95)
+```
+
+Second, since the bootstrap distribution is roughly bell-shaped, we can construct a confidence interval using the standard error method as well. Recall that to construct a confidence interval using the standard error method, we need to specify the center of the interval using the `point_estimate` argument. In our case, we need to set it to be the difference in sample proportions of 4.4% that the *Mythbusters* observed.
+
+We can also use the `infer` workflow to compute this value by excluding the `generate()` `r n_virtual_resample` bootstrap replicates step. In other words, do not generate replicates, but rather use only the original sample data. We can achieve this by commenting out the `generate()` line, telling R to ignore it:
+
+```{r}
+obs_diff_in_props <- mythbusters_yawn %>% 
+  specify(formula = yawn ~ group, success = "yes") %>% 
+  # generate(reps = 1000, type = "bootstrap") %>% 
+  calculate(stat = "diff in props", order = c("seed", "control"))
+obs_diff_in_props
+```
+
+We thus plug this value in as the `point_estimate` argument. 
+
+```{r}
+myth_ci_se <- bootstrap_distribution_yawning %>% 
+  get_confidence_interval(type = "se", point_estimate = obs_diff_in_props)
+myth_ci_se
+```
+
+Let's visualize both confidence intervals in Figure \@ref(fig:bootstrap-distribution-mythbusters-CI), with the percentile-method interval marked with black lines and the standard-error-method marked with grey lines. Observe that they are both similar to each other. 
+
+```{r bootstrap-distribution-mythbusters-CI, echo=FALSE, fig.show="hold", fig.cap="Two 95\\% confidence intervals: percentile method (black) and standard error method (grey).", purl=FALSE}
+# Will need to make a tweak to the {infer} package so that it doesn't always display "Null" here (added to `develop` branch on 2019-10-26)
+visualize(bootstrap_distribution_yawning) +
+  ggtitle("") +
+  shade_confidence_interval(
+    endpoints = myth_ci_percentile, fill = NULL,
+    color = "black"
+  ) +
+  shade_confidence_interval(
+    endpoints = myth_ci_se, fill = NULL,
+    color = "grey70"
+  )
+```
+
 
 ### Interpreting the confidence interval
 
+Given that both confidence intervals are quite similar, let's focus our interpretation to only the percentile-method confidence interval of (`r myth_ci_percentile[["lower_ci"]] %>% round(4)`, `r myth_ci_percentile[["upper_ci"]] %>% round(4)`). Recall from Subsection \@ref(shorthand) that the precise statistical interpretation of a 95% confidence interval is: if this construction procedure is repeated 100 times, then we expect about 95 of the confidence intervals to capture the true value of $p_{seed} - p_{control}$. In other words, if we gathered 100 samples of $n$ = `r n_participants` participants from a similar pool of people and constructed 100 confidence intervals each based on each of the 100 samples, about 95 of them will contain the true value of $p_{seed} - p_{control}$ while about five won't. Given that this is a little long winded, we use the shorthand interpretation: we're 95% "confident" that the true difference in proportions $p_{seed} - p_{control}$ is between (`r myth_ci_percentile[["lower_ci"]] %>% round(4)`, `r myth_ci_percentile[["upper_ci"]] %>% round(4)`).
+
+There is one value of particular interest that this 95% confidence interval contains: zero. If $p_{seed} - p_{control}$ were equal to 0, then there would be no difference in proportion yawning between the two groups. This would suggest that there is no associated effect of being exposed to a yawning recruiter on whether you yawn yourself. 
+
+In our case, since the 95% confidence interval includes 0, we cannot conclusively say if either proportion is larger. Of our `r n_virtual_resample` bootstrap resamples with replacement, sometimes $\widehat{p}_{seed}$ was higher and thus those exposed to yawning yawned themselves more often. At other times, the reverse happened. 
+
+Say, on the other hand, the 95% confidence interval was entirely above zero. This would suggest that $p_{seed} - p_{control} > 0$, or, in other words $p_{seed} > p_{control}$, and thus we'd have evidence suggesting those exposed to yawning do yawn more often. 
+
+<!--
+v2 TODO: Talk about randomized experiment nature of Mythbusters data
+
+Add this back once we add a discussion on random assignment and 
+randomized experiments in Conclusion of sampling chapter
+
+Furthermore, if the `r n_participants` participants were randomly allocated to
+the `"seed"` and `"control"` groups, then this would be suggestive that being
+exposed to yawning doesn't not *cause* yawning. In other words, yawning is not
+contagious. However, no information on how participants were assigned to be
+exposed to yawning or not could be found, so we cannot make such a causal
+statement.
+-->
+
+
+
+
+
+
 ## Summary and Final Remarks
 
-### Bootstrap sampling: theoretical framework
 
-#### Simulation results
+## Conclusion {#ci-conclusion}
 
-Here comes the theory supporting the use of bootstrapping for inference
-Some results based on simulations showing this (as hinted by Robert) would be useful here too
+### Additional resources
 
-#### Best practices when using bootstrap samples for confidence intervals
-
-Best practices when using these methods
-Introduce some theory/simulations/reference that show the bootstrap sample is an adequate method and could have some advantages over the theory-based approach
-
+```{r echo=FALSE, results="asis", purl=FALSE}
+if (knitr::is_latex_output()) {
+  cat("Solutions to all *Learning checks* can be found online in [Appendix D](https://moderndive.com/D-appendixD.html).")
+}
+```
 
 
+If you want more examples of the `infer` workflow to construct confidence intervals, we suggest you check out the `infer` package homepage, in particular, a series of example analyses available at <https://infer.netlify.app/articles/>.
 
 
+### What's to come?
+
+Now that we've equipped ourselves with confidence intervals, in Chapter \@ref(hypothesis-testing) we'll cover the other common tool for statistical inference: hypothesis testing. Just like confidence intervals, hypothesis tests are used to infer about a population using a sample. However, we'll see that the framework for making such inferences is slightly different. 
 
 

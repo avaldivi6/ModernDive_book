@@ -6,7 +6,7 @@ chap <- 8
 lc <- 0
 
 # Set R code chunk defaults:
-opts_chunk$set(
+knitr::opts_chunk$set(
   echo = TRUE,
   eval = TRUE,
   warning = FALSE,
@@ -63,7 +63,7 @@ We ended the chapter showing that these characteristics also apply to sampling d
 On the other hand, you may remember that the original motivation was to determine population parameter values, such as the average weight of all the almonds in the entire bowl of almonds.
 
 How can we determine the population mean weight of almonds in the bowl if we do not have access to the entire bowl? 
-Based on the characteristics of the sampling distribution, stated above, if we have access to a large number of random samples, we know that the average of all those sample means will be a really good estimate of the expected value, which happen to be precisely the population mean weight.
+Based on the characteristics of the sampling distribution, stated above, if we have access to a large number of random samples and obtain the mean from each sample, we know that the average of those sample means will be a really good estimate of the expected value, which is precisely the population mean weight.
 
 However, in real life situations, we do not have access to many random samples. In fact, we typically have access to a single random sample. How can we determine the population mean weight of almonds in the bowl if all we have is a single random sample of almonds? 
 
@@ -85,32 +85,21 @@ library(infer)
 
 Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
 
-
-```{r message=FALSE}
-library(tidyverse)
-library(moderndive)
-library(infer)
-```
-
 ```{r message=FALSE, echo=FALSE, purl=FALSE}
 # Packages needed internally, but not in the text
+library(knitr)
 library(kableExtra)
 library(patchwork)
 library(purrr)
 library(scales)
 ```
 
-
-
-
-
-
-
 ## Revisiting the Almond Activity for Estimation
 
 In Chapter \@ref(chapter7) one of the activities was to take many random samples of size 100 from a bowl of chocolate covered almonds, get the sample means of these samples, construct a histogram using these sample means, and show how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw), the histogram obtained using sample means from random samples of size $n=100$, and add a smooth curve for the normal distribution with appropriate expected value and standard error.
 
 ```{r sample-mean-100-with-normal-redraw, echo=FALSE, fig.height=3, fig.cap="The distribution of the sample mean.", purl=FALSE}
+almonds_bowl <- read_rds("rds/almonds_bowl.rds")
 n = 100
 x = almonds_bowl$weight
 mu = mean(x)
@@ -189,26 +178,11 @@ But, how can we know if this is a good estimate of the population proportion? Is
 In Section 8.1, we introduce another sampling activity, we sample chocolate-covered almonds from a bowl and determine the average weight of the sample. As we did earlier with the sample proportion, we use the average weight in the sample, or sample mean, as an estimate of the average weight of all the chocolate-covered almonds in the entire bowl, or population mean. We also show, using simulations, the properties of the sampling distribution for the sample mean. In section 8.2. we revisit the Central Limit Theorem, introduce the standard error for the sample mean, and show that the sample mean is a generalization of the sample proportion studied earlier. In Section 8.3. we discuss the real-life limitations of having a single sample and introduce bootstrapping, a resampling method that uses a single sample to approximate the sampling distribution of the sample mean. In Section 8.4. we return to the central topic of using a sample mean (or sample proportion) to estimate the population mean (or population proportion). We formally introduce *confidence intervals*, provide their rationale and present two different methods to obtain them. The first one is called the *theory-based approach* and relies on large enough samples and the Central Limit Theorem. This method has been the central tool for statistical analysis for about two centuries. The second method is called the *simulation-based approach* and takes advantage of bootstrapping. In Section 8.5. we provide the details for the construction of confidence intervals under both approaches. In Section 8.6. we expand on the meaning and interpretation of confidence intervals and in Section 8.7. we conclude with a Case Study.
 
 
+<!-- 
+The code below may not be relevant. Consider erasing. AV 1/17/23
+-->
 
-### Needed packages {-#CI-packages}
-
-If needed, read Section \@ref(packages) for information on how to install and load R packages. 
-
-```{r message=FALSE}
-library(tidyverse)
-library(moderndive)
-library(infer)
-```
-
-Recall that loading the `tidyverse` package loads many commonly used data science packages that are needed here and we have encountered earlier. For details refer to Section \@ref(tidyverse-package).
-
-```{r message=FALSE, echo=FALSE, purl=FALSE}
-# Packages needed internally, but not in the text
-library(kableExtra)
-library(patchwork)
-library(purrr)
-library(scales)
-
+```{r message=FALSE, eval= FALSE, echo=FALSE, purl=FALSE}
 
 # Dynamic coding of summary statistics for bowl of covered chocolate candy i.e. avoid hard-coding any values
 # wherever possible
@@ -232,174 +206,12 @@ pop_ave_wt <- bowl_almonds |>
   summarize(mu = mean(weight)) |>
   pull(mu) |>
   round(3)
+
+x_bar <- almonds_sample %>% 
+  summarize(mean_weight = mean(weight))
+x_bar
 ```
 
-
-
-
-
-
-<!--
-This was a previous sections that will be replaced. It has been hidden AV 8/16/23
-
-
-## Understanding confidence intervals {#ci-build-up}
-
-Let's start this section with an analogy involving fishing. Say you are trying to catch a fish. On the one hand, you could use a spear, while on the other you could use a net. Using the net will probably allow you to catch more fish! 
-
-Now think back to our almonds exercise where you are trying to estimate the true population mean weight $\mu$ of *all* US almonds. \index{confidence interval!analogy to fishing} Think of the value of $\mu$ as a fish.
-
-On the one hand, we could use the appropriate *point estimate/sample statistic* to estimate $\mu$, which we saw in Table \@ref(tab:table-ch8-b) is the sample mean $\overline{x}$. Based on our sample of `r num_almonds` almonds from the bank, the sample mean was `r x_bar %>% pull(mean_weight) %>% round(2)`. Think of using this value as "fishing with a spear."
-
-What would "fishing with a net" correspond to? Look at the bootstrap distribution in Figure \@ref(fig:one-thousand-sample-means) once more. Between which two weights would you say that "most" sample means lie?  While this question is somewhat subjective, saying that most sample means lie between 1992 and 2000 would not be unreasonable. Think of this interval as the "net."
-
-What we've just illustrated is the concept of a *confidence interval*, which we'll abbreviate with "CI" throughout this book. As opposed to a point estimate/sample statistic that estimates the value of an unknown population parameter with a single value, a *confidence interval* \index{confidence interval} gives what can be interpreted as a range of plausible values. Going back to our analogy, point estimates/sample statistics can be thought of as spears, whereas confidence intervals can be thought of as nets. 
-
-<!--
-Point estimate           |  Confidence interval
-:-------------------------:|:-------------------------:
-![](images/shutterstock/shutterstock_149730074_cropped.jpg){ height=2.5in } |  ![](images/shutterstock/shutterstock_176684936.jpg){ height=2.5in }
--->
-
-
-
-<!--
-```{r point-estimate-vs-conf-int, echo=FALSE, fig.cap="Analogy of difference between point estimates and confidence intervals.", out.width="100%", purl=FALSE}
-knitr::include_graphics("images/shutterstock/point_estimate_vs_conf_int.png")
-```
-
-Our proposed interval of 1992 to 2000 was constructed by eye and was thus somewhat subjective. We now introduce two methods for constructing such intervals in a more exact fashion: the *percentile method* and the *standard error method*.
-
-Both methods for confidence interval construction share some commonalities. First, they are both constructed from a bootstrap distribution, as you constructed in Subsection \@ref(bootstrap-1000-replicates) and visualized in Figure \@ref(fig:one-thousand-sample-means).
-
-Second, they both require you to specify the \index{confidence interval!confidence level} *confidence level*. Commonly used confidence levels include 90%, 95%, and 99%.  All other things being equal, higher confidence levels correspond to wider confidence intervals, and lower confidence levels correspond to narrower confidence intervals. In this book, we'll be mostly using 95% and hence constructing "95% confidence intervals for $\mu$" for our almonds activity.
-
-
-### Percentile method {#percentile-method}
-
-```{r echo=FALSE, purl=FALSE}
-# Can also use conf_int() and get_confidence_interval() instead of get_ci(),
-# as they are aliases that work the exact same way.
-percentile_ci <- virtual_resampled_means %>%
-  rename(stat = mean_weight) %>%
-  get_ci(level = 0.95, type = "percentile")
-```
-
-One method to construct a confidence interval is to use the middle 95% of values of the bootstrap distribution. We can do this by computing the 2.5th and 97.5th percentiles, which are `r percentile_ci[["lower_ci"]]` and `r percentile_ci[["upper_ci"]]`, respectively. This is known as the *percentile method* for constructing confidence intervals. 
-
-For now, let's focus only on the concepts behind a percentile method constructed confidence interval; we'll show you the code that computes these values in the next section.
-
-Let's mark these percentiles on the bootstrap distribution with vertical lines in Figure \@ref(fig:percentile-method). About 95% of the `mean_weight` variable values in `virtual_resampled_means` fall between `r percentile_ci[["lower_ci"]]` and `r percentile_ci[["upper_ci"]]`, with 2.5% to the left of the leftmost line and 2.5% to the right of the rightmost line. 
-
-(ref:perc-method) Percentile method 95% confidence interval. Interval endpoints marked by vertical lines.
-
-```{r percentile-method, echo=FALSE, message=FALSE, fig.cap="(ref:perc-method)", fig.height=3.4}
-ggplot(virtual_resampled_means, aes(x = mean_weight)) +
-  geom_histogram(binwidth = 1, color = "white", boundary = 1988) +
-  labs(x = "Resample sample mean") +
-  scale_x_continuous(breaks = seq(1988, 2006, 2)) +
-  geom_vline(xintercept = percentile_ci[[1, 1]], size = 1) +
-  geom_vline(xintercept = percentile_ci[[1, 2]], size = 1)
-```
-
-
-### Percentile method {#percentile-method}
-
-```{r echo=FALSE, purl=FALSE}
-# Can also use get_confidence_interval() instead of get_ci(),
-# as it is an alias that works the exact same way.
-standard_error_ci <- virtual_resampled_means %>%
-  rename(stat = mean_weight) %>%
-  get_ci(type = "se", point_estimate = x_bar)
-
-# bootstrap SE value as scalar
-bootstrap_se <- virtual_resampled_means %>%
-  summarize(se = sd(mean_weight)) %>%
-  pull(se)
-```
-
-Recall in Appendix \@ref(appendix-normal-curve), we saw that if a numerical variable follows a normal distribution, or, in other words, the histogram of this variable is bell-shaped, then roughly 95% of values fall between $\pm$ `r qnorm(0.975) %>% round(2)` standard deviations of the mean. Given that our bootstrap distribution based on `r n_virtual_resample` resamples with replacement in Figure \@ref(fig:one-thousand-sample-means) is normally shaped, let's use this fact about normal distributions to construct a confidence interval in a different way.
-
-First, recall the bootstrap distribution has a mean equal to `r mean_of_means`. This value almost coincides exactly with the value of the sample mean $\overline{x}$ of our original `r num_almonds` almonds of `r x_bar %>% pull(mean_weight) %>% round(2)`. Second, let's compute the standard deviation of the bootstrap distribution using the values of `mean_weight` in the `virtual_resampled_means` data frame:
-
-```{r}
-virtual_resampled_means %>% 
-  summarize(SE = sd(mean_weight))
-```
-
-What is this value? Recall that the bootstrap distribution is an approximation to the sampling distribution. Recall also that the standard deviation of a sampling distribution has a special name: the *standard error*. Putting these two facts together, we can say that `r bootstrap_se %>% round(5)` is an approximation of the standard error of $\overline{x}$.  
-
-Thus, using our 95% rule of thumb about normal distributions from Appendix \@ref(appendix-normal-curve), we can use the following formula to determine the lower and upper endpoints of a 95% confidence interval for $\mu$:
-
-$$
-\begin{aligned}
-\overline{x} \pm `r qnorm(0.975) %>% round(2)` \cdot SE &= (\overline{x} - `r qnorm(0.975) %>% round(2)` \cdot SE, \overline{x} + `r qnorm(0.975) %>% round(2)` \cdot SE)\\
-&= (`r x_bar %>% pull(mean_weight) %>% round(2)` - `r qnorm(0.975) %>% round(2)` \cdot `r bootstrap_se %>% round(2)`, `r x_bar %>% pull(mean_weight) %>% round(2)` + `r qnorm(0.975) %>% round(2)` \cdot `r bootstrap_se %>% round(2)`)\\
-&= (1991.15, 1999.73)
-\end{aligned}
-$$
-
-Let's now add the SE method confidence interval with dashed lines in Figure \@ref(fig:percentile-and-se-method).
-
-(ref:both-methods) Comparing two 95% confidence interval methods.
-
-```{r percentile-and-se-method, echo=FALSE, message=FALSE, fig.cap="(ref:both-methods)", fig.height=5.2, purl=FALSE}
-both_CI <- bind_rows(
-  percentile_ci %>% gather(endpoint, value) %>% mutate(type = "percentile"),
-  standard_error_ci %>% gather(endpoint, value) %>% mutate(type = "SE")
-)
-ggplot(virtual_resampled_means, aes(x = mean_weight)) +
-  geom_histogram(binwidth = 1, color = "white", boundary = 1988) +
-  labs(x = "sample mean", title = "Percentile method CI (solid lines), SE method CI (dashed lines)") +
-  scale_x_continuous(breaks = seq(1988, 2006, 2)) +
-  geom_vline(xintercept = percentile_ci[[1, 1]], size = 1) +
-  geom_vline(xintercept = percentile_ci[[1, 2]], size = 1) +
-  geom_vline(xintercept = standard_error_ci[[1, 1]], linetype = "dashed", size = 1) +
-  geom_vline(xintercept = standard_error_ci[[1, 2]], linetype = "dashed", size = 1)
-```
-
-We see that both methods produce nearly identical 95% confidence intervals for $\mu$ with the percentile method yielding $(`r round(percentile_ci[["lower_ci"]], 2)`, `r round(percentile_ci[["upper_ci"]], 2)`)$ while the standard error method produces $(`r round(standard_error_ci[["lower_ci"]], 2)`, `r round(standard_error_ci[["upper_ci"]],2)`)$. However, recall that we can only use the standard error rule when the bootstrap distribution is roughly normally shaped. 
-
-Now that we've introduced the concept of confidence intervals and laid out the intuition behind two methods for constructing them, let's explore the code that allows us to construct them. 
-
-<!--
-v2 TODO: Consider adding:
-
-The variability of the sampling distribution may be approximated by the variability of the resampling distribution. Traditional theory-based methodologies for inference also have formulas for standard errors, assuming some conditions are met.
-
-This is done by using the formula where $\bar{x}$ is our original sample mean and $SE$ stands for **standard error** and corresponds to the standard deviation of the resampling distribution.  The value of $multiplier$ here is the appropriate percentile of the standard normal distribution. We'll go into this further in Section \@ref(ci-conclusion).
-
-These are automatically calculated when `level` is provided with `level = 0.95` being the default. (95% of the values in a standard normal distribution fall within `r qnorm(0.975) %>% round(2)` standard deviations of the mean, so $multiplier = `r qnorm(0.975) %>% round(2)`$ for `level = 0.95`, for example.)  As mentioned, this formula assumes that the bootstrap distribution is symmetric and bell-shaped. This is often the case with bootstrap distributions, especially those in which the original distribution of the sample is not highly skewed.
-
-This $\bar{x} \pm (multiplier * SE)$ formula is implemented in the `get_ci()` function as shown with our almonds problem using the bootstrap distribution's variability as an approximation for the sampling distribution's variability. We'll see more on this approximation shortly.
-
-Note that the center of the confidence interval (the `point_estimate`) must be provided for the standard error confidence interval.
-
-```{r eval=FALSE}
-standard_error_ci <- bootstrap_distribution %>% 
-  get_ci(type = "se", point_estimate = x_bar)
-standard_error_ci
-```
--->
-
-
-<!--
-```{block, type="learncheck", purl=FALSE}
-\vspace{-0.15in}
-**_Learning check_**
-\vspace{-0.1in}
-```
-
-**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** What condition about the bootstrap distribution must be met for us to be able to construct confidence intervals using the standard error method?
-
-**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Say we wanted to construct a 68% confidence interval instead of a 95% confidence interval for $\mu$. Describe what changes are needed to make this happen. Hint: we suggest you look at Appendix \@ref(appendix-normal-curve) on the normal distribution.
-
-```{block, type="learncheck", purl=FALSE}
-\vspace{-0.25in}
-\vspace{-0.25in}
-```
-
--->
 
 
 ## Revisiting the bowl activities {#ci-activity1}
@@ -1565,17 +1377,19 @@ Who is the study population here? All humans? All the people who watch the show 
 Just like with our sampling bowl, the population parameter here will involve proportions. However, in this case it will be the *difference in population proportions* $p_{seed} - p_{control}$, where $p_{seed}$ is the proportion of *all* Americans who if exposed to yawning will yawn themselves, and $p_{control}$ is the proportion of *all* Americans who if not exposed to yawning still yawn themselves. Correspondingly, the point estimate/sample statistic based the *Mythbusters*' sample of participants will be the *difference in sample proportions* $\widehat{p}_{seed} - \widehat{p}_{control}$. Let's extend Table \@ref(tab:table-ch8) of scenarios of sampling for inference to include our latest scenario. 
 
 ```{r table-ch8-c, echo=FALSE, message=FALSE, purl=FALSE}
+# Update this table
+
 # The following Google Doc is published to CSV and loaded using read_csv():
 # https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
 
-if (!file.exists("rds/sampling_scenarios.rds")) {
+#if (!file.exists("rds/sampling_scenarios.rds")) {
   sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>%
     read_csv(na = "") %>%
     slice(1:5)
-  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
-} else {
-  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
-}
+#  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
+#} else {
+#  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
+#}
 
 sampling_scenarios %>%
   # Only first two scenarios
