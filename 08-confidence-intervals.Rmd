@@ -1,4 +1,4 @@
-# Estimation, Confidence Intervals, and Bootstrapping V2 {#confidence-intervals}
+# Estimation, Confidence Intervals, and Bootstrapping {#confidence-intervals}
 
 ```{r setup_ci, include=FALSE, purl=FALSE}
 # Used to define Learning Check numbers:
