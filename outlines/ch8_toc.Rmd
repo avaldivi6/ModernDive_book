@@ -2745,7 +2745,7 @@ As mentioned before, histograms, such as those seen in Figure \@ref(fig:comparin
 - Construct a confidence interval using bootstrap samples and the standard error method
 - Construct a confidence interval using bootstrap samples and the bca method
 - Compare these confidence intervals with the theory-based confidence interval
-- Mention that later in the chapter we will show more formally why the bootstrap method work
+- Mention that later in the chapter we will show more formally why the bootstrap method work.
 
 ### Constructing confidence intervals: original workflow {#bootstrap-process}
 
