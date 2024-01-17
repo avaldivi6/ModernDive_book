@@ -1,4 +1,7 @@
-# install.packages("mindr")
+
+# install.packages("remotes")
+# remotes::install_github("pzhaonet/mindr")
+
 library(mindr)
 
 create_mindmaps <- function(input_file) {
@@ -12,6 +15,7 @@ create_mindmaps <- function(input_file) {
 
 }
 
+
 getwd()
 setwd("C:/Users/artur/Documents/MD2/ModernDive_book/outlines")
 ch7_v1_v2_outline_widget <- create_mindmaps(input_file = "ch7_toc.Rmd")$widget
@@ -24,3 +28,7 @@ ch8_v1_v2_outline_widget
 
 ch7_v1_v2_outline_widget
 ch8_v1_v2_outline_widget
+
+v2_outline_widget <- create_mindmaps(input_file = "07-sampling.Rmd")$widget
+v1_outline_widget <- create_mindmaps(input_file = "07-sampling-OLD.Rmd")$widget
+

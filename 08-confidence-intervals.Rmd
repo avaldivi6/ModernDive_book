@@ -6,7 +6,7 @@ chap <- 8
 lc <- 0
 
 # Set R code chunk defaults:
-opts_chunk$set(
+knitr::opts_chunk$set(
   echo = TRUE,
   eval = TRUE,
   warning = FALSE,
@@ -85,13 +85,6 @@ library(infer)
 
 Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
 
-
-```{r message=FALSE}
-library(tidyverse)
-library(moderndive)
-library(infer)
-```
-
 ```{r message=FALSE, echo=FALSE, purl=FALSE}
 # Packages needed internally, but not in the text
 library(knitr)
@@ -100,12 +93,6 @@ library(patchwork)
 library(purrr)
 library(scales)
 ```
-
-
-
-
-
-
 
 ## Revisiting the Almond Activity for Estimation
 
@@ -189,6 +176,41 @@ This sample proportion is an *estimate* of the population proportion.
 But, how can we know if this is a good estimate of the population proportion? Is it precise? Is it useful? As it turns out, we do not know exactly how precise this particular estimate is, but we know it comes from the sampling distribution of the sample proportion and in Chapter \@ref(sampling) we have learned important characteristics of this distribution. While the Gallup poll article did not provide additional information, oftentimes studies such as this provide a *margin of error* based on some level of confidence. As an illustration, a statement could have been: "We are 95% confident that the proportion of *all* people living in the US who believed that pre-pandemic normalcy was no longer attainable for them was 47% with a margin of error of plus or minus 2.3%". Based on this information we could construct the interval [47% - 2.3%, 47% + 2.3%] = [44.7%, 49.3%]. This range of plausible values is called a *confidence interval* and provides an interval as an estimate of the sample proportion instead of a single value. This method, its construction, and its interpretation will be the central focus of this chapter.
 
 In Section 8.1, we introduce another sampling activity, we sample chocolate-covered almonds from a bowl and determine the average weight of the sample. As we did earlier with the sample proportion, we use the average weight in the sample, or sample mean, as an estimate of the average weight of all the chocolate-covered almonds in the entire bowl, or population mean. We also show, using simulations, the properties of the sampling distribution for the sample mean. In section 8.2. we revisit the Central Limit Theorem, introduce the standard error for the sample mean, and show that the sample mean is a generalization of the sample proportion studied earlier. In Section 8.3. we discuss the real-life limitations of having a single sample and introduce bootstrapping, a resampling method that uses a single sample to approximate the sampling distribution of the sample mean. In Section 8.4. we return to the central topic of using a sample mean (or sample proportion) to estimate the population mean (or population proportion). We formally introduce *confidence intervals*, provide their rationale and present two different methods to obtain them. The first one is called the *theory-based approach* and relies on large enough samples and the Central Limit Theorem. This method has been the central tool for statistical analysis for about two centuries. The second method is called the *simulation-based approach* and takes advantage of bootstrapping. In Section 8.5. we provide the details for the construction of confidence intervals under both approaches. In Section 8.6. we expand on the meaning and interpretation of confidence intervals and in Section 8.7. we conclude with a Case Study.
+
+
+<!-- 
+The code below may not be relevant. Consider erasing. AV 1/17/23
+-->
+
+```{r message=FALSE, eval= FALSE, echo=FALSE, purl=FALSE}
+
+# Dynamic coding of summary statistics for bowl of covered chocolate candy i.e. avoid hard-coding any values
+# wherever possible
+
+# Simulated bowl until real data is obtained
+# Sample of 25 (real) weights produced
+samp1 <- c(3.1, 3.6, 3.0, 4.1, 3.6, 3.3, 3.7, 3.2, 3.7, 3.4, 4.0, 3.7, 3.3, 2.9, 3.9, 3.5, 3.5, 3.8, 3.8, 3.7, 3.8, 3.8, 3.6, 2.9, 3.7)
+almonds_sample <- tibble("ID" = 1:length(samp1), "weight" = samp1)
+almonds_sample
+num_almonds_sample <- nrow(almonds_sample)
+# For now, we use the sample to represent the virtual bowl of chocolate covered almonds,
+# and we'll add a 0.1 shock to each weight, to make the ball different than the sample
+set.seed(1)
+pop_almond <- sample(samp1, size = 5000, replace = T)+0.1
+bowl_almonds <- tibble("unit_ID" = 1:length(pop_almond), "weight" = pop_almond)
+# The  of 25 units was 88.6 gr. We'll assume this is the population proportion
+# The range of weights observed (in 25 units) was from 2.9 gr to 4.1 gr. 
+# 
+num_almonds <- nrow(bowl_almonds)
+pop_ave_wt <- bowl_almonds |>
+  summarize(mu = mean(weight)) |>
+  pull(mu) |>
+  round(3)
+
+x_bar <- almonds_sample %>% 
+  summarize(mean_weight = mean(weight))
+x_bar
+```
 
 
 
@@ -1355,17 +1377,19 @@ Who is the study population here? All humans? All the people who watch the show 
 Just like with our sampling bowl, the population parameter here will involve proportions. However, in this case it will be the *difference in population proportions* $p_{seed} - p_{control}$, where $p_{seed}$ is the proportion of *all* Americans who if exposed to yawning will yawn themselves, and $p_{control}$ is the proportion of *all* Americans who if not exposed to yawning still yawn themselves. Correspondingly, the point estimate/sample statistic based the *Mythbusters*' sample of participants will be the *difference in sample proportions* $\widehat{p}_{seed} - \widehat{p}_{control}$. Let's extend Table \@ref(tab:table-ch8) of scenarios of sampling for inference to include our latest scenario. 
 
 ```{r table-ch8-c, echo=FALSE, message=FALSE, purl=FALSE}
+# Update this table
+
 # The following Google Doc is published to CSV and loaded using read_csv():
 # https://docs.google.com/spreadsheets/d/1QkOpnBGqOXGyJjwqx1T2O5G5D72wWGfWlPyufOgtkk4/edit#gid=0
 
-if (!file.exists("rds/sampling_scenarios.rds")) {
+#if (!file.exists("rds/sampling_scenarios.rds")) {
   sampling_scenarios <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRd6bBgNwM3z-AJ7o4gZOiPAdPfbTp_V15HVHRmOH5Fc9w62yaG-fEKtjNUD2wOSa5IJkrDMaEBjRnA/pub?gid=0&single=true&output=csv" %>%
     read_csv(na = "") %>%
     slice(1:5)
-  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
-} else {
-  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
-}
+#  write_rds(sampling_scenarios, "rds/sampling_scenarios.rds")
+#} else {
+#  sampling_scenarios <- read_rds("rds/sampling_scenarios.rds")
+#}
 
 sampling_scenarios %>%
   # Only first two scenarios

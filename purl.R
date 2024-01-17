@@ -25,14 +25,6 @@ rmd_files <- rmds[
 # Replace "Rmd" with "R" to create R output file names
 r_files <- stringr::str_replace(rmd_files, "Rmd", "R")
 
-# Create `docs`` folder and `scripts` subfolder
-if (!dir.exists("docs")) {
-  dir.create("docs")
-}
-if (!dir.exists(here::here("docs", "scripts"))) {
-  dir.create(here::here("docs", "scripts"))
-}
-
 # Append full path to `r_files`
 r_files <- here::here("docs", "scripts", r_files)
 
