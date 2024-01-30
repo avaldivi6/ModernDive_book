@@ -46,32 +46,32 @@ n_gallup_survey <- 1000L
 ## Introduction
 
 
-In Chapter \ref(chapter7) we worked with sampling. Specifically, the activities with red and white balls consisted on getting many random samples of the same size from a bowl, calculate the corresponding sample proportions of red balls from each of those samples, and studied what was the distribution of those sample proportions. We learned that
+We studied sampling in Chapter \@ref(sampling). Recall, for example, getting many random samples of red and white balls consisted from a bowl, obtaining the sample proportions of red balls from each of those samples, and studying the distribution of the sample proportions. In summary, we learned that
 
 - the sampling distribution of the sampling proportion follows, approximately, the normal distribution, 
 - the expected value of the sample proportion, located at the center of the distribution, is exactly equal to the population proportion, and
 - the sampling variation, measured by the standard error of the sample proportion, is equal to the standard deviation of the population divided by the square root of the sample size used to collect the samples.
 
-We also performed sampling with chocolate covered almonds where the statistic of interest was the sample mean weight. We learned that the characteristics of the sampling distribution of the sample proportion apply in exactly the same way to the sampling distribution of the sample mean; namely,
+Similarly, when sampling chocolate covered almonds and getting the sample mean weight from each sample, the characteristics described above are also encountered on the sampling distribution of the sample mean; namely,
 
 - the sampling distribution of the sampling mean follows, approximately, the normal distribution; 
 - the expected value of the sample mean is the population mean, and
 - the standard error of the sample mean is the standard deviation of the population divided by the square root of the sample size.
 
-We ended the chapter showing that these characteristics also apply to sampling distributions for the difference of samples means, the difference of sample proportions, etc. Note that the sampling distribution is not dependent on the original distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
+Moreover, these characteristics also apply to sampling distributions for the difference of samples means, the difference of sample proportions, and many other parameters. Note that the sampling distribution is not dependent on the original distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
 
-On the other hand, you may remember that the original motivation was to determine population parameter values, such as the average weight of all the almonds in the entire bowl of almonds.
 
-How can we determine the population mean weight of almonds in the bowl if we do not have access to the entire bowl? 
-Based on the characteristics of the sampling distribution, stated above, if we have access to a large number of random samples and obtain the mean from each sample, we know that the average of those sample means will be a really good estimate of the expected value, which is precisely the population mean weight.
 
-However, in real life situations, we do not have access to many random samples. In fact, we typically have access to a single random sample. How can we determine the population mean weight of almonds in the bowl if all we have is a single random sample of almonds? 
+The study of the sampling distribution is actually motivated by another question we have not yet answered: how can we determine the average weight of all the almonds from if we do not have access to the entire bowl?
 
-While we cannot determine exactly what the population mean weight of almonds is from any one random sample, we could __estimate__ the population mean based on our knowledge of this sample. 
-The first idea would be to use the sample mean to estimate the population mean, but due to sampling variation we know that he sample mean is not equal to the population mean. Instead, we are going to build an interval based on the information from the sample and use this interval as an estimate of the population mean. 
-This chapter discusses how to do this and why this is a clever idea that often produces useful results.
+Clearly, if we have access to a large number of random samples from the bowl, because of our study of the sampling distribution, we know that the average of the sample means will be the expected value of the sample mean, which is precisely the population mean weight.
 
-In Section \@ref(traditional_CI) we show how to use the sample mean observed and our knowledge of the sampling distribution of the sample mean to construct this interval. In Section \@ref(bootstrap_CI) we introduce a technique call the bootstrap that allows us to construct confidence intervals based on resampling from the original sample. In Section \@ref(compare_CI) we compare these two techniques and show advantage and disadvantage of using them. Finally, in Section \@ref(infer) we introduce syntax in R to perform bootstrap confidence intervals.
+However, in real life situations, we do not have access to many random samples. 
+For most problems we have only access to a single random sample due to time or other constraints. 
+Due to sampling variation we know that the sample mean will not match the population mean exactly, rather it will be an approximation of the population mean. We call this a __point estimate__ of the population mean.  Moreover, the information we get from the sample can also be used to obtain and interval of plausible values that __estimate__ the population mean. We call this interval an _interval estimate_, or if given some level of accuracy, a __confidence interval__  of the population mean. 
+This chapter explain how to do this, presents different methods to produce confidence intervals, and shows why this is a clever idea that produces useful results.
+
+In Section \@ref(traditional_CI) we introduce a method that uses information of the sample observed and characteristics of the sampling distribution of the sample mean to construct these intervals. We call this the traditional method to construct intervals. In addition, we present syntax in R to construct these confidence intervals and discuss how to interpret them. In Section \@ref(bootstrap_CI) we introduce another method, call the bootstrap, that produces intervals by resampling from the original sample. We show how to perform this method manually, and introduce the syntax in R to produce these intervals virtually via simulations. In Section \@ref(theory_CI) we provide some theoretical foundations to explain the logic behind the bootstrap, compare it with the traditional method, and show advantages and disadvantages of using both methods. Finally, in Section \@ref(summary-CI) we summarize and present extensions of these method.
 
 ### Needed packages {-#CI-packages}
 
@@ -81,6 +81,7 @@ If needed, read Section \@ref(packages) for information on how to install and lo
 library(tidyverse)
 library(moderndive)
 library(infer)
+library(knitr)
 ```
 
 Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
@@ -96,15 +97,79 @@ library(scales)
 
 
 
-## Tying Sampling Distribution to Estimation
+## Tying Sampling Distribution to Estimation {#tracitional-CI}
 
 
-We revisit the almond activity to understand how the sampling distribution of the sample mean can help us in the estimation of the population mean 
+
+We start this section by introducing or recollecting some terminology
+
+### Terminology and notation {#terminology-and-notation-CI}
+
+Recall that a **population** is the collection of all the individuals or objects of interest. 
+A **population parameter** or simply a **parameter** is a numerical summary, a number, that represents some characteristic of the population. 
+For example, if the bowl of chocolate covered almonds is the population of interest, the *population mean* weight of almonds in the bowl, denoted by the Greek letter $\mu$, is a population parameter; the *population standard deviation* of the almonds' weight, denoted by the Greek letter $\sigma$, is another population parameter.
+
+A **sample statistic** or simply a **statistic** is a number computed from a sample. 
+For example, if a random sample of 50 almonds is taken from the bowl, the *sample mean*, denoted by $\bar x$, is a statistic, and the *sample standard deviation*, denoted by $s$, is another statistic.
+
+When a statistic is used to **estimate** a population parameter, we also call it **estimator** or, to be more precise, **point estimator**. For example, the sample mean weight, $\bar x$, can be an estimator of the population mean weight of almonds in the bowl, $\mu$, and the sample standard deviation, $s$, may be an estimator of the population standard deviation, $\sigma$.
+
+Another example of a population of interest is the population of sample means for all the possible random samples of the same size, obtained from the almonds' bowl. The distribution of this population is, as discussed earlier, the sampling distribution of the sample mean. Some population parameters of interest for this population are the expected value of the sampling distribution, denoted by $\mu_{\bar X}$, and the standard error denoted by $SE_{\bar X}$, which is precisely the standard deviation of this sampling distribution. 
+
+In chapter \@ref(sampling) we showed that the expected value of the sampling distribution of the sample mean is precisely the population mean weight of almonds, $$\mu_{\bar X} = \mu$$ and the standard error of the sampling distribution of the sample mean is the population standard deviation of the almonds' weight divided by the square root of the sample size used, $$SE_{\overline X} = \frac{\sigma}{\sqrt n}.$$
+
+Observe that for any random sample taken, its sample mean could also be a point estimator of the expected value of the sampling distribution and its sample standard deviation divided by the square root of the sample size can be an estimator of $SE_{\overline X}$. This information will be useful to construct interval estimates for the population mean.
+
+Furthermore, we say that an estimator is **unbiased** if the expected value of the estimator is equal to the population parameter it is trying to estimate. If it is not equal we say that the estimator is **biased**. 
+For example, we have shown in Chapter \@ref(sampling) that the expected value of the sample mean is equal to the population mean; so the sample mean is an unbiased estimator of the population mean. 
+
+One last clarification. We are often loose when referring to a sample statistic that is use to estimate a population parameter, we call it both *estimator* and *estimate*. To be proper, the **estimator** is the procedure, equation, or method that is used to estimate a parameter from a sample, for example the equation of the sample mean. An **estimate** is the realization of this method when applied to the sample obtained. If an **estimator**, such as the sample mean, has been obtained and calculated, then we say $\bar x = 3.68$ is an **estimate** of the population mean $\mu$. 
+We can now revisit the almond activity and study how the sampling distribution of the sample mean can help us in the interval estimation of the population mean. 
 
 
 ### Revisiting the Almond Activity for Estimation
 
-In Chapter \@ref(chapter7) one of the activities was to take many random samples of size 100 from a bowl of chocolate covered almonds, get the sample means of these samples, construct a histogram using these sample means, and show how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw), the histogram obtained using sample means from random samples of size $n=100$, and add a smooth curve for the normal distribution with appropriate expected value and standard error.
+In Chapter \@ref(sampling) one of the activities was to take many random samples of size 100 from a bowl of 5,000 chocolate covered almonds. Since we know the contents of the bowl, we can obtain the population parameters:
+
+```{r echo=-1}
+almonds_bowl <- read_rds("rds/almonds_bowl.rds")
+almonds_bowl |> 
+  summarize(population_mean = mean(weight), 
+            population_sd = sd(weight))
+```
+
+Since the total number of almonds in the population is 5000, the population mean is given by $$\mu = \sum_{i=1}^{5000}\frac{x_i}{5000}=3.64.$$ and the population standard deviation is given by $$\sigma = \sum_{i=1}^{5000} \frac{(x_i - \mu)^2}{5000}=0.392.$$
+
+But now we would like to estimate the population mean $\mu$ in the case that we do not have access to the entire bowl, only to a single random sample of 100 almonds. We use the sample of 100 almonds `almonds_sample_100` stored in package `moderndive`:
+
+
+<!--
+Need to add this sample into package moderndive AV 1-13-23
+-->
+
+```{r echo=FALSE}
+almonds_bowl <- read_rds("rds/almonds_bowl.rds")
+if (!file.exists("rds/almonds_sample_100.rds")) {
+  set.seed(20)
+  almonds_sample_100 <- almonds_bowl |>
+    rep_slice_sample(n = 100, replace = TRUE, reps = 1)
+  write_rds(almonds_sample_100, "rds/almonds_sample_100.rds")
+} else {
+  almonds_sample_100 <- read_rds("rds/almonds_sample_100.rds")
+}
+almonds_sample_100
+```
+
+
+The `ID` variable shows the almond chosen from the bowl and its corresponding weight. We can use this sample to obtain the sample statistics:
+
+```{r}
+almonds_sample_100 |> 
+  summarize(mean_weight = mean(weight), 
+            sd_weight = sd(weight), 
+            sample_size = n())
+```
+In the activity performed in Chapter \@ref(sampling) we obtained many random samples, calculated their sample means, constructed a histogram using these sample means, and show how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw).
 
 ```{r sample-mean-100-with-normal-redraw, echo=FALSE, fig.height=3, fig.cap="The distribution of the sample mean.", purl=FALSE}
 almonds_bowl <- read_rds("rds/almonds_bowl.rds")
@@ -123,25 +188,42 @@ if (!file.exists("rds/virtual_mean_weight_100.rds")) {
 
 
 ggplot(virtual_mean_weight_100, aes(x = mean_weight)) +
-  geom_histogram(aes(y=..density..), binwidth = 0.018, color = "white") + 
-  stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + xlim(3.4,4) + ylim(0,12) +
+  geom_histogram(aes(y=..density..), binwidth = 0.01, color = "white") + 
+  stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") +
   labs(
     x = "Sample means with n=100"
-  )
-
+  ) +
+  geom_point(aes(x=mean(almonds_sample_100$weight), y=0), color="blue") +
+  geom_point(aes(x=mu, y=0), color="red") +
+  annotate(geom="text", x=mu, y=-0.5, label=bquote("\u03BC"),
+              color="red") +
+  annotate(geom="text", x=mean(almonds_sample_100$weight), y=-0.5, label=bquote("x\u0305"),
+              color="blue")
 ```
 
+The histogram obtained in Figure \@ref(fig:sample-mean-100-with-normal-redraw) is constructed with sample means almond weights from random samples of size $n=100$. The added red smooth curve is the density curve for the normal distribution with the appropriate expected value and standard error obtained from the sample distribution. The red dot represents the population mean $\mu$ which is the unknown parameter we are trying to estimate. The blue dot is the sample mean $\bar x = 3.68$ from our random sample `almonds_sample_100`.
 
-As mentioned before, histograms, such as those seen in Figure \@ref(fig:comparing-sampling-distributions-3) provide a good approximation of the sampling distribution of the sample proportion, the distribution of $\bar X$. Since we are interested in the shape of the distribution, we redraw again the histogram obtained using sample proportions from random samples of size $n=25$, $n=50$, and $n=100$ but this time we add a smooth curve that appears to connect the top parts of each bar in the histogram. These histograms are presented in Figures \@ref(fig:sample-proportion-25-with-normal-pdf), \@ref(fig:sample-proportion-50-with-normal-pdf)
+
+<!--
+Talk about the sampling error (or standard error) to motivate the confidence interval AV 1-15-23
+-->
+
 
 
 ### The Normal Distribution
 
+<!--
+
 - Connect the sampling distribution of the sample mean with the normal due to the central limit theorem
 - Show the properties of the normal, in particular the 68 - 95 - 99.7 rule
 - Let's focus in 95%
+-->
+
+
+
 
 ### Using the sampling distribution of the sample mean to estimate the population mean
+
 
 - Recall that the sampling distribution is normal with mean equal to the population mean and standard deviation equal to the standard error
 - Argue that 95% of the sample means that we may get are within 1.96 standard errors of the population mean
@@ -998,7 +1080,7 @@ Add a note that in the remainder of the text, we’ll focus on the simulation-ba
 
 
 
-## Estimation with the Bootstrap
+## Estimation with the Bootstrap {#bootstrap-CI}
 
 - Discuss the bootstrap in general terms
 
@@ -1379,7 +1461,7 @@ As noted in Section \@ref(ci-build-up), both methods produce similar confidence 
 
 ### Interpretations revisited using bootstrap {#one-prop-ci}
 
-## Theoretical Framework
+## Theoretical Framework {#theory-CI}
 
 ### Why the bootstrap-based approach
 
@@ -1715,7 +1797,7 @@ statement.
 
 
 
-## Summary and Final Remarks
+## Summary and Final Remarks {#summary-CI}
 
 
 ## Conclusion {#ci-conclusion}
