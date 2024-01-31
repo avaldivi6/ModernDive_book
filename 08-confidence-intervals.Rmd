@@ -46,32 +46,33 @@ n_gallup_survey <- 1000L
 ## Introduction
 
 
-We studied sampling in Chapter \@ref(sampling). Recall, for example, getting many random samples of red and white balls consisted from a bowl, obtaining the sample proportions of red balls from each of those samples, and studying the distribution of the sample proportions. In summary, we learned that
+We studied sampling in Chapter \@ref(sampling). Recall, for example, getting many random samples of red and white balls from a bowl, obtaining the sample proportions of red balls from each of those samples, and studying the distribution of the sample proportions. We can summarize our findings as follows:
 
 - the sampling distribution of the sampling proportion follows, approximately, the normal distribution, 
 - the expected value of the sample proportion, located at the center of the distribution, is exactly equal to the population proportion, and
 - the sampling variation, measured by the standard error of the sample proportion, is equal to the standard deviation of the population divided by the square root of the sample size used to collect the samples.
 
-Similarly, when sampling chocolate covered almonds and getting the sample mean weight from each sample, the characteristics described above are also encountered on the sampling distribution of the sample mean; namely,
+Similarly, when sampling chocolate-covered almonds and getting the sample mean weight from each sample, the characteristics described above are also encountered in the sampling distribution of the sample mean; namely,
 
 - the sampling distribution of the sampling mean follows, approximately, the normal distribution; 
 - the expected value of the sample mean is the population mean, and
 - the standard error of the sample mean is the standard deviation of the population divided by the square root of the sample size.
 
-Moreover, these characteristics also apply to sampling distributions for the difference of samples means, the difference of sample proportions, and many other parameters. Note that the sampling distribution is not dependent on the original distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
+Moreover, these characteristics also apply to sampling distributions for the difference of sample means, the difference of sample proportions, and many other parameters. Note that the sampling distribution is not dependent on the original distribution of the population values. As long as the samples taken are fairly large and we use the appropriate standard error, see \@ref(table-title), we can generalize these results appropriately.
 
 
 
-The study of the sampling distribution is actually motivated by another question we have not yet answered: how can we determine the average weight of all the almonds from if we do not have access to the entire bowl?
+The study of the sampling distribution is motivated by another question we have not yet answered: how can we determine the average weight of all the almonds if we do not have access to the entire bowl?
 
-Clearly, if we have access to a large number of random samples from the bowl, because of our study of the sampling distribution, we know that the average of the sample means will be the expected value of the sample mean, which is precisely the population mean weight.
+If we have access to a large number of random samples from the bowl, because we studied the sampling distribution, we know that the average of the sample means will be the expected value of the sample mean, which is precisely the population mean weight.
 
-However, in real life situations, we do not have access to many random samples. 
-For most problems we have only access to a single random sample due to time or other constraints. 
-Due to sampling variation we know that the sample mean will not match the population mean exactly, rather it will be an approximation of the population mean. We call this a __point estimate__ of the population mean.  Moreover, the information we get from the sample can also be used to obtain and interval of plausible values that __estimate__ the population mean. We call this interval an _interval estimate_, or if given some level of accuracy, a __confidence interval__  of the population mean. 
-This chapter explain how to do this, presents different methods to produce confidence intervals, and shows why this is a clever idea that produces useful results.
+However, in real-life situations, we do not have access to many random samples, we only have access to a single random sample due to time or other constraints. 
+Due to sampling variation, we know that the sample mean will not match the population mean exactly, rather it will be an approximation of the population mean. We call this a __point estimate__ of the population mean.  Moreover, the information we get from the sample can also be used to obtain an interval of plausible values that __estimate__ the population mean. We call this interval an _interval estimate_ or, if given some level of accuracy, a __confidence interval__  of the population mean. 
+This chapter explains how to do this, presents different methods to produce confidence intervals, and shows why this is a clever idea that produces useful results.
 
-In Section \@ref(traditional_CI) we introduce a method that uses information of the sample observed and characteristics of the sampling distribution of the sample mean to construct these intervals. We call this the traditional method to construct intervals. In addition, we present syntax in R to construct these confidence intervals and discuss how to interpret them. In Section \@ref(bootstrap_CI) we introduce another method, call the bootstrap, that produces intervals by resampling from the original sample. We show how to perform this method manually, and introduce the syntax in R to produce these intervals virtually via simulations. In Section \@ref(theory_CI) we provide some theoretical foundations to explain the logic behind the bootstrap, compare it with the traditional method, and show advantages and disadvantages of using both methods. Finally, in Section \@ref(summary-CI) we summarize and present extensions of these method.
+In Section \@ref(traditional_CI) we introduce a method that uses information on the sample observed and characteristics of the sampling distribution of the sample mean to construct these intervals. We call this the traditional method of constructing intervals. In addition, we present syntax in R to construct these confidence intervals and discuss how to interpret them. In Section \@ref(bootstrap_CI) we introduce another method, called the bootstrap, that produces intervals by resampling from the original sample. We show how to perform this method manually and introduce the syntax in R to produce these intervals virtually via simulations. In Section \@ref(theory_CI) we provide some theoretical foundations to explain the logic behind the bootstrap, compare it with the traditional method, and show the advantages and disadvantages of using both methods. Finally, in Section \@ref(summary-CI) we summarize and present extensions of these methods.
+
+
 
 ### Needed packages {-#CI-packages}
 
@@ -81,7 +82,6 @@ If needed, read Section \@ref(packages) for information on how to install and lo
 library(tidyverse)
 library(moderndive)
 library(infer)
-library(knitr)
 ```
 
 Recall that loading the `tidyverse` package loads many packages that we have encountered earlier. For details refer to Section \@ref(tidyverse-package). The packages `moderndive` and `infer` contain functions and data frames that will be used in this chapter.
@@ -93,6 +93,8 @@ library(kableExtra)
 library(patchwork)
 library(purrr)
 library(scales)
+library(knitr)
+library(ggrepel)
 ```
 
 
@@ -107,7 +109,7 @@ We start this section by introducing or recollecting some terminology
 
 Recall that a **population** is the collection of all the individuals or objects of interest. 
 A **population parameter** or simply a **parameter** is a numerical summary, a number, that represents some characteristic of the population. 
-For example, if the bowl of chocolate covered almonds is the population of interest, the *population mean* weight of almonds in the bowl, denoted by the Greek letter $\mu$, is a population parameter; the *population standard deviation* of the almonds' weight, denoted by the Greek letter $\sigma$, is another population parameter.
+For example, if the bowl of chocolate-covered almonds is the population of interest, the *population mean* weight of almonds in the bowl, denoted by the Greek letter $\mu$, is a population parameter; the *population standard deviation* of the almonds' weight, denoted by the Greek letter $\sigma$, is another population parameter.
 
 A **sample statistic** or simply a **statistic** is a number computed from a sample. 
 For example, if a random sample of 50 almonds is taken from the bowl, the *sample mean*, denoted by $\bar x$, is a statistic, and the *sample standard deviation*, denoted by $s$, is another statistic.
@@ -123,13 +125,16 @@ Observe that for any random sample taken, its sample mean could also be a point 
 Furthermore, we say that an estimator is **unbiased** if the expected value of the estimator is equal to the population parameter it is trying to estimate. If it is not equal we say that the estimator is **biased**. 
 For example, we have shown in Chapter \@ref(sampling) that the expected value of the sample mean is equal to the population mean; so the sample mean is an unbiased estimator of the population mean. 
 
-One last clarification. We are often loose when referring to a sample statistic that is use to estimate a population parameter, we call it both *estimator* and *estimate*. To be proper, the **estimator** is the procedure, equation, or method that is used to estimate a parameter from a sample, for example the equation of the sample mean. An **estimate** is the realization of this method when applied to the sample obtained. If an **estimator**, such as the sample mean, has been obtained and calculated, then we say $\bar x = 3.68$ is an **estimate** of the population mean $\mu$. 
+One last clarification. We are often loose when referring to a sample statistic used to estimate a population parameter; we call it both *estimator* and *estimate*. To be proper, the **estimator** is the procedure, equation, or method used to estimate a parameter from a sample, for example, the equation of the sample mean. An **estimate** is the realization of this method when applied to the sample obtained. If an **estimator**, such as the sample mean, has been calculated, say $\bar x = 3.68$, we call this number an **estimate** of the population mean $\mu$. 
 We can now revisit the almond activity and study how the sampling distribution of the sample mean can help us in the interval estimation of the population mean. 
 
 
 ### Revisiting the Almond Activity for Estimation
 
-In Chapter \@ref(sampling) one of the activities was to take many random samples of size 100 from a bowl of 5,000 chocolate covered almonds. Since we know the contents of the bowl, we can obtain the population parameters:
+In Chapter \@ref(sampling) one of the activities was to take many random samples of size 100 from a bowl of 5,000 chocolate-covered almonds. Since we know the contents of the bowl, we can obtain the population parameters:
+
+
+
 
 ```{r echo=-1}
 almonds_bowl <- read_rds("rds/almonds_bowl.rds")
@@ -138,9 +143,9 @@ almonds_bowl |>
             population_sd = sd(weight))
 ```
 
-Since the total number of almonds in the population is 5000, the population mean is given by $$\mu = \sum_{i=1}^{5000}\frac{x_i}{5000}=3.64.$$ and the population standard deviation is given by $$\sigma = \sum_{i=1}^{5000} \frac{(x_i - \mu)^2}{5000}=0.392.$$
+The total number of almonds in the bowl is 5,000. The population mean is $$\mu = \sum_{i=1}^{5000}\frac{x_i}{5000}=3.645$$ and the population standard deviation is $$\sigma = \sum_{i=1}^{5000} \frac{(x_i - \mu)^2}{5000}=0.392.$$
 
-But now we would like to estimate the population mean $\mu$ in the case that we do not have access to the entire bowl, only to a single random sample of 100 almonds. We use the sample of 100 almonds `almonds_sample_100` stored in package `moderndive`:
+The problem now is to estimate the population mean $\mu$ when we do not have access to the entire bowl but only to a single random sample of 100 almonds: the `almonds_sample_100` object stored in package `moderndive`. We show the contents of the first few rows here:
 
 
 <!--
@@ -161,7 +166,7 @@ almonds_sample_100
 ```
 
 
-The `ID` variable shows the almond chosen from the bowl and its corresponding weight. We can use this sample to obtain the sample statistics:
+The `ID` variable shows the almond chosen from the bowl and its corresponding weight. Using this sample we obtain some sample statistics:
 
 ```{r}
 almonds_sample_100 |> 
@@ -169,7 +174,8 @@ almonds_sample_100 |>
             sd_weight = sd(weight), 
             sample_size = n())
 ```
-In the activity performed in Chapter \@ref(sampling) we obtained many random samples, calculated their sample means, constructed a histogram using these sample means, and show how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw).
+In the activity performed in Chapter \@ref(sampling) we obtained many random samples, calculated their sample means, constructed a histogram using these sample means, and showed how the histogram is a good approximation of the sampling distribution of the sample mean. We redraw Figure \@ref(fig:sample-mean-100-with-normal) here as Figure \@ref(fig:sample-mean-100-with-normal-redraw).
+
 
 ```{r sample-mean-100-with-normal-redraw, echo=FALSE, fig.height=3, fig.cap="The distribution of the sample mean.", purl=FALSE}
 almonds_bowl <- read_rds("rds/almonds_bowl.rds")
@@ -201,7 +207,12 @@ ggplot(virtual_mean_weight_100, aes(x = mean_weight)) +
               color="blue")
 ```
 
-The histogram obtained in Figure \@ref(fig:sample-mean-100-with-normal-redraw) is constructed with sample means almond weights from random samples of size $n=100$. The added red smooth curve is the density curve for the normal distribution with the appropriate expected value and standard error obtained from the sample distribution. The red dot represents the population mean $\mu$ which is the unknown parameter we are trying to estimate. The blue dot is the sample mean $\bar x = 3.68$ from our random sample `almonds_sample_100`.
+The histogram obtained in Figure \@ref(fig:sample-mean-100-with-normal-redraw) is drawn using many sample mean weights from random samples of size $n=100$. 
+The added red smooth curve is the density curve for the normal distribution with the appropriate expected value and standard error obtained from the sample distribution. 
+The red dot represents the population mean $\mu$, the unknown parameter we are trying to estimate. The blue dot is the sample mean $\bar x = 3.68$ from the random sample stored in `almonds_sample_100`.
+Recall that in real-life applications, the distribution and the population mean are unknown, so the location of the blue dot is also unknown. However, the strategy is to use the sample mean and our knowledge of the sampling distribution of the sample mean to produce intervals centered in the observed sample mean that will likely contain the population mean.
+
+To understand this, we need to learn a few additional properties of the normal distribution.
 
 
 <!--
@@ -212,59 +223,307 @@ Talk about the sampling error (or standard error) to motivate the confidence int
 
 ### The Normal Distribution
 
-<!--
+The normal distribution \index{distribution!normal} is the distribution of a special type of random variable. It can be represented by a density curve that has a distinctive bell shape and it is fully defined by two values: (1) the expected value or *mean* $\mu$ ("mu") of the random variable and (2) the *standard deviation* $\sigma$ ("sigma") which reflects the dispersion of the random variable.
+In Figure \@ref(fig:normal-curves), we plot three normal distributions:
 
-- Connect the sampling distribution of the sample mean with the normal due to the central limit theorem
-- Show the properties of the normal, in particular the 68 - 95 - 99.7 rule
-- Let's focus in 95%
--->
+1. The solid normal curve has mean $\mu = 5$ \& standard deviation $\sigma = 2$.
+1. The dotted normal curve has mean $\mu = 5$ \& standard deviation $\sigma = 5$.
+1. The dashed normal curve has mean $\mu = 15$ \& standard deviation $\sigma = 2$.
+
+```{r normal-curves, echo=FALSE, fig.cap="Three normal distributions.", purl=FALSE, out.width="90%"}
+all_points <- tibble(
+  domain = seq(from = -10, to = 25, by = 0.01),
+  `mu = 5, sigma = 2` = dnorm(x = domain, mean = 5, sd = 2),
+  `mu = 5, sigma = 5` = dnorm(x = domain, mean = 5, sd = 5),
+  `mu = 15, sigma = 2` = dnorm(x = domain, mean = 15, sd = 2)
+)  %>% 
+  gather(key = "Distribution", value = "value", - domain) %>% 
+  mutate(
+    Distribution = factor(
+      Distribution, 
+      levels = c("mu = 5, sigma = 2", 
+                 "mu = 5, sigma = 5", 
+                 "mu = 15, sigma = 2")
+    )
+  )
+
+for_labels <- all_points %>% 
+  filter(between(domain, 3.795, 3.805) & Distribution == "mu = 5, sigma = 2" |
+           between(domain, 0.005, 0.0105) & Distribution == "mu = 5, sigma = 5" |
+           between(domain, 16.005, 16.015) & Distribution == "mu = 15, sigma = 2")
+
+all_points %>% 
+  ggplot(aes(x = domain, y = value, linetype = Distribution)) +
+  geom_line() +
+  geom_label_repel(data = for_labels, aes(label = Distribution),
+                            nudge_x = c(-1, -2.1, 1)) +
+  theme_light() +
+  scale_linetype_manual(values=c("solid", "dotted", "longdash")) + 
+  theme(
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "none"
+  )
+```
+
+Notice how the solid and dotted line normal curves have the same center due to their common mean $\mu$ = 5. However, the dotted line normal curve is wider due to its larger standard deviation of $\sigma$ = 5. On the other hand, the solid and dashed line normal curves have the same variation due to their common standard deviation $\sigma$ = 2. However, they are centered at different locations. 
+
+A special normal distribution is one with mean $\mu$ = 0 and standard deviation $\sigma$ = 1. It is called the *standard normal distribution* or the *$z$-curve*\index{distribution!standard normal} and because it is centered at zero, the standard value obtained with this random variable represents also the number of standard deviations above the mean, if positive, or below the mean, if negative. Furthermore, you can transform any normal distribution into a standard normal by standardizing its values. For example, if a value $x = 11$ comes from a normal distribution with mean $\mu =5$ and standard deviation $\sigma = 2$, the value $$z = \frac{x - \mu}{\sigma} = \frac{11 - 5}{2} = 3$$ is the corresponding value in a standard normal curve. Observe that 11 is precisely three standard deviation above the mean because $z = 3$.
+
+The total area under a density curve is exactly equal to 1 and the probability of obtaining a value in any given interval is equal to the area under the curve for that interval. 
+For a normal density curve, the probabilities or areas for any given interval can be obtained using the R function `pnorm()`. Think of the `p` in the name as __p__robability or __p__ercentage as this function finds the area under the curve to the left of any given value which is the probability of observing any number less than or equal to that value. It is possible to indicate the appropriate expected value and standard deviation as arguments in the function, but the default uses the standard normal values, $\mu = 0$ and $\sigma = 1$. For example, the probability of observing a value that is less than or equal to 1 in the standard normal curve is given by:
+
+```{r}
+pnorm(1)
+```
+
+or 84%. This is the probability of observing a value that is less than or equal to one standard deviation above the mean. It is shown in Figure \@ref(fig: normal-curve-shaded-1)
+
+
+```{r normal-curve-shaded-1}
+ ggplot(NULL, aes(c(-4,4))) +
+  geom_area(stat = "function", fun = dnorm, fill = "grey50", xlim = c(-4, 1)) +
+  geom_area(stat = "function", fun = dnorm, fill = "grey100", xlim = c(1, 4)) +
+  labs(x = "z", y = "") +
+  scale_y_continuous(breaks = NULL) +
+  scale_x_continuous(breaks = 1)
+```
+Similarly, the probability of observing a standard value between -1 and 1 is given by subtracting the area to the left of -1 from the area to the left of 1, as shown in Figure \@ref(fig: normal-curve-shaded-2)
+
+```{r normal-curve-shaded-2}
+ ggplot(NULL, aes(c(-4,4))) +
+  geom_area(stat = "function", fun = dnorm, fill = "grey100", xlim = c(-4, -1)) +
+    geom_area(stat = "function", fun = dnorm, fill = "grey80", xlim = c(-1, 1)) +
+  geom_area(stat = "function", fun = dnorm, fill = "grey100", xlim = c(1, 4)) +
+  labs(x = "z", y = "") +
+  scale_y_continuous(breaks = NULL) +
+  scale_x_continuous(breaks = c(-1,1))
+```
+In R, we obtain this probability as follows:
+
+```{r}
+pnorm(1) - pnorm(-1)
+```
+The probability of getting a standard value between -1 and 1, or equivalently, the probability of observing a value within one standard deviation from the mean is about 68%. Similarly, the probability of getting a value within 2 standard deviations from the mean is given by
+
+```{r}
+pnorm(2) - pnorm(-2)
+```
+or about 95%. 
+Moreover, we do not need to restrict our study to areas within one or two standard deviations from the mean. We can find the number of standard deviations needed for any desired percentage around the mean using the R function `qnorm()`. The `q` in the name stands for $quantile$ and this function can be thought of as the inverse or complement of `pnorm()`. It finds the value of the random variable for a given area under the curve to the left of this value. When using the standard normal, the quantile also represents the number of standard deviations. For example, in Figure \@ref(fig:normal-curve-shaded-1) we learned that the area under the standard normal curve to the left of a standard value of 1 was approximately 84%. If instead, we want to find the standard value that corresponds to exactly an area of 84% under the curve to the left of this value, we can use the following syntax:
+
+```{r}
+qnorm(0.84)
+```
+In other words, there is exactly an 84% chance that the observed standard value is less than or equal to 0.994. Similarly, to have exactly a 95% chance of obtaining a value within `q` number of standard deviations from the mean, we need to select the appropriate value for `qnorm()`. 
+
+
+```{r normal-curve-shaded-3}
+ ggplot(NULL, aes(c(-4,4))) +
+  geom_area(stat = "function", fun = dnorm, fill = "grey100", xlim = c(-4, -2)) +
+    geom_area(stat = "function", fun = dnorm, fill = "grey80", xlim = c(-2, 2)) +
+  geom_area(stat = "function", fun = dnorm, fill = "grey100", xlim = c(2, 4)) +
+  labs(x = "z", y = "") +
+  scale_y_continuous(breaks = NULL) +
+  scale_x_continuous(breaks = NULL) + 
+  annotate(geom="text", x=2, y=-0.01, label="q",
+              color="blue")
+```
 
 
 
+Observe Figure \@ref(fig:normal-curve-shaded-3).
+We want to find the standard value `q` such that the area in the middle is exactly 0.95 (or 95%). Before using `qnorm()` we need to provide the total area under the curve to the left of `q`. Since the total area under the normal density curve is 1, the curve is symmetric, and the area in the middle is 0.95, the total area on the tails is 1 - 0.95 = 0.05 (or 5%), and the area on each tail is 0.05/2 = 0.025 (or 2.5%). The total area under the curve to the left of `q` will be the area in the middle and the area on the left tail or 0.95 + 0.025 = 0.975. We can now obtain the standard value `q` by using `qnorm()`:
 
-### Using the sampling distribution of the sample mean to estimate the population mean
+```{r}
+q <- qnorm(0.975)
+q
+```
+The probability of observing a value within 1.96 standard deviations from the mean is exactly 95%.
 
+We can follow this method to obtain the number of standard deviations needed for any area, or probability, around the mean. For example, if we want an area of 98% around the mean, the area on the tails is 1 - 0.98 = 0.02, or 0.02/2 = 0.01 on each tail, the area under the curve to the left of the desired `q` value would be 0.98 + 0.01 = 0.99 so
 
-- Recall that the sampling distribution is normal with mean equal to the population mean and standard deviation equal to the standard error
-- Argue that 95% of the sample means that we may get are within 1.96 standard errors of the population mean
-- Show that the sample standard deviation of the sample can be use to estimate the standard deviation of the population
-- Construct the estimated standard error using the sample standard deviation
-- Introduce the logic behind a confidence interval
+```{r}
+qnorm(0.99)
+```
+The area within 2.33 standard deviations from the mean is 98%, or there is a 98% chance of choosing a value within 2.33 standard deviations from the mean. This information will be very useful to us.
 
-
-<!--
-Show any given sample proportion and compare it with the population proportion
-
-Pick any 33 sample proportions and show how close they are for the population proportion
-
-Show how about 95% of the sample proportions are within 2 SE from the true population proportion
-
-Construct an interval based on any one sample and show how this interval contains the true population proportion
-
-
-
-Show how about 95% of the sample means are within 2 SE from the sample mean
-
-Construct an interval based on any one sample and show how this interval contains the true population proportion
-
-Obtain one sample and introduce resampling with replacements from this sample. Discuss bootstrap sampling.
-
-Obtain 1000 bootstrap samples and obtain their sample means. Show how the histogram compares to the histogram of 1000 samples.
-
-Use the bootstrap samples to obtain the 95% interval
-
-
--->
+We are now ready to return to our main problem.
 
 
 ### The confidence interval using one sample of almonds
 
-- Show the steps of how to do this for the almond activity with one sample
+
+In Chapter \@ref(sampling) we showed that the sampling distribution of the sample mean approximates a normal distribution. For this example, we assume that the sampling distribution of the sample mean follows *exactly* a normal distribution. In Figure \@ref(fig:normal-curve-1), we plot the normal density curve for the sampling distribution of the sample mean weight of almonds in grams.
+
+```{r normal-curve-1, echo=FALSE, fig.cap="The normal density curve for the sample mean weight of almonds.", purl=FALSE, out.width="90%}
+p1 <- ggplot(data = data.frame(x = c(3.47, 3.8)), aes(x)) +
+  stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + ylab("") +
+  scale_y_continuous(breaks = NULL) + 
+  labs(
+    x = "Sample means with n=100"
+  ) +
+  geom_point(aes(x=mean(almonds_sample_100$weight), y=0), color="blue") +
+  geom_point(aes(x=mu, y=0), color="red") +
+  annotate(geom="text", x=mu, y=-0.5, label=bquote("\u03BC=3.64"),
+              color="red") +
+  annotate(geom="text", x=mean(almonds_sample_100$weight), y=-0.5, label=bquote("x\u0305=3.68"),
+              color="blue")+
+  geom_hline(yintercept = 0, col="red", lty=2)
+p1
+```
+
+The horizontal axis shows the possible values or possible sample means, that can be obtained from random samples of size 100. The curve's height can be thought of as how likely those sample means are to be observed. As an illustration, it is more likely to get a random sample with a sample mean around $\mu = 3.64$ grams (the highest point of the curve) than it is to get a sample with a sample mean far from $\mu$, say around $3.5$ grams since the curve's height is almost zero at that value. Observe, in particular, that the sample mean from our sample is given by the blue dot, $\bar x = 3.68$, which is greater than $\mu$ but not too far from it.
+
+In real-life situations, the population mean $\mu$ is unknown so the distance of $\mu$ from the sample mean obtained is also unknown. 
+On the other hand, the sampling distribution of the sample mean follows a normal distribution. Based on our earlier discussion about areas under the normal curve, we have shown that there is a 95% chance that we obtain a value within 1.96 standard deviations from the center. In the context of our problem, there is a 95% chance that the sample mean obtained is within 1.96 standard errors from the population mean. 
+We then construct an interval centered at the sample mean observed. The length of the interval will extend exactly 1.96 standard errors on each side. We can now construct the interval. We first recall the population standard deviation, $\sigma$, and the sample mean from our sample:
+
+```{r}
+almonds_bowl |> 
+  summarize(sigma = sd(weight))
+almonds_sample_100 |> 
+  summarize(mean_weight = mean(weight),
+            sample_size = n())
+```
+
+We use these values to construct the confidence interval
+
+```{r}
+xbar <- 3.682 
+se_xbar <- 0.392/sqrt(100)
+lower_bound <- xbar - 1.96 *  se_xbar
+upper_bound <- xbar + 1.96 *  se_xbar
+c(lower_bound, upper_bound)
+```
+the object `xbar` is the sample mean observed and `se_xbar` is the standard error of the sample mean. The number 1.96 was obtained earlier during our discussion of areas under the normal curve. We have constructed a 95% confidence interval and can say that, with 95% confidence, the population mean weight of almonds is somewhere between 3.61 and 3.76 grams.
+
+
+```{r normal-curve-2, echo=FALSE, fig.cap="The normal density curve for the sample mean weight of almonds.", purl=FALSE, out.width="90%}
+df <- data.frame(x1 = lower_bound, x2 = upper_bound, y1 = 0, y2 = 0)
+p1 <- ggplot(data = data.frame(x = c(3.47, 3.8)), aes(x)) +
+  stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + ylab("") +
+  scale_y_continuous(breaks = NULL) + 
+  labs(title = "The Sampling Distribution of the Sample Mean",
+    x = "Sample mean weights"
+  ) +
+  geom_point(aes(x=mean(almonds_sample_100$weight), y=0), color="blue") +
+  geom_point(aes(x=mu, y=0), color="red") +
+  annotate(geom="text", x=mu, y=-0.5, label=bquote("\u03BC"),
+              color="red") +
+  annotate(geom="text", x=mean(almonds_sample_100$weight), y=-0.5, label=bquote("x\u0305"),
+              color="blue")+
+  geom_hline(yintercept = 0, col="red", lty=2) + 
+  geom_segment(aes(x = x1, y = y1, xend = x2, yend = y2, colour = "segment"), data = df, col="blue")
+p1
+```
+
+Figure \@ref(fig: normal-curve-2) shows the confidence interval obtained as a horizontal blue line. Clearly the population mean $\mu$ is part of this interval.
+
+### The t distribution
+
+
+Recall that due to the Central Limit Theorem, the sampling distribution of the sample mean was approximately normal with mean equal to the population mean $\mu$ and standard deviation given by the standard error $SE_{\overline X} = \sigma/\sqrt{n}$. We can standardize this for any sample mean $\bar x$ such that $$z = \frac{\bar x - \mu}{\sigma/\sqrt{n}}$$ is the corresponding value of the standard normal distribution.
+
+In the construction of the interval in Figure \@ref(fig: normal-curve-2) we have assumed the population standard deviation, $\sigma$, was known, and therefore we have use it to obtain the confidence interval. Unfortunately, in real-life applications, the population standard deviation is also unknown. 
+What we do is estimate it using the sample standard deviation, $s$, from the sample given and use this value instead of $\sigma$. Our estimated standard error is given by $$\widehat{SE}_{\overline X} = \frac{s}{\sqrt n}.$$
+
+When using the sample standard deviation to estimate the standard error, we are introducing additional uncertainty in our model. For example, if we try to standardize this value we get $$t = \frac{\bar x - \mu}{s/\sqrt{n}}$$. Because we are using the sample standard deviation in this equation and since the sample standard deviation changes from sample to sample, the additional uncertaintly makes the values $t$ no longer normal. Instead they follow a new distribution called the $t$ distribution.
+
+The $t$ distribution is very similar to the standard normal; its density curve is also bell-shaped and symmetric, but the tails of the $t$ distribution are a little thicker than those of the standard normal.
+
+The syntax in R for the $t$ distribution is analogous to the standard normal distribution. We use the function `pt()` instead of `pnorm()` and `qt()` instead of `qnorm()`.
+In addition, the $t$ distribution requires one additional parameter, the degrees of freedom. For the sample mean problems, the degrees of freedom needed are exactly $n-1$, the size of the samples minus one.
+
+We construct again a 95% confidence interval for the population mean, but this time using the sample standard deviation to estimate the standard error and the $t$ distribution to determine how wide the confidence interval should be.
+
+We start by obtaining the sample statistics:
+
+
+```{r}
+almonds_sample_100 |> 
+  summarize(mean_weight = mean(weight),
+            sd_weight = sd(weight),
+            sample_size = n())
+```
+To obtain the number of standard deviations on the $t$ distribution to account for 95% of the values, we proceed as we did in the normal case: the area in the middle is 0.95, so the area on the tails is 1-0.95 = 0.05. Since the $t$ distribution is also symmetric, the area on each tail is 0.05/2 - 0.025. The number of standard deviation around the center is given by the value $q$ such as the area under the $t$ curve to the left of $q$ is exactly $0.95 + 0.025 = 0.975$. Using R we get:
+
+```{r}
+qt(0.975, df = 100 - 1)
+```
+So, in order to account for 95% of the observations around the mean, we need to take into account all the values within 1.98 standard deviation from the mean. Compare this number with the 1.96 obtained for the standard normal; the difference is due to the fact that the $t$ curve has thicker tails than the standard normal.
+We can now construct the 95% confidence interval
+
+```{r}
+xbar <- 3.682 
+se_xbar <- 0.362/sqrt(100)
+lower_bound <- xbar - 1.98 *  se_xbar
+upper_bound <- xbar + 1.98 *  se_xbar
+c(lower_bound, upper_bound)
+```
+We are 95% confident that the population mean weight of almonds is a number between 3.61 and 3.75 grams.
+
 
 ### Confidence intervals using many samples of almonds
 
-- Show how most of them do include the population mean but some of them don't
+In the example study earlier using the sample stored in `almonds_sample_100` we constructed a confidence interval and showed that the interval contained the population mean weight of almonds. This results is not surprising as we expect the constructed interval to include the population mean for about 95% of the possible random samples.
 
+We reiterate again that in real-life applications the population mean is unkown and it is not possible to determine whether your 95% confidence interval includes the population mean or not. All you know is that
+
+- If the size used for your random sample is large enough, the sampling distribution of the sample mean for samples similar to yours will follow, approximately, the normal distribution.
+- When this happens, the method presented earlier to construct a 95% confidence intervals guarantees that for 95% of the possible samples the intervals obtained will include the population mean. However, it also guarantees that for 5% of the possible samples, the intervals obtained will not include the population mean.
+- As we constructed 95% confidence intervals we can construct intervals of any confidence level.
+
+To illustrate this, we now work with many samples and obtain the 95% confidence interval for each of them. Since we know, in our almond activity, what is the population mean, we can check whether or not the intervals include the population mean.
+
+
+Figure \@ref(fig:almong-mean-cis) present eighty 95% confidence intervals, each obtained using the same procedure but with different random samples.
+
+```{r almond-mean-cis, fig.cap="(ref:almond-mean-ci)", echo=FALSE, fig.height=4.2, purl=FALSE}
+
+set.seed(320)
+  # Compute data frame with sampled data, sample means, and ci
+  almond_mean_cis <- almonds_bowl %>%
+    rep_sample_n(size = 100, reps = 80, replace = FALSE) %>%
+    summarize(sample_mean = mean(weight), sample_sd = sd(weight), size = n()) %>%
+    mutate(lower_bound = sample_mean - 1.98*sample_sd/sqrt(size), 
+           upper_bound = sample_mean + 1.98*sample_sd/sqrt(size),
+           captured = lower_bound <= mu & upper_bound >= mu)
+```
+
+
+```{r}
+  
+# Identify if confidence interval captured true p
+almond_cis <- almond_mean_cis %>%
+  mutate(captured = lower_bound <= mu & upper_bound >= mu)
+
+# Plot them!
+ggplot(almond_mean_cis) +
+  geom_segment(aes(
+    y = replicate, yend = replicate, x = lower_bound, xend = upper_bound,
+    alpha = factor(captured, levels = c("TRUE", "FALSE"))
+  )) +
+  # Removed point estimates since it doesn't necessarily act as center for
+  # percentile-based CI's
+  # geom_point(aes(x = sample_prop, y = replicate, color = captured)) +
+  labs(
+    x = expression("Sample mean weight of almonds"),
+    y = "Confidence interval number",
+    alpha = "Captured"
+  ) +
+  geom_vline(xintercept = mu, color = "red") +
+  coord_cartesian(xlim = c(3.4, 3.9)) +
+  theme_light() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+```
+The red vertical line is drawn at the location of the population mean weight $\mu = 3.64$. The horizontal lines represent the 95% confidence intervals. Observe that the gray confidence intervals all cross the red line, so they include the population mean in the interval estimates. The few black confidence intervals do not include the population mean. In real-life applications, we cannot know whether the sample obtained is one the produces a gray or a black interval.
 
 ### Interpreting Confidence Intervals
 
@@ -1064,18 +1323,6 @@ x_bar
 
 
 
-### Confidence Interval: the theory-based approach
-### Confidence interval: the simulation-based approach
-
-<!--
-Introduce some theory about bootstrap sampling
--->
-
-### Comparing theory- and simulation-based approaches
-
-<!--
-Add a note that in the remainder of the text, we’ll focus on the simulation-based approach
--->
 
 
 
