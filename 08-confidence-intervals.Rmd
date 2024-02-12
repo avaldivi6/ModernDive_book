@@ -358,7 +358,7 @@ We are now ready to return to our main problem.
 
 In Chapter \@ref(sampling) we showed that the sampling distribution of the sample mean approximates a normal distribution. For this example, we assume that the sampling distribution of the sample mean follows *exactly* a normal distribution. In Figure \@ref(fig:normal-curve-1), we plot the normal density curve for the sampling distribution of the sample mean weight of almonds in grams.
 
-```{r normal-curve-1, echo=FALSE, fig.cap="The normal density curve for the sample mean weight of almonds.", purl=FALSE, out.width="90%}
+```{r normal-curve-1, echo=FALSE, fig.cap="The normal density curve for the sample mean weight of almonds.", purl=FALSE, out.width="90%"}
 p1 <- ggplot(data = data.frame(x = c(3.47, 3.8)), aes(x)) +
   stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + ylab("") +
   scale_y_continuous(breaks = NULL) + 
@@ -401,7 +401,7 @@ c(lower_bound, upper_bound)
 the object `xbar` is the sample mean observed and `se_xbar` is the standard error of the sample mean. The number 1.96 was obtained earlier during our discussion of areas under the normal curve. We have constructed a 95% confidence interval and can say that, with 95% confidence, the population mean weight of almonds is somewhere between 3.61 and 3.76 grams.
 
 
-```{r normal-curve-2, echo=FALSE, fig.cap="The normal density curve for the sample mean weight of almonds.", purl=FALSE, out.width="90%}
+```{r normal-curve-2, echo=FALSE, fig.cap="The normal density curve for the sample mean weight of almonds.", purl=FALSE, out.width="90%"}
 df <- data.frame(x1 = lower_bound, x2 = upper_bound, y1 = 0, y2 = 0)
 p1 <- ggplot(data = data.frame(x = c(3.47, 3.8)), aes(x)) +
   stat_function(fun = dnorm,  args = list(mean = mu, sd = sigma/sqrt(n)), col="red") + ylab("") +
