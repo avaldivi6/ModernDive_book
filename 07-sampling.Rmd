@@ -1104,7 +1104,7 @@ As we did in the case of the sample proportion, we are interested in learning ke
 1. The effect of *sampling variation* on the *sampling distribution* and the effect of the sample size on *sampling variation*
 1. The shape of the *sampling distribution* 
 
-### Random variables
+### Random variables {#random-variable-sample-mean}
 
 Once again, we use random variable to formalize our understanding of the sample distribution of the sample mean. Instead of using Bernoulli trials as we did in the case of sample proportions, our trials will record the almond weights. We again modify the bowl activity slightly. In lieu of selecting a sample of almonds all at once, we randomly select one almond at a time, we record the weight of the almond and return it to the bowl before selecting another almond, so the configuration of weights and the chances of any of the almonds to be selected is the same every time we choose one.
 Getting a sample of 25 almonds is performing these trials 25 times to obtain 25 weights. Then, the average of these 25 numbers is the average weight or mean weight of a sample of 25 almonds. This is what we call a sample mean.
