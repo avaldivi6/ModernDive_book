@@ -1003,7 +1003,7 @@ We have completed the "Data Modeling with `moderndive`" portion of this book. We
 
 Once we have covered Chapters \@ref(sampling) on sampling, \@ref(confidence-intervals) on confidence intervals, and \@ref(hypothesis-testing) on hypothesis testing, we revisit the regression models in Chapter \@ref(inference-for-regression) on inference for regression. This complete the topics we want to covered in this book, as shown in Figure \@ref(fig:part3)!
 
-Furthermore in Chapter \@ref(inference-for-regression), we revisit the concept of residuals $y - \widehat{y}$ and discuss their importance when interpreting the results of a regression model. We perform what is known as a *residual analysis* of the `residual` variable of all `get_regression_points()` outputs. Residual analyses allow you to verify what are known as the *conditions for inference for regression*.h
+Furthermore in Chapter \@ref(inference-for-regression), we revisit the concept of residuals $y - \widehat{y}$ and discuss their importance when interpreting the results of a regression model. We perform what is known as a *residual analysis* of the `residual` variable of all `get_regression_points()` outputs. Residual analyses allow you to verify what are known as the *conditions for inference for regression*.
 
 ```{r part3, echo=FALSE, fig.cap="(ref:flowchart-partiii)", purl=FALSE}
 include_graphics("images/flowcharts/flowchart/flowchart.006.png")
