@@ -30,7 +30,7 @@ set.seed(76)
 
 In Chapter \@ref(regression) we studied simple linear regression as a model that represents the relationship between two variables: an outcome variable or response $y$ and an explanatory variable or regressor $x$. Furthermore to keep things simple, we only considered models with one explanatory $x$ variable that was either numerical in Section \@ref(model1) or categorical in Section \@ref(model2).
 
-In this chapter we introduce multiple linear regression, the direct extension to simple linear regression when more than one explanatory variable is taking into account to explain changes in the outcome variable. As we show in the next few sections, many of the material develop in the case of simple linear regression translates directly into multiple linear regression, but the interpretation of the associated effect of any one explanatory variable must be made taking into account the other explanatory variables included in the model.
+In this chapter we introduce multiple linear regression, the direct extension to simple linear regression when more than one explanatory variable is taking into account to explain changes in the outcome variable. As we show in the next few sections, much of the material developed for simple linear regression translates directly into multiple linear regression, but the interpretation of the associated effect of any one explanatory variable must be made taking into account the other explanatory variables included in the model.
 
 ## Needed packages {-#mult-reg-packages}
 
@@ -39,7 +39,6 @@ If needed, read Section \@ref(packages) for information on how to install and lo
 ```{r, eval=FALSE}
 library(tidyverse)
 library(moderndive)
-#library(skimr)
 library(ISLR2)
 library(knitr)
 ```
@@ -124,7 +123,7 @@ UN_data |> sample_n(size = 5)
 ```{r model4-data-preview, echo=FALSE, purl=FALSE}
 UN_data |>
   sample_n(5) |>
-  kable(
+  kbl(
     digits = 3,
     caption = "A random sample of 5 out of 182 UN member states",
     booktabs = TRUE,
@@ -136,15 +135,16 @@ UN_data |>
   )
 ```
 
-Now that we are familiar with the variables in `UN_data` and what they represent, we obtain summary statistics. As we did in our exploratory data analyses in Sections \@ref(model1EDA) and  \@ref(model2EDA) from the previous chapter, we use the `skim()` function from the `skimr` package. Remember to only `select()` the variables of interest in the model:\index{R packages!skimr!skim()}
+Life expectancy, `life_exp`, is an estimate of how many years, on average, a person in a given country is expected to live. Fertility rate, `fert_rate`, is the average number of live births per woman of childbearing age in a country. As we did in our exploratory data analyses in Sections \@ref(model1EDA) and  \@ref(model2EDA) from the previous chapter, we obtain summary statistics:
 
 ```{r, eval=FALSE}
-UN_data |> select(life_exp, fert_rate, income) |> summary()
-UN_data |> filter(income == "Low income") |> nrow()
+UN_data |> 
+  select(life_exp, fert_rate, income) |> 
+  summary()
 ```
 
 
-Recall that each row represents a particular country or state. Observe that we have no missing data, that there are `r UN_data |> filter(income == "Low income") |> nrow()` states categorized as `Low Income` states, `r UN_data |> filter(income == "High income") |> nrow()` `High Income` states, etc. The average life expectancy is `r UN_data$life_exp |> mean() |> round(digits = 2)`. 
+Recall that each row in `UN_data` represents a particular country or UN member state. The `summary()` function shows a summary for each variable in the data set and we perform this analysis using the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `summary()` function provides the minimum value observed, `Min.`, the first quartile, `1st Qu.`, second quartile or median, `Median`, third quartile, `3rd Qu.`, and maximum value observed, `Max.`. These five numbers together are often called the five-number summary. In addition, the `summary()` function provides the average or mean, `Mean`. We have encounter the mean before, but we briefly discussed what the quartiles now. The first quartile, `1st Qu.`, indicates that one fourth of the data is less than or equal to this value, the median or second quartile, `Median`, show that one half (two quarts) of the observations are less than or equal to this valueIf some numerical summary if the varaibelWe have no missing data, that there are `r UN_data |> filter(income == "Low income") |> nrow()` UN member states. The variable `income` is categorical with four categories; `Low Income`, `Lower middle income`, `Upper middle income`, and `High income` states. The summary also provides the number of states for each category; for example, there are `r UN_data |> filter(income == "High income") |> nrow()` `High Income` states. The average life expectancy is `r UN_data$life_exp |> mean() |> round(digits = 2)` years. The first quartile, `1st Qu.`, state that one quarter of the UN member states, or 25%, have life expectancy less than 69.36 years. The first quartile is also called the 25th percentile
 
 Furthermore, we can compute the correlation coefficient between our two numerical variables: `life_exp` and `fert_rate`. Recall from Subsection \@ref(model1EDA) that correlation coefficients only exist between numerical variables. We observe that they are "strongly negatively" correlated.
 
@@ -243,7 +243,11 @@ lifeExp_model <- lm(fert_rate ~ income, data = UN_data)
 b0 <- round(coef(lifeExp_model),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b2", "b3", "b4"),"Values" = coefficients(lifeExp_model))
-kable(lm_data)
+kbl(lm_data)|>
+  kable_styling(
+    font_size = ifelse(is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
 ```
 
 
@@ -292,7 +296,7 @@ b_int <- round(coef(model_int),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b02", "b03", "b04", "b1", "b12", "b13", "b14"),"Values" = coefficients(model_int))
 lm_data |> 
-  kable(
+  kbl(
     digits = 3,
     caption = "Regression table for interaction model",
     booktabs = TRUE,
@@ -307,7 +311,7 @@ lm_data |>
 We can match the coefficients with the values obtained: the fitted fertility rate $\widehat{y} = \widehat{\text{fert rate}}$ for `Low income` countries is
 
 
-$$\widehat{\text{fert rate}} = b_0 + b_1\cdot x = `r b_int[[1]]` + `r b_int[[5]]`\cdot `life_exp`$$
+$$\widehat{\text{fert rate}} = b_0 + b_1\cdot x = `r b_int[[1]]` + `r b_int[[5]]`\cdotx$$
 
 
 which is the equation of the regression line in Figure \@ref(fig:numxcatxplot1) for low income countries. The regression has an intercept of `r b_int[[1]]` and a slope of `r b_int[[5]]`. Since life expectancy is greater than zero for all countries, the intercept has not practical interpretation and we only need it to produce the most appropriate line. The interpretation of the slope is the following: for `Low income` countries, every additional year of life expectancy reduces the average fertility rate by `r abs(b_int[[5]])` units. 
@@ -317,7 +321,7 @@ As discussed earlier, the intercept and slope for all the other income groups is
 
 $$\widehat{y} = \widehat{\text{fert rate}} = b_0 + b_1x + b_{04} + b_{14}x = (b_0 + b_{04} ) + (b_1+b_{14})x $$
 
-The intercept is $b_0 + b_{04}$ = `(Intercept) + incomeHigh income` = `r b_int[[1]]` +(`r b_int[[4]]`) = `r b_int[[1]]+b_int[[4]]` and the slope for these `High income` countries is `life_exp + life_exp:incomeHigh income` $b_1 + b_{14}=  `r b_int[[5]]` + `r b_int[[8]]` = `r b_int[[5]]+b_int[[8]]`$. For `High income` countries, every additional year of life expectancy reduces the average fertility rate by `r abs(b_int[[5]]+b_int[[8]])` units.  The intercepts and slopes for other income levels are obtained similarly and are left as an exercise. 
+where $x$ is life expectancy, `life_exp`. The intercept is $b_0 + b_{04}$ = `(Intercept) + incomeHigh income` = `r b_int[[1]]` +(`r b_int[[4]]`) = `r b_int[[1]]+b_int[[4]]` and the slope for these `High income` countries is `life_exp + life_exp:incomeHigh income` $b_1 + b_{14}=  `r b_int[[5]]` + `r b_int[[8]]` = `r b_int[[5]]+b_int[[8]]`$. For `High income` countries, every additional year of life expectancy reduces the average fertility rate by `r abs(b_int[[5]]+b_int[[8]])` units.  The intercepts and slopes for other income levels are obtained similarly and are left as an exercise. 
 
 Since the life expectancy for `Low income` countries have a steeper slope than `High income` countries, one additional year of life expectancy will decrease fertility rate more for the low income group than for the high income group. This is consistent with our observation from Figure \@ref(fig:numxcatxplot1). When the associated effect of one variable *depends on the value of another variable* we say that there is an interaction effect. This is the reason why the regression slopes are different for different income groups.
 
@@ -369,14 +373,16 @@ model_no_int <- lm(fert_rate ~ life_exp + income, data = UN_data)
 # Get the coefficients of the model
 coef(model_no_int)
 ```
-```{r regtable-parallel, echo=FALSE, purl=FALSE}
+
+
+```{r regtable-parallel1, echo=FALSE, purl=FALSE}
 # Fit regression model:
 model_no_int <- lm(fert_rate ~ income + life_exp , data = UN_data)
 b_no_int <- round(coef(model_no_int),3)
 # Get the coefficients of the model
 lm_data1 <- data.frame("Coefficients" = c("b0", "b02", "b03", "b04", "b1"),"Values" = coefficients(model_no_int))
 lm_data1 |> 
-  kable(
+  kbl(
     digits = 3,
     caption = "Regression table for a model without interactions",
     booktabs = TRUE,
@@ -430,7 +436,7 @@ b_int <- round(coef(model_int),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b02", "b03", "b04", "b1", "b12", "b13", "b14"),"Values" = coefficients(model_int))
 lm_data |> 
-  kable(
+  kbl(
     digits = 3,
     caption = "Regression table for interaction model",
     booktabs = TRUE,
@@ -452,7 +458,11 @@ We can use these coefficient to obtain the fitted values and residuals for any g
 ```{r fittedtable, echo=FALSE, purl= FALSE}
 newpoints <- 
   get_regression_points(model_int, newdata = slice(UN_data, c(41, 102)))
-kable(newpoints)
+kbl(newpoints)|>
+  kable_styling(
+    font_size = ifelse(is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
 ```
 
 
@@ -491,7 +501,7 @@ regression_points
 regression_points <- get_regression_points(model_int)
 regression_points |>
   slice(1:10) |>
-  kable(
+  kbl(
     digits = 3,
     caption = "Regression points (First 10 out of 182 countries)" # ,
     #    booktabs = TRUE
@@ -554,7 +564,7 @@ credit_ch6 |> sample_n(size = 5)
 ```{r model3-data-preview, echo=FALSE, purl=FALSE}
 credit_ch6 |>
   sample_n(5) |>
-  kable(
+  kbl(
     digits = 3,
     caption = "Random sample of 5 credit card holders",
     booktabs = TRUE,
@@ -573,7 +583,14 @@ credit_ch6 |> select(debt, credit_limit, income) |> summary()
 ```
 
 ```{r, echo = FALSE}
-credit_ch6 |> select(debt, credit_limit, income) |> summary() |> kable()
+credit_ch6 |> 
+  select(debt, credit_limit, income) |> 
+  summary() |> 
+  kbl() |>
+  kable_styling(
+    font_size = ifelse(is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
 ```
 
 The mean and median credit card `debt` are \$520.01 and \$459.50, respectively. The first quartile for `debt` is 68.75; this means that 25% of card holders had debts of \$68.75 or less. Correspondingly, the mean and median credit card limit, `credit_limit`, are \$4,736 and \$4,622, respectively. Note also that the third quartile of `income` is 57.47; this means that 75% of card holders had incomes below \$57,470.
@@ -637,7 +654,7 @@ credit_ch6 |>
 credit_ch6 |>
   select(debt, credit_limit, income) |>
   cor() |>
-  kable(
+  kbl(
     digits = 3,
     caption = "Correlation coefficients between credit card debt, credit limit, and income",
     booktabs = TRUE,
@@ -663,7 +680,13 @@ credit_ch6 |> get_correlation(debt ~ 1000*income)
 ```
 
 ```{r, echo=FALSE}
-credit_ch6 |> get_correlation(debt ~ 1000*income)|> kable()
+credit_ch6 |> 
+  get_correlation(debt ~ 1000*income)|> 
+  kbl()|>
+  kable_styling(
+    font_size = ifelse(is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
 ```
 
 The correlation is exactly the same.
@@ -757,7 +780,7 @@ debt_model <- lm(debt ~ credit_limit + income, data = credit_ch6)
 credit_line <- get_regression_table(debt_model) |>
   pull(estimate)
 get_regression_table(debt_model) |>
-  kable(
+  kbl(
     digits = 3,
     caption = "Multiple regression table",
     booktabs = TRUE,
@@ -783,7 +806,11 @@ debt_model <- lm(debt ~ credit_limit + income, data = credit_ch6)
 b0 <- round(coef(debt_model),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b1", "b2"),"Values" = coefficients(debt_model))
-kable(lm_data)
+kbl(lm_data)|>
+  kable_styling(
+    font_size = ifelse(is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
 ```
 
 
@@ -792,7 +819,7 @@ kable(lm_data)
 
 We interpret the coefficients obtained. The `intercept` value is -\$385.179. If the range of values that the regressors could take include a `credit_limit` of \$0 and an `income` of \$0, the intercept would represents the average credit card debt for an individual with those levels of `credit_limit` and `income`. This is not the case in our data and the intercept has no practical interpretation; it is mainly used to determine where the plane should cut the $y$-intercept to produce the smallest sum of squared residuals. 
 
-Each slope in a multiple linear regression is considered a partial slope and represents the marginal or additional contribution of a regressor when it is added to a model that already contains other regressor.  This partial slope is typically different than the slope we may find in a simple linear regression for the same regressor. The reason is that, typically, regressors are correlated, so when one regressor is part of a model, indirectly is also explaining part of the other regressor. When the second regressor is added to the model, it helps explain only changes in the response that were not already accounted for by the first regressor. For example, the slope for `credit_limit` is  \$0.264. Keeping `income` fixed to some value, for an additional increase of credit limit by one dollar the credit debt increases, on average, by \$0.264. Similarly the slope of `income` is -\$7.66. Keeping `credit_limit` fixed to some level, for a one unit increase of `income` (\$1000 in actual income), there is an associated decrease of \$7.66 in credit card debt, on average.
+Each slope in a multiple linear regression is considered a partial slope and represents the marginal or additional contribution of a regressor when it is added to a model that already contains other regressors.  This partial slope is typically different than the slope we may find in a simple linear regression for the same regressor. The reason is that, typically, regressors are correlated, so when one regressor is part of a model, indirectly is also explaining part of the other regressor. When the second regressor is added to the model, it helps explain only changes in the response that were not already accounted for by the first regressor. For example, the slope for `credit_limit` is  \$0.264. Keeping `income` fixed to some value, for an additional increase of credit limit by one dollar the credit debt increases, on average, by \$0.264. Similarly the slope of `income` is -\$7.66. Keeping `credit_limit` fixed to some level, for a one unit increase of `income` (\$1000 in actual income), there is an associated decrease of \$7.66 in credit card debt, on average.
 
 Putting these results together, the equation of the regression plane that gives us fitted values $\widehat{y}$ = $\widehat{\text{debt}}$ is:
 
@@ -820,7 +847,11 @@ debt_model1 <- lm(debt ~ income, data = credit_ch6)
 b01 <- round(coef(debt_model1),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0'", "b2'"),"Values" = coefficients(debt_model1))
-kable(lm_data)
+kbl(lm_data)|>
+  kable_styling(
+    font_size = ifelse(is_latex_output(), 10, 16),
+    latex_options = c("hold_position")
+  )
 ```
 The regression line is given by
 
@@ -838,7 +869,7 @@ $$
 &= -385.179 + 0.263 \cdot x_1 - 7.663 \cdot x_2
 \end{aligned}
 $$
-So the slope for income in a simple linear regression is 6.048 and the slope for income in a multiple linear regression is $-7.663$. As surprising as these results may appear at first, they are perfectly valid and consistent as the slope of a simple linear regression has a different role than the partial slope of a multiple linear regression. The latter is the additional effect of `income` in `debt` when `credit_limit` has already been taken into account. 
+So the slope for income in a simple linear regression is 6.048 and the slope for income in a multiple linear regression is $-7.663$. As surprising as these results may appear at first, they are perfectly valid and consistent as the slope of a simple linear regression has a different role than the partial slope of a multiple linear regression. The latter is the additional effect of `income` in `debt` when `credit_limit` has already been taken into account.
 
 ```{block, type="learncheck", purl=FALSE}
 \vspace{-0.15in}
@@ -874,7 +905,7 @@ set.seed(76)
 regression_points <- get_regression_points(debt_model)
 regression_points |>
   slice(1:10) |>
-  kable(
+  kbl(
     digits = 3,
     caption = "Regression points (First 10 credit card holders out of 400)",
     booktabs = TRUE,
