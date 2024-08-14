@@ -109,6 +109,7 @@ We first look at the raw data values by either looking at `UN_data` using RStudi
 ```{r}
 glimpse(UN_data)
 ```
+The variable `country` contains all the UN member states. R reads this variable as character, `<chr>`, and beyond the country identification it will not be needed for the analysis. The variables life expectancy, `life_exp`, and fertility rate, `fert_rate`, are numerical, and the variable income, `income`, is categorical. In R, categorical variables are called factors and the categories are factor levels.
 
 ```{r echo=FALSE, purl=FALSE}
 # This code is used for dynamic non-static in-line text output purposes
@@ -121,6 +122,7 @@ We also display a random sample of 5 rows of the `r n_UN_data` rows correspondin
 UN_data |> sample_n(size = 5)
 ```
 ```{r model4-data-preview, echo=FALSE, purl=FALSE}
+set.seed(20)
 UN_data |>
   sample_n(5) |>
   kbl(
@@ -144,7 +146,7 @@ UN_data |>
 ```
 
 
-Recall that each row in `UN_data` represents a particular country or UN member state. The `summary()` function shows a summary for each variable in the data set and we perform this analysis using the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `summary()` function provides the minimum value observed, `Min.`, the first quartile, `1st Qu.`, second quartile or median, `Median`, third quartile, `3rd Qu.`, and maximum value observed, `Max.`. These five numbers together are often called the five-number summary. In addition, the `summary()` function provides the average or mean, `Mean`. We have encounter the mean before, but we briefly discussed what the quartiles now. The first quartile, `1st Qu.`, indicates that one fourth of the data is less than or equal to this value, the median or second quartile, `Median`, show that one half (two quarts) of the observations are less than or equal to this valueIf some numerical summary if the varaibelWe have no missing data, that there are `r UN_data |> filter(income == "Low income") |> nrow()` UN member states. The variable `income` is categorical with four categories; `Low Income`, `Lower middle income`, `Upper middle income`, and `High income` states. The summary also provides the number of states for each category; for example, there are `r UN_data |> filter(income == "High income") |> nrow()` `High Income` states. The average life expectancy is `r UN_data$life_exp |> mean() |> round(digits = 2)` years. The first quartile, `1st Qu.`, state that one quarter of the UN member states, or 25%, have life expectancy less than 69.36 years. The first quartile is also called the 25th percentile
+Recall that each row in `UN_data` represents a particular country or UN member state. The `summary()` function shows a summary for each variable in the data set and we perform this analysis using the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `summary()` function provides the five-number summary and also shows the mean. As an illustration, observe that the average life expectancy is `r UN_data$life_exp |> mean() |> round(digits = 2)` years. The first quartile, `1st Qu.`, shows that 25% of the UN member states have life expectancy less than 69.36 years. Similarly, there are four categories or factor levels for `income`: `Low Income`, `Lower middle income`, `Upper middle income`, and `High income`. The summary also provides the number of states for each factor level; for example, there are `r UN_data |> filter(income == "High income") |> nrow()` `High Income` states.
 
 Furthermore, we can compute the correlation coefficient between our two numerical variables: `life_exp` and `fert_rate`. Recall from Subsection \@ref(model1EDA) that correlation coefficients only exist between numerical variables. We observe that they are "strongly negatively" correlated.
 
