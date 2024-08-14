@@ -311,7 +311,7 @@ lm_data |>
 We can match the coefficients with the values obtained: the fitted fertility rate $\widehat{y} = \widehat{\text{fert rate}}$ for `Low income` countries is
 
 
-$$\widehat{\text{fert rate}} = b_0 + b_1\cdot x = `r b_int[[1]]` + `r b_int[[5]]`\cdotx$$
+$$\widehat{\text{fert rate}} = b_0 + b_1\cdot x = `r b_int[[1]]` + `r b_int[[5]]`\cdot x$$
 
 
 which is the equation of the regression line in Figure \@ref(fig:numxcatxplot1) for low income countries. The regression has an intercept of `r b_int[[1]]` and a slope of `r b_int[[5]]`. Since life expectancy is greater than zero for all countries, the intercept has not practical interpretation and we only need it to produce the most appropriate line. The interpretation of the slope is the following: for `Low income` countries, every additional year of life expectancy reduces the average fertility rate by `r abs(b_int[[5]])` units. 
@@ -921,7 +921,7 @@ regression_points |>
 
 
 <!--
-I've added the correlation property of invariance under linear transformations in the main text. The Simpson's Paradox example presenting by separating the data in 4 groups based on credit limit should be moved to an appendix.
+I've added the correlation property of invariance under linear transformations in the main text. The Simpson's Paradox example presenting by separating the data in 4 groups based on credit limit should be moved to an appendix. AV 8/13/24
 -->
 
 
