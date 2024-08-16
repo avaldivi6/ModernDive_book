@@ -142,14 +142,9 @@ The data on the `r n_countries` current UN member states (as of 2024) can be fou
 
 ```{r}
 UN_data_ch5 <- un_member_states_2024 |>
-  select(iso, fert_rate, life_expectancy_2022, obes_rate) |> 
-  na.omit()
-
-UN_data_ch5 <- un_member_states_2024 |>
-  select(iso, life_expectancy_2022, fertility_rate_2022, obes_rate)|>
-  na.omit()|>
-  rename(life_exp = life_expectancy_2022, fert_rate = fertility_rate_2022, 
-         obesity_rate_2016 = obes_rate)|>
+  select(iso, life_exp = life_expectancy_2022, 
+         fert_rate = fertility_rate_2022, 
+         obes_rate = obesity_rate_2016)|>
   na.omit()
 ```
 

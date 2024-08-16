@@ -55,14 +55,14 @@ library(patchwork)
 
 
 
+## The Linear Model
 
-
-## Regression refresher
+### Linear Regression revisited
 
 Before jumping into inference for regression, let's remind ourselves of the University of Texas Austin teaching evaluations analysis in Section \@ref(model1). 
 
 
-### Teaching evaluations analysis
+#### UN member states
 
 Recall using simple linear regression \index{regression!simple linear} we modeled the relationship between
 
@@ -165,7 +165,51 @@ where $b_0$ is the fitted intercept and $b_1$ is the fitted slope for `bty_avg`.
 Thus, the slope value quantifies the relationship between the $y$ variable `score` and the $x$ variable `bty_avg`. We also discussed the intercept value of $b_0$ = `r b0` and its lack of practical interpretation, since the range of possible "beauty" scores does not include 0. 
 
 
-### Sampling scenario
+
+### The linear model
+
+We introduce a mathematical model to represent
+
+We say that there is a linear relationship between $Y$ and $X$ if the response variable, $Y$, can be expressed as 
+\begin{equation}
+\label{mean}
+Y = \beta_0 + \beta_1 X  + \epsilon
+\end{equation} 
+
+where $\beta_0$ (intercept) and $\beta_1$ (slope) are the parameters of the model, $X$ is the value of the explanatory variable and $\epsilon$ is called the random error and it is a random variable that represents a variation of the response $Y$ not explained by this model. Since it is a random variable, we assume that it has expected value 0 and variance equal to $\sigma^2$ which is another parameter of the model.
+
+Observe that $\beta_0$, $\beta_1$ are unknown but fixed parameters. $X$ is the value of the explanatory variable and when it is observed, it is also a constant, therefore $\beta_0 + \beta_1 X$ is a constant value. On the other hand $\epsilon$ is a random variable, so $Y$ is the sum of a constant and a random variable and is, itself, a random variable.
+
+
+
+
+
+Don't forget that $(Y|X=x)$ is a random variable.
+
+While the expected value is fully defined by the value of $X$, the random variable $(Y|X=x)$ is not as there is some variation of potential values that $Y$ could take. We assume, however, that this variation is constant for any value of $X$ and take this into account by introducing the variance function:
+\begin{equation}
+\label{var}
+Var(Y|X=x) = \sigma^2
+\end{equation}
+
+where $\sigma^2$ is a scalar that represent this constant variance for any value $x$ in the range of $X$. When we focus in a single explanatory variable as in , we refer to \eqref{mean} and \eqref{var} as the __simple linear regression__ model because only one predictor $X$ is included.
+
+Equivalently, a __multiple linear regression__ model relates $Y$ to $p \ge 2$ predictors, with mean function
+$$E(Y|X_1=x_1, \dots, X_p = x_p) = \beta_0 + \beta_1 x_1 + \dots  + \beta_p x_p$$
+and variance function $$Var(Y|X_1=x_1, \dots, X_p = x_p) = \sigma^2.$$
+
+Many key characteristics apply to both simple and multiple linear regression. 
+
+
+
+
+### Estimating the regression coefficients from data
+
+### The method of ordinary least squares (OLS)
+
+#### Properties of OLS
+
+#### Residuals revisited
 
 Let's now revisit this study in terms of the terminology and notation related to sampling we studied in Subsection \@ref(terminology-and-notation). 
 
@@ -218,7 +262,44 @@ Since we are now viewing our fitted slope $b_1$ and fitted intercept $b_0$ as *p
 
 
 
-## Interpreting regression tables {#regression-interp}
+
+## Theory-based inference for regression {#theory-regression}
+
+Recall in Subsection \@ref(regression-table-computation) when we interpreted the regression table in Table \@ref(tab:regtable-11), we mentioned that R does not compute its values using simulation-based methods for constructing confidence intervals and conducting hypothesis tests as we did in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing) using the `infer` package. Rather, R uses a theory-based approach using mathematical formulas, much like the theory-based confidence intervals you saw in Subsection \@ref(theory-ci) and the theory-based hypothesis tests you saw in Subsection \@ref(theory-hypo). These formulas were derived in a time when computers didn't exist, so it would've been incredibly labor intensive to run extensive simulations.
+
+In particular, much like the formula for the standard error for the sample proportion $\widehat{p}$ we saw in Subsection \@ref(theory-se) and the formula for the standard error for the difference in sample means $\overline{x}_1 - \overline{x}_2$ we saw in Subsection \@ref(theory-hypo), there is a formula for the standard error of the fitted slope $b_1$:
+
+$$\text{SE}_{b_1} = \dfrac{\dfrac{s_y}{s_x} \cdot \sqrt{1-r^2}}{\sqrt{n-2}}$$
+
+<!-- Source: https://stats.stackexchange.com/questions/342632/how-to-understand-se-of-regression-slope-equation -->
+
+As with many formulas in statistics, there's a lot going on here, so let's first break down what each symbol represents. First $s_x$ and $s_y$ are the *sample standard deviations* of the explanatory variable `bty_avg` and the response variable `score`, respectively. Second, $r$ is the sample *correlation coefficient* between `score` and `bty_avg`. This was computed as `r cor(evals_ch5$score, evals_ch5$bty_avg) %>% round(3)` in Chapter \@ref(regression). Lastly, $n$ is the number of pairs of points in the `evals_ch5` data frame, here `r n_evals_ch5`.
+
+To put this formula into words, the standard error of $b_1$ depends on the relationship between the variability of the response variable and the variability of the explanatory variable as measured in the $s_y / s_x$ term. Next, it looks into how the two variables relate to each other in the $\sqrt{1-r^2}$ term. 
+
+However, the most important observation to make in the previous formula is that there is an $n - 2$ in the denominator. In other words, as the sample size $n$ increases, the standard error $\text{SE}_{b_1}$ decreases. Just as we demonstrated in Subsection \@ref(moral-of-the-story) when we used shovels with $n$ = 25, 50, and 100 slots, the amount of sampling variation of the fitted slope $b_1$ will depend on the sample size $n$. In particular, as the sample size increases, both the sampling and bootstrap distributions narrow and the standard error $\text{SE}_{b_1}$ decreases. Hence, our estimates of $b_1$ for the true population slope $\beta_1$ get more and more *precise*. 
+
+R then uses this formula for the standard error of $b_1$ in the third column of the regression table and subsequently to construct 95% confidence intervals. But what about the hypothesis test? Much like with our theory-based hypothesis test in Subsection \@ref(theory-hypo), R uses the following *$t$-statistic* as the test statistic for hypothesis testing:
+
+$$
+t = \dfrac{ b_1 - \beta_1}{ \text{SE}_{b_1}}
+$$
+
+And since the null hypothesis $H_0: \beta_1 = 0$ is assumed during the hypothesis test, the $t$-statistic becomes
+
+$$
+t = \dfrac{ b_1 - 0}{ \text{SE}_{b_1}} = \dfrac{ b_1 }{ \text{SE}_{b_1}}
+$$
+
+What are the values of $b_1$ and $\text{SE}_{b_1}$? They are in the `estimate` and `std_error` column of the regression table in Table \@ref(tab:regtable-11). Thus the value of `r t1` in the table is computed as `r b1`/`r se1` = `r (b1/se1) %>% round(3)`. Note there is a difference due to some rounding error here. 
+
+Lastly, to compute the $p$-value, we need to compare the observed test statistic of `r t1` to the appropriate null distribution. Recall from Section \@ref(understanding-ht), that a null distribution is the sampling distribution of the test statistic *assuming the null hypothesis $H_0$ is true*. Much like in our theory-based hypothesis test in Subsection \@ref(theory-hypo), it can be mathematically proven that this distribution is a $t$-distribution with degrees of freedom equal to $df = n - 2 = `r n_evals_ch5` - 2 = `r n_evals_ch5 - 2`$.
+
+Don't worry if you're feeling a little overwhelmed at this point. There is a lot of background theory to understand before you can fully make sense of the equations for theory-based methods. That being said, theory-based methods and simulation-based methods for constructing confidence intervals and conducting hypothesis tests often yield consistent results. As mentioned before, in our opinion, two large benefits of simulation-based methods over theory-based are that (1) they are easier for people new to statistical inference to understand, and (2) they also work in situations where theory-based methods and mathematical formulas don't exist. 
+
+
+
+### Inference Overview {#regression-interp}
 
 We've so far focused only on the two leftmost columns of the regression table in Table \@ref(tab:regtable-11): `term` and `estimate`. Let's now shift our attention to the remaining columns: `std_error`, `statistic`, `p_value`, `lower_ci` and `upper_ci` in Table \@ref(tab:score-model-part-deux).
 
@@ -239,7 +320,7 @@ get_regression_table(score_model) %>%
 Given the lack of practical interpretation for the fitted intercept $b_0$, in this section we'll focus only on the second row of the table corresponding to the fitted slope $b_1$. We'll first interpret the `std_error`, `statistic`, `p_value`, `lower_ci` and `upper_ci` columns. Afterwards in the upcoming Subsection \@ref(regression-table-computation), we'll discuss how R computes these values. 
 
 
-### Standard error {#regression-se}
+#### Standard error {#regression-se}
 
 The third column of the regression table in Table \@ref(tab:regtable-11) `std_error` corresponds to the *standard error* of our estimates. Recall the definition of **standard error** \index{standard error} we saw in Subsection \@ref(sampling-definitions):
 
@@ -261,7 +342,7 @@ The *standard error* of $b_1$ similarly quantifies how much variation in the fit
 In Section \@ref(infer-regression), we'll perform a simulation using the `infer` package to construct the bootstrap distribution for $b_1$ in this case. Recall from Subsection \@ref(bootstrap-vs-sampling) that the bootstrap distribution is an *approximation* to the sampling distribution in that they have a similar shape. Since they have a similar shape, they have similar *standard errors*. However, unlike the sampling distribution, the bootstrap distribution is constructed from a *single* sample, which is a practice more aligned with what's done in real life. 
 
 
-### Test statistic {#regression-test-statistic}
+#### Test statistic {#regression-test-statistic}
 
 The fourth column of the regression table in Table \@ref(tab:regtable-11) `statistic` corresponds to a *test statistic* relating to the following *hypothesis test*:
 
@@ -286,7 +367,7 @@ Recall our "hypothesized universe" of no gender discrimination we *assumed* in o
 The `statistic` column in the regression table is a tricky one, however. It corresponds to a standardized *t-test statistic*, much like the *two-sample $t$ statistic* we saw in Subsection \@ref(theory-hypo) where we used a theory-based method for conducting hypothesis tests. In both these cases, the *null distribution* can be mathematically proven to be a *$t$-distribution*. Since such test statistics are tricky for individuals new to statistical inference to study, we'll skip this and jump into interpreting the $p$-value. If you're curious, we have included a discussion of this standardized *t-test statistic* in Subsection \@ref(theory-regression).
 
 
-### p-value
+#### p-value
 
 The fifth column of the regression table in Table \@ref(tab:regtable-11) `p_value` corresponds to the *p-value* of the hypothesis test $H_0: \beta_1 = 0$ versus  $H_A: \beta_1 \neq 0$. 
 
@@ -303,7 +384,7 @@ More precisely, however, the $p$-value corresponds to how extreme the observed t
 An extra caveat here is that the results of this hypothesis test are only valid if certain "conditions for inference for regression" are met, which we'll introduce shortly in Section \@ref(regression-conditions).
 
 
-### Confidence interval
+#### Confidence interval
 
 The two rightmost columns of the regression table in Table \@ref(tab:regtable-11) (`lower_ci` and `upper_ci`) correspond to the endpoints of the 95% *confidence interval* for the population slope $\beta_1$. Recall our analogy of "nets are to fish" what "confidence intervals are to population parameters" from Section \@ref(ci-build-up). The resulting 95% confidence interval for $\beta_1$ of (`r lower1`, `r upper1`) can be thought of as a range of plausible values for the population slope $\beta_1$ of the linear relationship between teaching and "beauty" scores. 
 
@@ -347,7 +428,7 @@ This closely matches the $(`r lower1`, `r upper1`)$ confidence interval in the l
 Much like hypothesis tests, however, the results of this confidence interval also are only valid if the "conditions for inference for regression" to be discussed in Section \@ref(regression-conditions) are met.
 
 
-### How does R compute the table? {#regression-table-computation}
+#### How does R compute the table? {#regression-table-computation}
 
 Since we didn't perform the simulation to get the values of the standard error, test statistic, $p$-value, and endpoints of the 95% confidence interval in Table \@ref(tab:regtable-11), you might be wondering how were these values computed. What did R do behind the scenes? Does R run simulations like we did using the `infer` package in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing) on confidence intervals and hypothesis testing?
 
@@ -359,23 +440,27 @@ In Section \@ref(infer-regression), we'll go over a simulation-based approach to
 
 
 
-## Conditions for inference for regression {#regression-conditions}
+
+
+
+### Conditions for inference for regression {#regression-conditions}
+
 
 Recall in Subsection \@ref(se-method) we stated that we could only use the standard-error-based method for constructing confidence intervals if the bootstrap distribution was bell shaped. Similarly, there are certain conditions that need to be met in order for the results of our hypothesis tests and confidence intervals we described in Section \@ref(regression-interp) to have valid meaning. These conditions must be met for the assumed underlying mathematical and probability theory to hold true. 
 
 For inference for regression, there are four conditions that need to be met. Note the first four letters of these conditions are highlighted in bold in what follows: **LINE**. This can serve as a nice reminder of what to check for whenever you perform linear regression. \index{regression!conditions for inference (LINE)}
 
 1. **L**inearity of relationship between variables
-1. **I**ndependence of the residuals
-1. **N**ormality of the residuals
-1. **E**quality of variance of the residuals
+1. **I**ndependence of the error terms
+1. **N**ormality of the error terms
+1. **E**quality of variance of the error terms
 
 Conditions **L**, **N**, and **E** can be verified through what is known as a *residual analysis*.\index{residual analysis} Condition **I** can only be verified through an understanding of how the data was collected. 
 
 In this section, we'll go over a refresher on residuals, verify whether each of the four **LINE** conditions hold true, and then discuss the implications. 
 
 
-### Residuals refresher
+#### Residuals refresher
 
 Recall our definition of a residual from Subsection \@ref(model1points): it is the *observed value* minus the *fitted value* denoted by $y - \widehat{y}$. Recall that residuals can be thought of as the error or the "lack-of-fit" between the observed value $y$ and the fitted value $\widehat{y}$ on the regression line in Figure \@ref(fig:regline). In Figure \@ref(fig:residual-example), we illustrate one particular residual out of `r n_evals_ch5` using an arrow, as well as its corresponding observed and fitted values using a circle and a square, respectively.
 
@@ -420,7 +505,7 @@ regression_points
 A *residual analysis* is used to verify conditions **L**, **N**, and **E** and can be performed using appropriate data visualizations. While there are more sophisticated statistical approaches that can also be done, we'll focus on the much simpler approach of looking at plots.
 
 
-### Linearity of relationship
+#### Linearity of relationship
 
 The first condition is that the relationship between the outcome variable $y$ and the explanatory variable $x$ must be **L**inear. Recall the scatterplot in Figure \@ref(fig:regline) where we had the explanatory variable $x$ as "beauty" score and the outcome variable $y$ as teaching score. Would you say that the relationship between $x$ and $y$ is linear? It's hard to say because of the scatter of the points about the line. In the authors' opinions, we feel this relationship is "linear enough."
 
@@ -441,7 +526,7 @@ evals_ch5 %>%
 ```
 
 
-### Independence of residuals
+#### Independence of residuals
 
 The second condition is that the residuals must be **I**ndependent. In other words, the different observations in our data must be independent of one another.
 
@@ -459,7 +544,7 @@ In this case, we say there exists *dependence* between observations. The first f
 So in this case, the independence condition is not met. What does this mean for our analysis? We'll address this in Subsection \@ref(what-is-the-conclusion) coming up, after we check the remaining two conditions.
 
 
-### Normality of residuals
+#### Normality of residuals
 
 The third condition is that the residuals should follow a **N**ormal distribution. Furthermore, the center of this distribution should be 0. In other words, sometimes the regression model will make positive errors: $y - \widehat{y} > 0$. Other times, the regression model will make equally negative errors: $y - \widehat{y} < 0$. However, *on average* the errors should equal 0 and their shape should be similar to that of a bell.
 
@@ -509,7 +594,7 @@ if (is_latex_output()) {
 ```
 
 
-### Equality of variance
+#### Equality of variance
 
 The fourth and final condition is that the residuals should exhibit **E**qual variance across all values of the explanatory variable $x$. In other words, the value and spread of the residuals should not depend on the value of the explanatory variable $x$.  
 
@@ -544,7 +629,7 @@ evals_ch5 %>%
 Observe how the spread of the residuals increases as the value of $x$ increases. This is a situation known as \index{heteroskedasticity} *heteroskedasticity*. Any inference for regression based on a model yielding such a pattern in the residuals would not be valid. 
 
 
-### What's the conclusion? {#what-is-the-conclusion}
+#### What's the conclusion? {#what-is-the-conclusion}
 
 Let's list our four conditions for inference for regression again and indicate whether or not they were satisfied in our analysis:
 
@@ -593,7 +678,7 @@ In this section, we'll use the simulation-based methods you previously learned i
 * Conduct a hypothesis test of $H_0: \beta_1 = 0$ versus $H_A: \beta_1 \neq 0$ using a permutation test. We did this previously in Sections \@ref(ht-infer) with the `promotions` data and \@ref(ht-case-study) with the `movies_sample` IMDb data.
 
 
-### Confidence interval for slope
+### Confidence interval for estimators
 
 We'll construct a 95% confidence interval for $\beta_1$ using the `infer` workflow outlined in Subsection \@ref(infer-workflow). Specifically, we'll first construct the bootstrap distribution for the fitted slope $b_1$ using our single sample of `r n_evals_ch5` courses: 
 
@@ -651,6 +736,8 @@ The resulting percentile-based 95% confidence interval for $\beta_1$ of (`r perc
 
 #### Standard error method {-}
 
+#### Bias Correction Acceleration method (BCA)
+
 Since the bootstrap distribution in Figure \@ref(fig:bootstrap-distribution-slope) appears to be roughly bell-shaped, we can also construct a 95% confidence interval for $\beta_1$ using the standard error method. 
 
 In order to do this, we need to first compute the fitted slope $b_1$, which will act as the center of our standard error-based confidence interval. While we saw in the regression table in Table \@ref(tab:regtable-11) that this was $b_1$ = `r b1`, we can also use the `infer` pipeline with the `generate()` step removed to calculate it:
@@ -672,7 +759,7 @@ se_ci
 
 The resulting standard error-based 95% confidence interval for $\beta_1$ of $(`r se_ci[["lower_ci"]]`, `r se_ci[["upper_ci"]]`)$ is slightly different than the confidence interval in the regression Table \@ref(tab:regtable-11) of $(`r lower1`, `r upper1`)$.
 
-#### Comparing all three {-}
+#### Comparing different methods {-}
 
 Let's compare all three confidence intervals in Figure \@ref(fig:bootstrap-distribution-slope-CI), where the percentile-based confidence interval is marked with solid lines, the standard error based confidence interval is marked with dashed lines, and the theory-based confidence interval (`r lower1`, `r upper1`) from the regression table in Table \@ref(tab:regtable-11) is marked with dotted lines. 
 
@@ -699,7 +786,7 @@ visualize(bootstrap_distn_slope) +
 Observe that all three are quite similar! Furthermore, none of the three confidence intervals for $\beta_1$ contain 0 and are entirely located above 0. This is suggesting that there is in fact a meaningful positive relationship between teaching and "beauty" scores.
 
 
-### Hypothesis test for slope
+### Hypothesis test for estimators
 
 Let's now conduct a hypothesis test of $H_0: \beta_1 = 0$ vs. $H_A: \beta_1 \neq 0$. We will use the `infer` package, which follows the hypothesis testing paradigm in the "There is only one test" diagram in Figure \@ref(fig:htdowney).  
 
@@ -779,7 +866,9 @@ When the conditions for inference for regression are met and the null distributi
 ```
 
 
+#### Intercept
 
+#### Slope
 
 
 ## Conclusion {#inference-conclusion}
@@ -797,41 +886,6 @@ To conclude this chapter, we'll be investigating how regression relates to two d
 
 
 -->
-
-
-### Theory-based inference for regression {#theory-regression}
-
-Recall in Subsection \@ref(regression-table-computation) when we interpreted the regression table in Table \@ref(tab:regtable-11), we mentioned that R does not compute its values using simulation-based methods for constructing confidence intervals and conducting hypothesis tests as we did in Chapters \@ref(confidence-intervals) and \@ref(hypothesis-testing) using the `infer` package. Rather, R uses a theory-based approach using mathematical formulas, much like the theory-based confidence intervals you saw in Subsection \@ref(theory-ci) and the theory-based hypothesis tests you saw in Subsection \@ref(theory-hypo). These formulas were derived in a time when computers didn't exist, so it would've been incredibly labor intensive to run extensive simulations.
-
-In particular, much like the formula for the standard error for the sample proportion $\widehat{p}$ we saw in Subsection \@ref(theory-se) and the formula for the standard error for the difference in sample means $\overline{x}_1 - \overline{x}_2$ we saw in Subsection \@ref(theory-hypo), there is a formula for the standard error of the fitted slope $b_1$:
-
-$$\text{SE}_{b_1} = \dfrac{\dfrac{s_y}{s_x} \cdot \sqrt{1-r^2}}{\sqrt{n-2}}$$
-
-<!-- Source: https://stats.stackexchange.com/questions/342632/how-to-understand-se-of-regression-slope-equation -->
-
-As with many formulas in statistics, there's a lot going on here, so let's first break down what each symbol represents. First $s_x$ and $s_y$ are the *sample standard deviations* of the explanatory variable `bty_avg` and the response variable `score`, respectively. Second, $r$ is the sample *correlation coefficient* between `score` and `bty_avg`. This was computed as `r cor(evals_ch5$score, evals_ch5$bty_avg) %>% round(3)` in Chapter \@ref(regression). Lastly, $n$ is the number of pairs of points in the `evals_ch5` data frame, here `r n_evals_ch5`.
-
-To put this formula into words, the standard error of $b_1$ depends on the relationship between the variability of the response variable and the variability of the explanatory variable as measured in the $s_y / s_x$ term. Next, it looks into how the two variables relate to each other in the $\sqrt{1-r^2}$ term. 
-
-However, the most important observation to make in the previous formula is that there is an $n - 2$ in the denominator. In other words, as the sample size $n$ increases, the standard error $\text{SE}_{b_1}$ decreases. Just as we demonstrated in Subsection \@ref(moral-of-the-story) when we used shovels with $n$ = 25, 50, and 100 slots, the amount of sampling variation of the fitted slope $b_1$ will depend on the sample size $n$. In particular, as the sample size increases, both the sampling and bootstrap distributions narrow and the standard error $\text{SE}_{b_1}$ decreases. Hence, our estimates of $b_1$ for the true population slope $\beta_1$ get more and more *precise*. 
-
-R then uses this formula for the standard error of $b_1$ in the third column of the regression table and subsequently to construct 95% confidence intervals. But what about the hypothesis test? Much like with our theory-based hypothesis test in Subsection \@ref(theory-hypo), R uses the following *$t$-statistic* as the test statistic for hypothesis testing:
-
-$$
-t = \dfrac{ b_1 - \beta_1}{ \text{SE}_{b_1}}
-$$
-
-And since the null hypothesis $H_0: \beta_1 = 0$ is assumed during the hypothesis test, the $t$-statistic becomes
-
-$$
-t = \dfrac{ b_1 - 0}{ \text{SE}_{b_1}} = \dfrac{ b_1 }{ \text{SE}_{b_1}}
-$$
-
-What are the values of $b_1$ and $\text{SE}_{b_1}$? They are in the `estimate` and `std_error` column of the regression table in Table \@ref(tab:regtable-11). Thus the value of `r t1` in the table is computed as `r b1`/`r se1` = `r (b1/se1) %>% round(3)`. Note there is a difference due to some rounding error here. 
-
-Lastly, to compute the $p$-value, we need to compare the observed test statistic of `r t1` to the appropriate null distribution. Recall from Section \@ref(understanding-ht), that a null distribution is the sampling distribution of the test statistic *assuming the null hypothesis $H_0$ is true*. Much like in our theory-based hypothesis test in Subsection \@ref(theory-hypo), it can be mathematically proven that this distribution is a $t$-distribution with degrees of freedom equal to $df = n - 2 = `r n_evals_ch5` - 2 = `r n_evals_ch5 - 2`$.
-
-Don't worry if you're feeling a little overwhelmed at this point. There is a lot of background theory to understand before you can fully make sense of the equations for theory-based methods. That being said, theory-based methods and simulation-based methods for constructing confidence intervals and conducting hypothesis tests often yield consistent results. As mentioned before, in our opinion, two large benefits of simulation-based methods over theory-based are that (1) they are easier for people new to statistical inference to understand, and (2) they also work in situations where theory-based methods and mathematical formulas don't exist. 
 
 
 ### Summary of statistical inference

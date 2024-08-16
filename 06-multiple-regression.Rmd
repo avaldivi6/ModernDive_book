@@ -85,10 +85,10 @@ In this section, we introduce one additional regressor to this model: the catego
 
 ### Exploratory data analysis {#model4EDA}
 
-The UN member states data frame is included in the `moderndive` package. To keep things simple, we `select()` only the subset of the variables needed here, and save this data in a new data frame called `UN_data`. Note that the variables used are different than the ones chosen in Chapter \@ref(regression). 
+The UN member states data frame is included in the `moderndive` package. To keep things simple, we `select()` only the subset of the variables needed here, and save this data in a new data frame called `UN_data_ch6`. Note that the variables used are different than the ones chosen in Chapter \@ref(regression). 
 
 ```{r}
-UN_data <- un_member_states_2024 |>
+UN_data_ch6 <- un_member_states_2024 |>
   select(country, life_expectancy_2022, fertility_rate_2022, income_group_2024)|>
   na.omit()|>
   rename(life_exp = life_expectancy_2022, fert_rate = fertility_rate_2022, 
@@ -104,26 +104,26 @@ Recall the three common steps in an exploratory data analysis we saw in Subsecti
 1. Computing summary statistics.
 1. Creating data visualizations.
 
-We first look at the raw data values by either looking at `UN_data` using RStudio's spreadsheet viewer or by using the `glimpse()` function from the `dplyr` package:
+We first look at the raw data values by either looking at `UN_data_ch6` using RStudio's spreadsheet viewer or by using the `glimpse()` function from the `dplyr` package:
 
 ```{r}
-glimpse(UN_data)
+glimpse(UN_data_ch6)
 ```
 The variable `country` contains all the UN member states. R reads this variable as character, `<chr>`, and beyond the country identification it will not be needed for the analysis. The variables life expectancy, `life_exp`, and fertility rate, `fert_rate`, are numerical, and the variable income, `income`, is categorical. In R, categorical variables are called factors and the categories are factor levels.
 
 ```{r echo=FALSE, purl=FALSE}
 # This code is used for dynamic non-static in-line text output purposes
-n_UN_data <- UN_data |> nrow()
+n_UN_data_ch6 <- UN_data_ch6 |> nrow()
 ```
 
-We also display a random sample of 5 rows of the `r n_UN_data` rows corresponding to different courses in Table \@ref(tab:model4-data-preview). Remember due to the random nature of the sampling, you will likely end up with a different subset of 5 rows.
+We also display a random sample of 5 rows of the `r n_UN_data_ch6` rows corresponding to different courses in Table \@ref(tab:model4-data-preview). Remember due to the random nature of the sampling, you will likely end up with a different subset of 5 rows.
 
 ```{r, eval=FALSE}
-UN_data |> sample_n(size = 5)
+UN_data_ch6 |> sample_n(size = 5)
 ```
 ```{r model4-data-preview, echo=FALSE, purl=FALSE}
 set.seed(20)
-UN_data |>
+UN_data_ch6 |>
   sample_n(5) |>
   kbl(
     digits = 3,
@@ -140,25 +140,25 @@ UN_data |>
 Life expectancy, `life_exp`, is an estimate of how many years, on average, a person in a given country is expected to live. Fertility rate, `fert_rate`, is the average number of live births per woman of childbearing age in a country. As we did in our exploratory data analyses in Sections \@ref(model1EDA) and  \@ref(model2EDA) from the previous chapter, we obtain summary statistics:
 
 ```{r, eval=FALSE}
-UN_data |> 
+UN_data_ch6 |> 
   select(life_exp, fert_rate, income) |> 
   summary()
 ```
 
 
-Recall that each row in `UN_data` represents a particular country or UN member state. The `summary()` function shows a summary for each variable in the data set and we perform this analysis using the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `summary()` function provides the five-number summary and also shows the mean. As an illustration, observe that the average life expectancy is `r UN_data$life_exp |> mean() |> round(digits = 2)` years. The first quartile, `1st Qu.`, shows that 25% of the UN member states have life expectancy less than 69.36 years. Similarly, there are four categories or factor levels for `income`: `Low Income`, `Lower middle income`, `Upper middle income`, and `High income`. The summary also provides the number of states for each factor level; for example, there are `r UN_data |> filter(income == "High income") |> nrow()` `High Income` states.
+Recall that each row in `UN_data_ch6` represents a particular country or UN member state. The `summary()` function shows a summary for each variable in the data set and we perform this analysis using the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `summary()` function provides the five-number summary and also shows the mean. As an illustration, observe that the average life expectancy is `r UN_data_ch6$life_exp |> mean() |> round(digits = 2)` years. The first quartile, `1st Qu.`, shows that 25% of the UN member states have life expectancy less than 69.36 years. Similarly, there are four categories or factor levels for `income`: `Low Income`, `Lower middle income`, `Upper middle income`, and `High income`. The summary also provides the number of states for each factor level; for example, there are `r UN_data_ch6 |> filter(income == "High income") |> nrow()` `High Income` states.
 
 Furthermore, we can compute the correlation coefficient between our two numerical variables: `life_exp` and `fert_rate`. Recall from Subsection \@ref(model1EDA) that correlation coefficients only exist between numerical variables. We observe that they are "strongly negatively" correlated.
 
 ```{r}
-UN_data |> 
+UN_data_ch6 |> 
   get_correlation(formula = fert_rate ~ life_exp)
 ```
 
 We are ready to create data visualizations, the last of our exploratory data analysis. Given that the outcome variable `fert_rate` and explanatory variable `life_exp` are both numerical, we can create a scatterplot to display their relationship, as we did in Figure \@ref(fig:numxplot1). But this time, we incorporate the categorical variable `income` by `mapping` this variable to the `color` aesthetic, thereby creating a *colored* scatterplot.
 
 ```{r eval=FALSE}
-ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income)) +
+ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income)) +
   geom_point() +
   labs(x = "Life Expectancy", y = "Fertility Rate", color = "Income group") +
   geom_smooth(method = "lm", se = FALSE)
@@ -166,12 +166,12 @@ ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income)) +
 
 ```{r numxcatxplot1, echo=FALSE, fig.cap="Colored scatterplot of relationship of teaching score and age.", fig.height=3.2, purl=FALSE, message=FALSE}
 if (is_html_output()) {
-  ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income)) +
+  ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income)) +
   geom_point() +
   labs(x = "Life Expectancy", y = "Fertility Rate", color = "Income group") +
   geom_smooth(method = "lm", se = FALSE)
 } else {
-  ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income)) +
+  ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income)) +
   geom_point() +
   labs(x = "Life Expectancy", y = "Fertility Rate", color = "Income group") +
   geom_smooth(method = "lm", se = FALSE) +
@@ -234,14 +234,14 @@ The average fertility rate for a `High middle income` country is $b_0 + b_3$. Ob
 We obtain the regression coefficients using the `lm()` function and the command `coef()` to obtain the coefficients of the linear regression:
 
 ```{r eval=FALSE}
-one_factor_model <- lm(fert_rate ~ income, data = UN_data)
+one_factor_model <- lm(fert_rate ~ income, data = UN_data_ch6)
 coef(one_factor_model)
 ```
 We present these results on a table with the mathematical notation used above:
 
 ```{r, echo=FALSE, purl=FALSE}
 # Fit regression model:
-lifeExp_model <- lm(fert_rate ~ income, data = UN_data)
+lifeExp_model <- lm(fert_rate ~ income, data = UN_data_ch6)
 b0 <- round(coef(lifeExp_model),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b2", "b3", "b4"),"Values" = coefficients(lifeExp_model))
@@ -285,7 +285,7 @@ As an illustration, we construct this multiple linear regression for the UN memb
 
 ```{r, eval=FALSE}
 # Fit regression model:
-model_int <- lm(fert_rate ~ life_exp * income, data = UN_data)
+model_int <- lm(fert_rate ~ life_exp * income, data = UN_data_ch6)
 
 # Get the coefficients of the model
 coef(model_int)
@@ -293,7 +293,7 @@ coef(model_int)
 
 ```{r regtable-interaction, echo=FALSE, purl=FALSE}
 # Fit regression model:
-model_int <- lm(fert_rate ~ income + life_exp + income:life_exp , data = UN_data)
+model_int <- lm(fert_rate ~ income + life_exp + income:life_exp , data = UN_data_ch6)
 b_int <- round(coef(model_int),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b02", "b03", "b04", "b1", "b12", "b13", "b14"),"Values" = coefficients(model_int))
@@ -335,14 +335,14 @@ We can simplify the previous model by removing the interaction effects. The mode
 To plot parallel slopes we use the function `geom_parallel_slopes()`\index{moderndive!geom\_parallel\_slopes()} that is included in the `moderndive` package. To use this function you need to load both the `ggplot2` and `moderndive` packages. Observe how the code is identical to the one use for the model with interactions in Figure \@ref(fig:numxcatxplot1), but now the `geom_smooth(method = "lm", se = FALSE)` layer is replaced with `geom_parallel_slopes(se = FALSE)`. 
 
 ```{r eval=FALSE}
-ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income)) +
+ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income)) +
   geom_point() +
   labs(x = "Life expectancy", y = "Fertility rate", color = "Income group") +
   geom_parallel_slopes(se = FALSE)
 ```
 
 ```{r numxcatx-parallel, echo=FALSE, fig.cap="Parallel slopes model of score with age and gender.", fig.height=3.5, purl=FALSE}
-par_slopes <- ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income)) +
+par_slopes <- ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income)) +
   geom_point() +
   labs(x = "Life expectancy", y = "Fertility rate", color = "Income group") +
   geom_parallel_slopes(se = FALSE)
@@ -370,7 +370,7 @@ To obtain the coefficients for this regression in R, the formula used is `y ~ x1
 
 ```{r, eval=FALSE}
 # Fit regression model:
-model_no_int <- lm(fert_rate ~ life_exp + income, data = UN_data)
+model_no_int <- lm(fert_rate ~ life_exp + income, data = UN_data_ch6)
 
 # Get the coefficients of the model
 coef(model_no_int)
@@ -379,7 +379,7 @@ coef(model_no_int)
 
 ```{r regtable-parallel1, echo=FALSE, purl=FALSE}
 # Fit regression model:
-model_no_int <- lm(fert_rate ~ income + life_exp , data = UN_data)
+model_no_int <- lm(fert_rate ~ income + life_exp , data = UN_data_ch6)
 b_no_int <- round(coef(model_no_int),3)
 # Get the coefficients of the model
 lm_data1 <- data.frame("Coefficients" = c("b0", "b02", "b03", "b04", "b1"),"Values" = coefficients(model_no_int))
@@ -400,12 +400,12 @@ lm_data1 |>
 In this model without interactions the slope is the same for all the regression lines, $b_1 = `r b_no_int[[5]]`$. Assuming that this model is correct, for any UN member state, every additional year of life expectancy reduces the average fertility rate by `r abs(b_no_int[[5]])` units, regardless of the income level of the member state. The intercept of the regression line for `Low income` member states is `r b_no_int[[1]]` while for `High income` member states is `r b_no_int[[1]]`+`r b_no_int[[4]]` = `r b_no_int[[1]]+b_no_int[[4]]`. The intercepts for other income levels are obtained similarly and are left as an exercise. We compare the visualizations for both models side-by-side in Figure \@ref(fig:numxcatx-comparison).
 
 ```{r numxcatx-comparison, fig.width=8, echo=FALSE, fig.cap="Comparison of interaction and parallel slopes models.", purl=FALSE, message=FALSE}
-interaction_plot <- ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income), show.legend = FALSE) +
+interaction_plot <- ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income), show.legend = FALSE) +
   geom_point() +
   labs(x = "Life expectancy", y = "Fertility rate", color = "Income group") +
   geom_smooth(method = "lm", se = FALSE) +
   theme(legend.position = "none")
-parallel_slopes_plot <- ggplot(UN_data,aes(x = life_exp, y = fert_rate, color = income), show.legend = FALSE) +
+parallel_slopes_plot <- ggplot(UN_data_ch6,aes(x = life_exp, y = fert_rate, color = income), show.legend = FALSE) +
   geom_point() +
   labs(x = "Life expectancy", y = "Fertility rate", color = "Income group") +
   geom_parallel_slopes(se = FALSE) +
@@ -433,7 +433,7 @@ In this subsection, we work with the regression model with interactions. The coe
 
 ```{r regtable-interaction1, echo=FALSE, purl=FALSE}
 # Fit regression model:
-model_int <- lm(fert_rate ~ income + life_exp + income:life_exp , data = UN_data)
+model_int <- lm(fert_rate ~ income + life_exp + income:life_exp , data = UN_data_ch6)
 b_int <- round(coef(model_int),2)
 # Get the coefficients of the model
 lm_data <- data.frame("Coefficients" = c("b0", "b02", "b03", "b04", "b1", "b12", "b13", "b14"),"Values" = coefficients(model_int))
@@ -459,7 +459,7 @@ We can use these coefficient to obtain the fitted values and residuals for any g
 
 ```{r fittedtable, echo=FALSE, purl= FALSE}
 newpoints <- 
-  get_regression_points(model_int, newdata = slice(UN_data, c(41, 102)))
+  get_regression_points(model_int, newdata = slice(UN_data_ch6, c(41, 102)))
 kbl(newpoints)|>
   kable_styling(
     font_size = ifelse(is_latex_output(), 10, 16),
@@ -475,10 +475,10 @@ We illustrate this in Figure \@ref(fig:fitted-values). The vertical line on the 
 
 ```{r fitted-values, echo=FALSE, fig.cap="Fitted values for two new professors.", fig.height=4.7, purl=FALSE, message=FALSE}
 newpoints <- 
-  get_regression_points(model_int, newdata = slice(UN_data, c(41, 102)))
+  get_regression_points(model_int, newdata = slice(UN_data_ch6, c(41, 102)))
 #Cyprus and Mali for comparison
 
-fitted_plot <- ggplot(UN_data, aes(x = life_exp, y = fert_rate, color = income), show.legend = FALSE) +
+fitted_plot <- ggplot(UN_data_ch6, aes(x = life_exp, y = fert_rate, color = income), show.legend = FALSE) +
   geom_point() +
   labs(x = "Life expectancy", y = "Fertility rate", title = "Interaction model") +
   geom_smooth(method = "lm", se = FALSE) +
@@ -493,7 +493,7 @@ if (is_html_output()) {
 }
 ```
 
-We can generalize the study of fitted values and residuals for all the countries in the `UN_data` data set, as shown in Table \@ref(tab:model4-points-table).
+We can generalize the study of fitted values and residuals for all the countries in the `UN_data_ch6` data set, as shown in Table \@ref(tab:model4-points-table).
 
 ```{r, eval=FALSE}
 regression_points <- get_regression_points(model_int)
