@@ -142,11 +142,11 @@ Life expectancy, `life_exp`, is an estimate of how many years, on average, a per
 ```{r, eval=FALSE}
 UN_data_ch6 |> 
   select(life_exp, fert_rate, income) |> 
-  summary()
+  tidy_summary()
 ```
 
 
-Recall that each row in `UN_data_ch6` represents a particular country or UN member state. The `summary()` function shows a summary for each variable in the data set and we perform this analysis using the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `summary()` function provides the five-number summary and also shows the mean. As an illustration, observe that the average life expectancy is `r UN_data_ch6$life_exp |> mean() |> round(digits = 2)` years. The first quartile, `1st Qu.`, shows that 25% of the UN member states have life expectancy less than 69.36 years. Similarly, there are four categories or factor levels for `income`: `Low Income`, `Lower middle income`, `Upper middle income`, and `High income`. The summary also provides the number of states for each factor level; for example, there are `r UN_data_ch6 |> filter(income == "High income") |> nrow()` `High Income` states.
+Recall that each row in `UN_data_ch6` represents a particular country or UN member state. The `tidy_summary()` function shows a summary for the numerical variables life expectancy, `life_exp`, fertility rate, `fert_rate`, and the categorical variable income group, `income`. When the variable is numerical, the `tidy_summary()` function provides the total number of observations in the data frame, the five-number summary, the mean, and the standard deviation. For example, the first row of our summary refers to life expectancy, `life_exp`. There are 182 observations for this variable, it is a numerical variable, and the first quartile, `Q1`, is 69.4; this means that the life expectancy of 25% of the UN member states is less than 69.4 years. When a variable in the data set is categorical, also called a `factor`, the summary shows all the categories or factor levels and the number of observations for each level. For example, income group, `income`, is a factor with four factor levels: `Low Income`, `Lower middle income`, `Upper middle income`, and `High income`. The summary also provides the number of states for each factor level; observe, for example, that the data set has 56 UN members states that are considered `High Income` states.
 
 Furthermore, we can compute the correlation coefficient between our two numerical variables: `life_exp` and `fert_rate`. Recall from Subsection \@ref(model1EDA) that correlation coefficients only exist between numerical variables. We observe that they are "strongly negatively" correlated.
 
@@ -578,24 +578,19 @@ credit_ch6 |>
   )
 ```
 
-Note that income is in thousands of dollars while debt and credit limit are in dollars. We can also compute summary statistics using the `summary()` function. We only `select()` the columns of interest for our model:
+Note that income is in thousands of dollars while debt and credit limit are in dollars. We can also compute summary statistics using the `tidy_summary()` function. We only `select()` the columns of interest for our model:
 
 ```{r, eval = FALSE}
-credit_ch6 |> select(debt, credit_limit, income) |> summary()
+credit_ch6 |> select(debt, credit_limit, income) |> tidy_summary()
 ```
 
 ```{r, echo = FALSE}
 credit_ch6 |> 
   select(debt, credit_limit, income) |> 
-  summary() |> 
-  kbl() |>
-  kable_styling(
-    font_size = ifelse(is_latex_output(), 10, 16),
-    latex_options = c("hold_position")
-  )
+  tidy_summary()
 ```
 
-The mean and median credit card `debt` are \$520.01 and \$459.50, respectively. The first quartile for `debt` is 68.75; this means that 25% of card holders had debts of \$68.75 or less. Correspondingly, the mean and median credit card limit, `credit_limit`, are \$4,736 and \$4,622, respectively. Note also that the third quartile of `income` is 57.47; this means that 75% of card holders had incomes below \$57,470.
+The mean and median credit card `debt` are \$520.0 and \$459.5, respectively. The first quartile for `debt` is 68.8; this means that 25% of card holders had debts of \$68.75 or less. Correspondingly, the mean and median credit card limit, `credit_limit`, are \$4,736 and \$4,622, respectively. Note also that the third quartile of `income` is 57.5; so 75% of card holders had incomes below \$57,470.
 
 We visualize the relationship of the response variable with each of the two explanatory variables using the R code below. There plots are shown in Figure \@ref(fig:2numxplot1).
 
