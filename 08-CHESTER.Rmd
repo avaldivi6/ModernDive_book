@@ -1,0 +1,202 @@
+#### Residuals
+
+Recall that given a random sample of $n$ pairs $(x_1, y_1), \dots, (x_n,y_n)$ the linear regression was given by:
+
+$$\widehat{y}_i = b_0 + b_1 \cdot x_i$$
+for all the observations $i = 1, dots,n$. Recall that the residual, as defined in Subsection \@ref(model1points), is the *observed response* minus the *fitted value*. If we denote the residuals with the letter $e$ we get:
+$$e_i = y_i - \widehat{y}_i$$ 
+for $i = 1, \dots, n$. Combining these two formulas we get
+$$\begin{aligned}
+y_i &= \underline{\widehat{y}_i} + e_i\\ 
+&= \underline{b_0 + b_1 \cdot x_i} + e_i
+\end{aligned}$$
+
+the resulting formula looks very similar to our linear model:
+
+$$y_i = \beta_0 + \beta_1 \cdot x_i + \epsilon_i$$
+
+In this context, residuals can be thought of as rough estimates of the error terms. Since many of the assumptions of the linear model are related to the error term, we can check these assumptions by studying the residuals.
+
+In Figure \@ref(fig:residual-example), we illustrate one particular residual for the geyser eruption where `duration` time is the explanatory variable and `waiting` time is the response. We use an arrow to connect the observed waiting time (a circle) with the fitted waiting time (a square). The vertical distance between these two points (or equivalently, the magnitude of the arrow) is the value of the residual for this observation.
+
+
+```{r residual-example, echo=FALSE, fig.cap="Example of observed value, fitted value, and residual.", purl=FALSE, message=FALSE}
+# Pick out one particular point to drill down on
+index <- which(old_faithful_2024$duration == 211 & old_faithful_2024$waiting == 178)
+target_point <- model_1 |>
+  get_regression_points() |>
+  slice(index)
+x <- target_point$duration
+y <- target_point$waiting
+y_hat <- target_point$waiting_hat
+resid <- target_point$residual
+
+# Plot residual
+best_fit_plot <- ggplot(old_faithful_2024, aes(x = duration, y = waiting)) +
+  geom_point() +
+  labs(
+    x = "Duration", y = "Waiting",
+    title = "Relationship of Duration and Waiting times"
+  ) +
+  geom_smooth(method = "lm", se = FALSE) +
+  annotate("point", x = x, y = y, col = "red", size = 4) +
+  annotate("point", x = x, y = y_hat, col = "red", shape = 15, size = 4) +
+  annotate("segment",
+    x = x, xend = x, y = y, yend = y_hat, color = "blue",
+    arrow = arrow(type = "closed", length = unit(0.02, "npc"))
+  )
+best_fit_plot
+```
+
+We can obtain all the $n = `r n`$ residuals by applying the `get_regression_points()` function to the regression model `model_1`. Observe how the resulting values of `residual` are roughly equal to `waiting - waiting_hat` (there may be a slight difference due to rounding error).
+
+```{r}
+# Fit regression model:
+simple_model <- lm(waiting ~ duration, data = old_faithful_2024)
+# Get regression points:
+regression_points <- get_regression_points(simple_model)
+regression_points
+```
+
+#### Residual diagnostics
+
+A *residual diagnostics* are used to verify conditions **L**, **N**, and **E**. While there are sophisticated statistical approaches that can be used, we focus on data visualization.
+
+##### Linearity of relationship
+
+We want to check whether the association between the response $y_i$ and the explanatory variable $x_i$ is **L**inear. Recall the scatterplot in Figure \@ref(fig:regline) where we had the explanatory variable $x$ as duration and the outcome variable $y$ as waiting time. Would you say that the relationship between $x$ and $y$ is linear? It's hard to say because of the scatter of the points about the line. In the authors' opinions, we feel this relationship is "linear enough."
+
+Let's present an example where the relationship between $x$ and $y$ is clearly not linear in Figure \@ref(fig:non-linear). In this case, the points clearly do not form a line, but rather a U-shaped polynomial curve. In this case, any results from an inference for regression would not be valid. 
+
+```{r non-linear, echo=FALSE, fig.cap="Example of a clearly non-linear relationship.", fig.height=3.3, message=FALSE, purl=FALSE}
+set.seed(76)
+old_faithful_2024 |>
+  mutate(
+    x = duration,
+    y = 150 + (((x - min(old_faithful_2024$duration)) * (x - max(old_faithful_2024$duration)))) / (max(old_faithful_2024$duration) - min(old_faithful_2024$duration)) + rnorm(n(), 0, 0.75)
+  ) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  labs(x = "Duration", y = "Waiting") +
+  geom_smooth(method = "lm", se = FALSE) #+
+#  expand_limits(y = c(min(old_faithful_2024$waiting), max(old_faithful_2024$waiting)))
+```
+
+##### Independence of residuals
+
+The second condition is that the residuals must be **I**ndependent. This means that the residuals for different observations should not be influenced by each other, and the observations themselves should be independent.
+
+For the `old_faithful_2024` dataset, where we're analyzing the relationship between the `waiting` time and the `duration` of eruptions, we can reasonably assume that the residuals are independent. Each observation in this dataset represents a unique eruption of Old Faithful, with `waiting` times and `duration` recorded separately for each event. Since these eruptions occur independently of one another, the residuals derived from the regression of `waiting` versus `duration` are also expected to be independent.
+
+In this case, the independence condition **is** met. The `old_faithful_2024` data does not involve repeated measurements or grouped observations that could lead to dependency issues. Therefore, we can proceed with our regression analysis with confidence that the residuals are not systematically related to one another, fulfilling the assumption of independence. This is an important aspect, as violating the independence assumption could lead to misleading conclusions in the analysis.
+
+This contrasts with situations where repeated measures or other dependencies might exist, such as data collected from the same individuals or groups multiple times. Here, since each eruption is a distinct entity, we do not have to account for repeated measures or related observations, simplifying our analysis.
+
+We'll move on to check the remaining two conditions in our analysis to ensure that all assumptions are met before drawing any conclusions.
+
+##### Normality of residuals
+
+The third condition is that the residuals should follow a **N**ormal distribution. Furthermore, the center of this distribution should be 0. In other words, sometimes the regression model will make positive errors: $y - \widehat{y} > 0$. Other times, the regression model will make equally negative errors: $y - \widehat{y} < 0$. However, *on average* the errors should equal 0 and their shape should be similar to that of a bell.
+
+The simplest way to check the normality of the residuals is to look at a histogram, which we visualize in Figure \@ref(fig:model1residualshist).
+
+```{r model1residualshist, fig.cap="Histogram of residuals."}
+ggplot(regression_points, aes(x = residual)) +
+  geom_histogram(bins = 12, color = "white") +
+  labs(x = "Residual")
+```
+
+This histogram appears to be pretty close to symmetric with the model tending to not underestimate or overestimate waiting times dramatically. The histogram also looks roughly normal in shape as the bell-shaped pattern is emerging. However, there are some deviations from normality, such as the highest bin value appearing just to the right of center. This doesn't appear to be much of an issue though from the authors' perspective.
+
+Let's present examples where the residuals clearly do and don't follow a normal distribution in Figure \@ref(fig:normal-residuals). In this case of the model yielding the clearly non-normal residuals on the right, any results from an inference for regression would not be valid. 
+
+```{r normal-residuals, echo=FALSE, fig.cap="Example of clearly normal and clearly not normal residuals.", purl=FALSE}
+sigma <- sd(regression_points$residual)
+normal_and_not_examples <- UN_data_ch10 |>
+  mutate(
+    `Clearly normal` = rnorm(n = n(), 0, sd = sigma),
+    `Clearly not normal` = rnorm(n = n(), mean = 0, sd = sigma)^2,
+    `Clearly not normal` = `Clearly not normal` - mean(`Clearly not normal`)
+  ) |>
+  select(life_exp, `Clearly normal`, `Clearly not normal`) |>
+  gather(type, eps, -life_exp) |>
+  ggplot(aes(x = eps)) +
+  geom_histogram(bins=12, color = "white") +
+  labs(x = "Residual") +
+  facet_wrap(~type, scales = "free")
+
+if (is_latex_output()) {
+  normal_and_not_examples +
+    theme(
+      strip.text = element_text(colour = "black"),
+      strip.background = element_rect(fill = "grey93")
+    )
+} else {
+  normal_and_not_examples
+}
+```
+
+
+##### Equality of variance
+
+The fourth and final condition is that the residuals should exhibit **E**qual variance across all values of the explanatory variable $x$. In other words, the value and spread of the residuals should not depend on the value of the explanatory variable $x$.  
+
+Recall the scatterplot in Figure \@ref(fig:regline-ch10): we had the explanatory variable $x$ of `duration` on the x-axis and the outcome variable $y$ of `waiting` on the y-axis. Instead, let's create a scatterplot that has the same values on the x-axis, but now with the residual $y-\widehat{y}$ on the y-axis as seen in Figure \@ref(fig:numxplot6).
+
+```{r numxplot6, fig.cap="Plot of residuals over beauty score."}
+ggplot(regression_points, aes(x = duration, y = residual)) +
+  geom_point() +
+  labs(x = "Duration", y = "Residual") +
+  geom_hline(yintercept = 0, col = "blue", linewidth = 1)
+```
+
+You can think of Figure \@ref(fig:numxplot6) as a modified version of the plot with the regression line in Figure \@ref(fig:regline-ch10), but with the regression line flattened out to $y=0$. Looking at this plot, would you say that the spread of the residuals around the line at $y=0$ is constant across all values of the explanatory variable $x$ of duration? This question is rather qualitative and subjective in nature, thus different people may respond with different answers. For example, some people might say that there is slightly more variation in the residuals for larger values of $x$ than for smaller ones. However, it can be argued that there isn't a *drastic* non-constancy.
+
+In Figure \@ref(fig:equal-variance-residuals) let's present an example where the residuals clearly do not have equal variance across all values of the explanatory variable $x$. 
+
+```{r equal-variance-residuals, echo=FALSE, fig.cap="Example of clearly non-equal variance.", purl=FALSE}
+old_faithful_2024 |>
+  mutate(eps = (rnorm(n(), 0, 0.075 * duration^2)) * 0.4) |>
+  ggplot(aes(x = duration, y = eps)) +
+  geom_point() +
+  labs(x = "Duration", y = "Residual") +
+  geom_hline(yintercept = 0, col = "blue", linewidth = 1)
+```
+
+Observe how the spread of the residuals increases as the value of $x$ increases. This is a situation known as \index{heteroskedasticity} *heteroskedasticity*. Any inference for regression based on a model yielding such a pattern in the residuals would not be valid. 
+
+
+##### What's the conclusion? {#what-is-the-conclusion}
+
+Let's list our four conditions for inference for regression again and indicate whether or not they were satisfied in our analysis:
+
+1. **L**inearity of relationship between variables: Yes
+1. **I**ndependence of residuals: Yes
+1. **N**ormality of residuals: Yes
+1. **E**quality of variance: Yes
+
+So what does this mean for the results of our confidence intervals and hypothesis tests?
+
+First, the **I**ndependence condition. It seems that the data was collected in a way such that it leads to an independence of each row. Thus, the condition is likely to be satisfied.
+
+Second, when conditions **L**, **N**, **E** are not met, it often means there is a shortcoming in our model. In our example, it appears that conditions **L**, **N**, **E** are met. But what if they weren't? For example, it may be the case that using only a single explanatory variable is insufficient, as we did with duration. We may need to incorporate more explanatory variables in a multiple regression model as we did in Chapter \@ref(multiple-regression), or perhaps use a transformation of one or more of your variables, or use an entirely different modeling technique. To learn more about addressing such shortcomings, you'll have to take a class on or read up on more advanced regression modeling methods. 
+
+The conditions for inference in regression problems are a key part of regression analysis that are of vital importance to the processes of constructing confidence intervals and conducting hypothesis tests. However, it is often the case with regression analysis in the real world that not all the conditions are completely met. Furthermore, as you saw, there is a level of subjectivity in the residual analyses to verify the **L**, **N**, and **E** conditions. So what can you do? We as authors advocate for transparency in communicating all results. This lets the stakeholders of any analysis know about a model's shortcomings or whether the model is "good enough." So while this checking of assumptions has lead to some fuzzy "it depends" results, we decided as authors to show you these scenarios to help prepare you for difficult statistical decisions you may need to make down the road while also viewing situations where the assumptions are clearly violated.
+
+<!-- CI: Need to replace -->
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.15in}
+**_Learning check_**
+\vspace{-0.1in}
+```
+
+**`r paste0("(LC", chap, ".", (lc <- lc + 1), ")")`** Continuing with our regression using `age` as the explanatory variable and teaching `score` as the outcome variable.
+
+- Use the `get_regression_points()` function to get the observed values, fitted values, and residuals for all `r n_UN_data_ch10` instructors. 
+- Perform a residual analysis and look for any systematic patterns in the residuals. Ideally, there should be little to no pattern but comment on what you find here.
+
+```{block, type="learncheck", purl=FALSE}
+\vspace{-0.25in}
+\vspace{-0.25in}
+```
